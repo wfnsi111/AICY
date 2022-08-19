@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+{#    <script src="/trading/js/jquery-3.6.0.min.js"></script>#}
+</head>
+<body>
+    <H1> 周期策略参数设置 </H1>
+    <form action="{% url 'trading:matrade'  %}" method="post">
+        {% csrf_token %}
+        <h2>
+            均线  <select name="ma" id="maalarm">
+                    <option value="60MA">60</option>
+                    <option value="90MA">90</option>
+            </select>
+        </h2>
+
+        <h2>
+            品种  <select name="instId" id="instId">
+                    <option value="ETH-USDT-SWAP">ETHUSDT</option>
+                    <option value="BTC-USDT-SWAP">BTCUSDT</option>
+            </select>
+        </h2>
+
+        <h2>K线周期</h2>
+
+            <p>
+                1min: <input type="checkbox" name="bar" value="1m" /><br />
+                3min: <input type="checkbox" name="bar" value="3m" /><br />
+                15min: <input type="checkbox" name="bar" value="15m" /><br />
+                30min: <input type="checkbox" name="bar" value="30m" /><br />
+                1H: <input type="checkbox" name="bar" value="1H" /><br />
+                2H: <input type="checkbox" name="bar" value="2H" /><br />
+                4H: <input type="checkbox" name="bar" value="4H" /><br />
+                6H: <input type="checkbox" name="bar" value="6H" /><br />
+                12H: <input type="checkbox" name="bar" value="12H" /><br />
+            </p>
+        <hr>
+
+            <h2>选择账户
+
+                <select name="accountinfo" id="accountinfo">
+                        {% for info in trader.accountinfo_set.all %}
+                            <option value={{ info.id }}>{{ info.account_text }}</option>
+
+                        {% endfor %}
+                </select>
+            </h2>
+        <br>
+        <br>
+         <hr>
+        <input type="submit" value="确定">
+
+    </form>
+
+</body>
+</html>

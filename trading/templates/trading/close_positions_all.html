@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1> 一键平仓 </h1>
+    <form action="{% url 'trading:close_positions_all'  %}" method="post">
+        {% csrf_token %}
+        <label > 密码 </label>
+        <input type="text" name="code" id="code" >
+        <br>
+        <br>
+        <input type="submit" value="确定">
+    </form>
+</body>
+</html>
