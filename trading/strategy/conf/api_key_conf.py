@@ -35,17 +35,3 @@ api_key4 = {
 }
 
 
-def get_aip_key_():
-    # from conf.api_key_conf import get_aip_key
-    my_aip_key = get_aip_key()
-    api_key = my_aip_key.get('api_key')
-    secret_key = my_aip_key.get('secret_key')
-    passphrase = my_aip_key.get('passphrase')
-    flag = my_aip_key.get('flag')
-    return api_key, secret_key, passphrase, flag
-
-
-def get_aip_key():
-    return api_key1
-    # return api_key2
-    # return api_key3

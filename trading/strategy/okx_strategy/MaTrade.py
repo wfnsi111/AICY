@@ -578,7 +578,7 @@ class MaTrade(BaseTrade):
                 self.log.info('满足3分钟信号')
                 return signal_order_para
 
-            time.sleep(2)
+            time.sleep(1)
 
         # 没出现信号
         self.log.info('未出现开仓信号 ，重新开始新一轮检测')

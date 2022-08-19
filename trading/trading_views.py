@@ -2,7 +2,6 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from .strategy.main import MyTrade
-from .strategy.conf.api_key_conf import get_aip_key_
 from .models import Trader, AccountInfo
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
