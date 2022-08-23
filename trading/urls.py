@@ -1,7 +1,7 @@
 from django.urls import path
-
+from django.contrib import admin
 from . import views
-from . import trading_views
+from . import trading_views, account_views
 
 app_name = 'trading'
 
@@ -18,13 +18,14 @@ urlpatterns = [
     # 例如: /trading/5/vote/
     path('<int:question_id>/vote/', views.vote, name='vote'),
 
-
+    path('admin/', admin.site.urls),
     path('', trading_views.trading_index, name='trading'),
     path('maalarm/', trading_views.maalarm, name='maalarm'),
     path('matrade/', trading_views.matrade, name='matrade'),
     path('login/', trading_views.login, name='login'),
     path('strategy/', trading_views.stop_processing_strategy, name='stop_processing_strategy'),
     path('close/', trading_views.close_positions_all, name='close_positions_all'),
-
+    path('accountinfo/', trading_views.account_info, name='account_info'),
+    path('addaccount/', account_views.addaccount, name='addaccount'),
 
 ]

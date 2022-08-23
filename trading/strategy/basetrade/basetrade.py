@@ -13,6 +13,7 @@ from ..okx import Convert_api as Convert
 from ..okx import Rfq_api as Rfq
 from ..okx import TradingBot_api as TradingBot
 from ..okx import Funding_api as Funding
+from ...models import OrderInfo
 
 import pandas as pd
 import datetime
@@ -37,6 +38,7 @@ class BaseTrade:
         self.instId_detail = {}
         self.has_order = None
         self.order_times = 0
+        self.orderinfo = {}
 
     def timestamp_to_date(self, t):
         # 13位时间戳转日期
@@ -228,3 +230,12 @@ class BaseTrade:
         except:
             self.log.error('get ATR  error!!!!!!!!!!!!!!!!!!!!')
 
+    def set_trading_orderinfo(self, accountinfo, *args, **kwargs):
+        orderinfo = OrderInfo(ordid=kwargs.get('ordId'), instid=kwargs.get('instId'), posside=kwargs.get('posSide'),
+                              side=kwargs.get('side'), avgpx=kwargs.get('avgpx'), tptriggerpx=kwargs.get('tpTriggerPx'),
+                              tpordpx=kwargs.get('tpOrdPx'), sltriggerpx=kwargs.get('slTriggerPx'),
+                              slordpx=kwargs.get('slOrdPx'), sz=kwargs.get('sz'), px=kwargs.get('px'),
+                              lever=kwargs.get('lever'), algo_order_id=kwargs.get('algo_order_id'))
+        orderinfo.accountinfo_id = accountinfo.id
+        orderinfo.save()
+        return orderinfo

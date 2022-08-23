@@ -6,6 +6,8 @@ from .models import Trader, AccountInfo
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from requests.exceptions import ConnectionError
+from .strategy.okx.AccountAndTradeApi import AccountAndTradeApi
+
 """
 status 状态：
     -2：强制退出
@@ -48,6 +50,7 @@ def matrade(request):
     if not bar:
         return HttpResponse('bar error')
     accountinfo_id = request.POST.get('accountinfo')
+    accountinfo_id = 1
     try:
         one_accountinfo = AccountInfo.objects.get(pk=accountinfo_id)
     except:
@@ -90,17 +93,18 @@ def matrade(request):
 
 
 def login(request):
-    if request.method == 'GET':
-        return render(request, 'trading/login.html')
-    username = request.POST.get('username')
-    password = request.POST.get('password')
-    try:
-        user = auth.authenticate(account=username, password=password)
-        trader = Trader.objects.filter(account=username).filter(password=password)[0]
-    except:
-        return HttpResponse('error')
-    # selected_accountinfo = trader.accountinfo_set.all()
+    # if request.method == 'GET':
+    #     return render(request, 'trading/login.html')
+    # username = request.POST.get('username')
+    # password = request.POST.get('password')
+    # try:
+    #     user = auth.authenticate(account=username, password=password)
+    #     trader = Trader.objects.filter(account=username).filter(password=password)[0]
+    # except:
+    #     return HttpResponse('error')
+    # # selected_accountinfo = trader.accountinfo_set.all()
 
+    trader = Trader.objects.filter(pk=1)[0]
     return render(request, 'trading/matrade.html', {'trader': trader})
 
 
@@ -116,15 +120,12 @@ def close_positions_all(request):
     if code != '123456':
         return HttpResponse('Who are you!!!')
 
-    from .strategy.okx import Account_api as Account
-    from .strategy.okx import Trade_api as Trade
     account_all = AccountInfo.objects.filter(status__gte=5)
     for obj in account_all:
         obj.status = 0
         obj.save()
-        a = Account.AccountAPI(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
-        t = Trade.TradeAPI(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
-        result = a.get_positions('SWAP')
+        obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
+        result = obj_api.AccountAPI.get_positions('SWAP')
         order_lst = result.get('data', [])
         for item in order_lst:
             if item:
@@ -139,7 +140,7 @@ def close_positions_all(request):
                 # 检测是否有委托 ，如果有委托， 先撤销委托，在平仓
                 # self.algo = self.cancel_algo_order_(algoid)
                 try:
-                    result = t.close_positions(**para)
+                    result = obj_api.TradeAPI.close_positions(**para)
                     obj.status = 0
                     obj.save()
                 except:
@@ -153,3 +154,24 @@ def trading_index(request):
     return render(request, 'trading/trade.html')
 
 
+def account_info(request):
+    show_lst = []
+    account_all = AccountInfo.objects.all()
+    for obj in account_all:
+        obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
+        result = obj_api.AccountAPI.get_positions('SWAP')
+        order_lst = result.get('data', [])
+        for item in order_lst:
+            if item:
+                para = {
+                    "instId": item.get("instId"),
+                    'mgnMode': item.get('mgnMode'),
+                    "ccy": item.get('ccy'),
+                    "posSide": item.get('posSide'),
+                    'autoCxl': True
+                }
+            obj.lever = item.get('lever')
+            obj.instid = item.get('instId')
+            obj.avgpx = item.get('avgPx')
+            obj.upl = item.get('upl')
+            obj.pos = item.get('pos')

@@ -28,12 +28,14 @@ class MaTrade(BaseTrade):
         self.instId = kwargs.get('instId')
         self.bar2 = kwargs.get('bar2')
         self.big_bar_time = kwargs.get('big_bar_time', 3)
-        self.accountinfo = kwargs.get('accountinfo')
+        self.accountinfo_obj = kwargs.get('accountinfo')
+        self.orderinfo_obj = None
         self.signal_order_para = None
         self.signal1 = False
         self.signal2 = False
         self.signal3 = False
         self.ma_percent, self.bar1, self.max_stop_loss, self.set_profit, self.risk_control = self.set_args(self.bar2)
+        self.lever = "50"
 
     def drow_k(self, df, ma_list=None):
         ma_list = [self.ma]
@@ -113,7 +115,7 @@ class MaTrade(BaseTrade):
 
     def set_my_position(self):
         # 设置头寸
-        atr = self.get_atr_data()
+        atr = self.get_atr_data(self.df, 20)
         self.mybalance = self.get_my_balance()
         currency = self.risk_control * self.mybalance / atr
         sz = self.currency_to_sz(self.instId, currency)
@@ -288,7 +290,14 @@ class MaTrade(BaseTrade):
                     if self.has_order:
                         self.log.error('止损止盈检查错误， 订单ID%s' % order_data.get('ordId'))
                     self.track_trading_status(0)
-                    if float(order_data.get('pnl')) >= 0:
+                    pnl = order_data.get('pnl')
+                    if self.orderinfo_obj is not None:
+                        self.orderinfo_obj.pnl = pnl
+                        self.orderinfo_obj.closeavgpx = order_data.get('avgPx')
+                        self.orderinfo_obj.closeordid = order_data.get('ordId')
+                        self.orderinfo_obj.close_position = 1
+                        self.orderinfo_obj.save()
+                    if float(pnl) >= 0:
                         print('止盈')
                         self.log.info('止盈')
                         self.stop_loss = 0
@@ -338,7 +347,7 @@ class MaTrade(BaseTrade):
         low = float(row['low'])
         # last = row['close']
         if high >= ma and low <= ma:
-            atr = self.get_atr_data()
+            atr = self.get_atr_data(df, 20)
             if self.side == 'buy':
                 if ma - low >= atr:
                     return True
@@ -368,7 +377,8 @@ class MaTrade(BaseTrade):
     def ready_order(self):
         # isolated cross保证金模式.全仓, market：市价单  limit：限价单 post_only：只做maker单
         # sz 委托数量
-        self.set_initialization_account(self.instId, lever='50', mgnMode='cross')
+        self.set_initialization_account(self.instId, lever=self.lever, mgnMode='cross')
+        self.orderinfo['lever'] = self.lever
         self.sz = self.set_my_position()
         self.posSide = self.signal_order_para.get('posSide')
         self.side = self.signal_order_para.get('side')
@@ -383,9 +393,11 @@ class MaTrade(BaseTrade):
             'posSide': self.posSide
         }
 
+        self.orderinfo.update(para)
         result = self.tradeAPI.place_order(**para)
         ordId, sCode, sMsg= self.check_order_result_data(result, 'ordId')
         if sCode == "0":
+            self.orderinfo['ordId'] = ordId
             # 获取持仓信息
             # self.get_order_details(self.instId, ordId)
             self.has_order = self.get_positions()
@@ -393,26 +405,15 @@ class MaTrade(BaseTrade):
             print('开仓成功！！！！！！')
             self.log.info('开仓成功！！！！！！')
             self.track_trading_status(5)
+            # 设置止损止盈
+            self.set_place_algo_order_oco()
+            self.has_order = True
+            # 设置订单信息
+            self.orderinfo_obj = self.set_trading_orderinfo(self.accountinfo_obj, **self.orderinfo)
         else:
             self.track_trading_status(-1)
             self.log.error('place_order error!!!!')
             self.has_order = False
-        if self.has_order:
-            # 设置止损止盈
-            self.set_place_algo_order_oco()
-            self.has_order = True
-
-    def get_atr_data(self):
-        try:
-            # self.mybalance = self.get_my_balance()
-            # 或者atr值， 前20天波动值
-            new_df = self.df.tail(20).copy()
-            tr_lst = []
-            new_df['tr'] = pd.to_numeric(new_df['high']) - pd.to_numeric(new_df['low'])
-            atr = new_df['tr'].mean()
-            return atr
-        except:
-            self.log.error('get ATR  error!!!!!!!!!!!!!!!!!!!!')
 
 
     def get_3_min_data(self):
@@ -447,28 +448,30 @@ class MaTrade(BaseTrade):
                 posSide = data.get('posSide')
                 if self.set_profit:
                     if posSide == 'long':
-                        tp = str(float(avgPx) + int(self.set_profit) * p)
-                        sl = str(float(avgPx) - p)
+                        tp = float(avgPx) + int(self.set_profit) * p
+                        sl = float(avgPx) - p
                     else:
-                        tp = str(float(avgPx) - int(self.set_profit) * p)
-                        sl = str(float(avgPx) + p)
+                        tp = float(avgPx) - int(self.set_profit) * p
+                        sl = float(avgPx) + p
                 else:
                     if posSide == 'long':
-                        tp = str(float(avgPx) * 2)
-                        sl = str(float(avgPx) - p)
+                        tp = float(avgPx) * 2
+                        sl = float(avgPx) - p
                     else:
-                        tp = str(float(avgPx) / 2)
-                        sl = str(float(avgPx) + p)
+                        tp = float(avgPx) / 2
+                        sl = float(avgPx) + p
                 # -1 为市价平仓
                 p2 = "-1"
                 price_para = {
-                    "tpTriggerPx": tp,
+                    "tpTriggerPx": "%0.2f" % tp,
                     "tpOrdPx": p2,
-                    "slTriggerPx": sl,
+                    "slTriggerPx": "%0.2f" % sl,
                     "slOrdPx": p2
                 }
                 # msg = "止损止盈设置成功， 止盈触发价：%s, 止损触发价： %s， 市价平仓" % (tp, sl)
                 # self.log.info(msg)
+                self.orderinfo.update(price_para)
+                self.orderinfo['avgpx'] = avgPx
                 return price_para
         else:
             self.log.error("no order details!!!*******************************")
@@ -510,6 +513,7 @@ class MaTrade(BaseTrade):
         if sCode == "0":
             # 事件执行结果的code，0代表成功
             self.track_trading_status(6)
+            self.orderinfo['algo_order_id'] = algoId
             self.algoID = algoId
         else:
             # 事件执行失败时的msg
@@ -522,7 +526,7 @@ class MaTrade(BaseTrade):
         self.track_trading_status(update_status=False)
         self.trend_analyze()
         signal1 = self.set_signal_1h()
-        signal1 = 'short'
+        # signal1 = 'short'
         return signal1
 
     def check_signal2(self):
@@ -543,7 +547,7 @@ class MaTrade(BaseTrade):
             last_p = row['close']
             # 2 判断价格接近均线 %1 附近，
             signal2 = self.price_to_ma(last_p, ma, self.ma_percent)
-            signal2 = True
+            # signal2 = True
             if signal2:
                 print()
                 print("信号2已确认！")
@@ -615,11 +619,11 @@ class MaTrade(BaseTrade):
         one_accountinfo = AccountInfo.objects.get(pk=1)
         if one_accountinfo.status == -2:
             raise Exception('已强行停止策略')
-        # if self.accountinfo.status == -2:
+        # if self.accountinfo_obj.status == -2:
         #     raise Exception('已强行停止策略')
         if update_status:
-            self.accountinfo.status = status
-            self.accountinfo.save()
+            self.accountinfo_obj.status = status
+            self.accountinfo_obj.save()
 
 
 if __name__ == '__main__':
