@@ -61,7 +61,6 @@ def matrade(request):
     if not bar:
         return HttpResponse('bar error')
     accountinfo_id = request.POST.get('accountinfo')
-    accountinfo_id = 1
     try:
         one_accountinfo = AccountInfo.objects.get(pk=accountinfo_id)
     except:
@@ -133,6 +132,8 @@ def close_positions_one(request):
         return HttpResponse('no account info')
     obj_api = AccountAndTradeApi(accountinfo.api_key, accountinfo.secret_key, accountinfo.passphrase, False,
                                  accountinfo.flag)
+    accountinfo.status = 0
+    accountinfo.save()
     result = obj_api.accountAPI.get_positions('SWAP')
     order_lst = result.get('data', [])
     if order_lst:
