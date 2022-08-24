@@ -58,6 +58,9 @@ class MaTrade(BaseTrade):
         # mpf.plot(df, type='candle', addplot=add_plot, title=title, ylabel='prise(usdt)', style=my_style)
 
     def start_my_trade(self):
+        self.accountinfo_obj.strategy_name = 'MaTrade'
+        self.accountinfo_obj.bar2 = self.bar2
+        self.accountinfo_obj.save()
         time.sleep(2)
         i = 1
         self.track_trading_status(1)
@@ -525,7 +528,7 @@ class MaTrade(BaseTrade):
         self.track_trading_status(update_status=False)
         self.trend_analyze()
         signal1 = self.set_signal_1h()
-        # signal1 = 'short'
+        signal1 = 'short'
         return signal1
 
     def check_signal2(self):
@@ -546,7 +549,7 @@ class MaTrade(BaseTrade):
             last_p = row['close']
             # 2 判断价格接近均线 %1 附近，
             signal2 = self.price_to_ma(last_p, ma, self.ma_percent)
-            # signal2 = True
+            signal2 = True
             if signal2:
                 print()
                 print("信号2已确认！")
@@ -576,7 +579,7 @@ class MaTrade(BaseTrade):
                 signal_order_para = self.get_short_signal_3min_confirm()
             else:
                 signal_order_para = False
-            # signal_order_para = {"side": "buy", "posSide": "long"}
+            signal_order_para = {"side": "buy", "posSide": "long"}
             if signal_order_para:
                 self.log.info('满足3分钟信号')
                 return signal_order_para

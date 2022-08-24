@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from .strategy.main import MyTrade
@@ -21,6 +21,17 @@ status 状态：
     6： 止损止盈设置成功
     
 """
+trading_status = {
+    -2: "强制退出",
+    -1: '出现错误',
+    0: '空闲中',
+    1:  '等待信号1',
+    2:  '等待信号2',
+    3:  '等待信号3',
+    4:  '准备开仓',
+    5:  '开仓成功',
+    6:  '止损止盈设置成功',
+}
 
 
 def ajax_test(request):
@@ -112,6 +123,23 @@ def stop_processing_strategy(request):
     pass
 
 
+def close_positions_one(request):
+    accountinfo_id = request.GET.get('accountinfo_id', None)
+    if accountinfo_id is None:
+        return HttpResponse('error')
+    try:
+        accountinfo = AccountInfo.objects.get(pk=accountinfo_id)
+    except:
+        return HttpResponse('no account info')
+    obj_api = AccountAndTradeApi(accountinfo.api_key, accountinfo.secret_key, accountinfo.passphrase, False,
+                                 accountinfo.flag)
+    result = obj_api.accountAPI.get_positions('SWAP')
+    order_lst = result.get('data', [])
+    if order_lst:
+        obj_api.close_positions_all(order_lst)
+    return redirect(reverse('trading:account_info'))
+
+
 def close_positions_all(request):
     if request.method == 'GET':
         return render(request, 'trading/close_positions_all.html')
@@ -125,7 +153,7 @@ def close_positions_all(request):
         obj.status = 0
         obj.save()
         obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
-        result = obj_api.AccountAPI.get_positions('SWAP')
+        result = obj_api.accountAPI.get_positions('SWAP')
         order_lst = result.get('data', [])
         for item in order_lst:
             if item:
@@ -140,7 +168,7 @@ def close_positions_all(request):
                 # 检测是否有委托 ，如果有委托， 先撤销委托，在平仓
                 # self.algo = self.cancel_algo_order_(algoid)
                 try:
-                    result = obj_api.TradeAPI.close_positions(**para)
+                    result = obj_api.tradeAPI.close_positions(**para)
                     obj.status = 0
                     obj.save()
                 except:
@@ -155,23 +183,30 @@ def trading_index(request):
 
 
 def account_info(request):
-    show_lst = []
-    account_all = AccountInfo.objects.all()
-    for obj in account_all:
-        obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
-        result = obj_api.AccountAPI.get_positions('SWAP')
-        order_lst = result.get('data', [])
-        for item in order_lst:
-            if item:
-                para = {
-                    "instId": item.get("instId"),
-                    'mgnMode': item.get('mgnMode'),
-                    "ccy": item.get('ccy'),
-                    "posSide": item.get('posSide'),
-                    'autoCxl': True
-                }
-            obj.lever = item.get('lever')
-            obj.instid = item.get('instId')
-            obj.avgpx = item.get('avgPx')
-            obj.upl = item.get('upl')
-            obj.pos = item.get('pos')
+    if request.method == 'GET':
+        show_lst = []
+        account_all = AccountInfo.objects.all()
+        for obj in account_all:
+            show_data = {}
+            try:
+                obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
+                result = obj_api.accountAPI.get_positions('SWAP')
+                order_lst = result.get('data', [])
+            except Exception as e:
+                order_lst = []
+            show_data['account_text'] = obj.account_text
+            show_data['id'] = obj.id
+            show_data['status'] = trading_status.get(obj.status, '出现错误')
+            show_data['strategy_name'] = obj.strategy_name
+            show_data['bar2'] = obj.bar2
+            if order_lst:
+                for item in order_lst:
+                    show_data.update(item)
+                    show_data['upl'] = "%.2f" % float(item['upl'])
+
+            else:
+                pass
+
+            show_lst.append(show_data)
+
+        return render(request, 'trading/accountinfo.html', {"accountinfo": show_lst})

@@ -24,7 +24,8 @@ urlpatterns = [
     path('matrade/', trading_views.matrade, name='matrade'),
     path('login/', trading_views.login, name='login'),
     path('strategy/', trading_views.stop_processing_strategy, name='stop_processing_strategy'),
-    path('close/', trading_views.close_positions_all, name='close_positions_all'),
+    path('close_positions_all/', trading_views.close_positions_all, name='close_positions_all'),
+    path('close_positions_one/', trading_views.close_positions_one, name='close_positions_one'),
     path('accountinfo/', trading_views.account_info, name='account_info'),
     path('addaccount/', account_views.addaccount, name='addaccount'),
 
