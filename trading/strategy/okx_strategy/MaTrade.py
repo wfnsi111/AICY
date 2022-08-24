@@ -4,7 +4,7 @@
 
 信号1 趋势中
 信号2 大周期接近均线
-信号3 小周期引线和成交量达到要求
+信号3 小周期影线和成交量达到要求
 
 """
 
@@ -27,7 +27,7 @@ class MaTrade(BaseTrade):
         self.ma = kwargs.get('ma')
         self.instId = kwargs.get('instId')
         self.bar2 = kwargs.get('bar2')
-        self.big_bar_time = kwargs.get('big_bar_time', 3)
+        self.big_bar_time = 10
         self.accountinfo_obj = kwargs.get('accountinfo')
         self.orderinfo_obj = None
         self.signal_order_para = None
@@ -120,10 +120,9 @@ class MaTrade(BaseTrade):
         currency = self.risk_control * self.mybalance / atr
         sz = self.currency_to_sz(self.instId, currency)
         if sz < 1:
-            print('仓位太小， 无法开仓 ---> *** %s张 ***' % sz)
-            self.log.error('仓位太小， 无法开仓')
-            self.track_trading_status(-1)
-            raise Exception('仓位太小， 无法开仓')
+            print('仓位太小， 无法开仓 ---> *** 余额%sU ***' % self.mybalance)
+            self.log.error('仓位太小， 无法开仓 ---> *** 余额%sU ***' % self.mybalance)
+            raise
         return int(sz)
 
     def trend_analyze(self, c_length=10):
