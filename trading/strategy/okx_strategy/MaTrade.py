@@ -66,7 +66,7 @@ class MaTrade(BaseTrade):
         self.track_trading_status(1)
         self.has_order = self.get_positions()
         while True:
-            time.sleep(1)
+            time.sleep(10)
             # time.sleep(60)
             # 检测持仓
             # self.has_order = self.get_positions()
@@ -95,6 +95,7 @@ class MaTrade(BaseTrade):
                     continue
 
             # 判断信号1
+            self.track_trading_status(1)
             print("\r" + "等待%s信号" % self.bar2 + '.' * i + ' ' * (7 - i), flush=True, end='')
             i += 1
             if i == 7:
@@ -540,7 +541,7 @@ class MaTrade(BaseTrade):
             print("\r" + "正在判断信号2" + '.' * i + ' ' * (7 - i), flush=True, end='')
             if i == 6:
                 i = 0
-            time.sleep(2)
+            time.sleep(5)
             # 获取现在的价格
             self.df = self._get_candle_data(self.instId, self.bar2, [self.ma])
             # 2 判断价格接近均线 %1 附近，
