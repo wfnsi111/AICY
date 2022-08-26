@@ -1,9 +1,14 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script type="text/javascript" src="{% static 'trading/js/jquery-3.6.0.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'trading/js/accountinfo.js' %}"></script>
     <meta charset="UTF-8">
     <title>账户信息</title>
-    <script type="text/javascript">
+
+<script type="text/javascript">
 function altRows(id){
     if(document.getElementsByTagName){
 
@@ -25,8 +30,30 @@ window.οnlοad=function(){
 }
 
 
-function close_positon(id){
-    alert("平仓成功");
+function close_positon(accountinfo_id){
+    alert('平仓成功');
+}
+
+
+function stop_processing_strategy(accountinfo_id){
+    console.log(accountinfo_id)
+    $.ajax({
+            url: '{% url "trading:stop_processing_strategy" %}',
+            type: 'POST',
+            async: true,
+            datatype: 'json',
+            data: {
+                'accountinfo_id': accountinfo_id
+            },
+            success: function(arg){
+                var obj = jQuery.parseJSON(arg);
+                alert('该账户已停止策略运行');
+                $('#'+accountinfo_id).html(obj.trading_status);
+            },
+            error: function () {
+                 alert('请求失败 ')
+            }
+      });
 }
 
 
@@ -72,6 +99,10 @@ a{text-decoration: none;}
 a:visited{text-decoration: none;}
 a:hover {text-decoration: none;}
 a:active{text-decoration:none;}
+
+button{
+    color: aqua;
+}
 </style>
 
 
@@ -80,6 +111,7 @@ a:active{text-decoration:none;}
 <table class="altrowstable" id="alternatecolor">
     <tr>
         <th>账户</th>
+        <th>账户余额</th>
         <th>品种</th>
         <th>持仓量（张）</th>
         <th>开仓均价</th>
@@ -88,12 +120,14 @@ a:active{text-decoration:none;}
         <th>策略</th>
         <th>周期</th>
         <th>状态</th>
-        <th>操作</th>
+        <th>平仓操作</th>
+        <th>策略操作</th>
     </tr>
 
     {% for one_accountinfo in accountinfo  %}
         <tr>
             <td>{{ one_accountinfo.account_text }}</td>
+            <td>{{ one_accountinfo.balance }}</td>
             <td>{{ one_accountinfo.instId }}</td>
             <td>{{ one_accountinfo.pos }}</td>
             <td>{{ one_accountinfo.avgPx }}</td>
@@ -101,8 +135,11 @@ a:active{text-decoration:none;}
             <td>{{ one_accountinfo.upl }}</td>
             <td>{{ one_accountinfo.strategy_name }}</td>
             <td>{{ one_accountinfo.bar2 }}</td>
-            <td>{{ one_accountinfo.status }}</td>
+            <td  id='{{ one_accountinfo.id  }}'>{{ one_accountinfo.status }}</td>
             <td><a href="{% url 'trading:close_positions_one' %}?accountinfo_id={{ one_accountinfo.id  }}">一键平仓</a></td>
+            <td>
+                <input type="button" value="停止策略" onclick="stop_processing_strategy({{ one_accountinfo.id }});" />
+            </td>
 
         </tr>
     {% endfor %}

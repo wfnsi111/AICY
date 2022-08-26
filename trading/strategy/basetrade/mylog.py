@@ -5,11 +5,8 @@ import time
 import os
 
 
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-file_path = os.path.join(base_dir, "log", 'log.log')
 name = 'root',
 logger_level = 'DEBUG',
-file = file_path,
 logger_format = " [%(asctime)s]  %(levelname)s %(filename)s [ line:%(lineno)d ] %(message)s"
 
 
@@ -18,7 +15,7 @@ class LoggerHandler(logging.Logger):
     def __init__(self,
                  name='root',
                  logger_level='DEBUG',
-                 file=file_path,
+                 file=None,
                  logger_format=" [%(asctime)s]  %(levelname)s %(filename)s [ line:%(lineno)d ] %(message)s"
                  ):
 
@@ -36,7 +33,9 @@ class LoggerHandler(logging.Logger):
 
         # 如果传递了文件，就会输出到file文件中
         if file:
-            file_handler = logging.FileHandler(file, encoding='utf-8')
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            file_path = os.path.join(base_dir, "log", '%s.log' % file)
+            file_handler = logging.FileHandler(file_path, encoding='utf-8')
             # 4、设置 file_handler 级别
             file_handler.setLevel(logger_level)
             # 6、设置handler格式
@@ -54,12 +53,10 @@ class LoggerHandler(logging.Logger):
             self.addHandler(stream_handler)
 
 
-log = LoggerHandler()
-
 if __name__ == '__main__':
     curTime = time.strftime("%Y-%m-%d %H_%M", time.localtime())
     base_dir = os.path.split(os.path.abspath(__file__))[0]
     # 日志文件
-    file_path = os.path.join(base_dir , '{}_test.log'.format(curTime))
+    file_path = os.path.join(base_dir, '{}_test.log'.format(curTime))
     logger = LoggerHandler(file=file_path)
     logger.info('hello world!')

@@ -26,7 +26,7 @@ class BaseTrade:
         self.marketAPI = Market.MarketAPI(api_key, secret_key, passphrase, use_server_time, flag)
         self.accountAPI = Account.AccountAPI(api_key, secret_key, passphrase, use_server_time, flag)
         self.tradeAPI = Trade.TradeAPI(api_key, secret_key, passphrase, use_server_time, flag)
-        self.log = LoggerHandler()
+        self.log = LoggerHandler(file='testlog')
         self.side = 'buy'
         self.trade_ok = False
         self.posSide = ''

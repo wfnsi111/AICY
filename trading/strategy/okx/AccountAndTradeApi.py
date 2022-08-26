@@ -30,3 +30,16 @@ class AccountAndTradeApi:
             return 'ok'
         else:
             return 'error'
+
+    def get_my_balance(self, balance_type=None):
+        result = self.accountAPI.get_account('USDT')
+        try:
+            data = result.get('data')[0].get('details')[0]
+            if balance_type is None:
+                mybalance = data.get('availEq', -1)
+            else:
+                mybalance = data.get(balance_type, -1)
+        except Exception as e:
+            mybalance = -1
+            print('get my balance error')
+        return "%.2f" % float(mybalance)

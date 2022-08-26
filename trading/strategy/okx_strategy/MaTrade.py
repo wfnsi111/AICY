@@ -61,12 +61,10 @@ class MaTrade(BaseTrade):
         self.accountinfo_obj.strategy_name = 'MaTrade'
         self.accountinfo_obj.bar2 = self.bar2
         self.accountinfo_obj.save()
-        time.sleep(2)
-        i = 1
         self.track_trading_status(1)
         self.has_order = self.get_positions()
         while True:
-            time.sleep(10)
+            time.sleep(60)
             # time.sleep(60)
             # 检测持仓
             # self.has_order = self.get_positions()
@@ -96,10 +94,10 @@ class MaTrade(BaseTrade):
 
             # 判断信号1
             self.track_trading_status(1)
-            print("\r" + "等待%s信号" % self.bar2 + '.' * i + ' ' * (7 - i), flush=True, end='')
-            i += 1
-            if i == 7:
-                i = 1
+            # print("\r" + "等待%s信号" % self.bar2 + '.' * i + ' ' * (7 - i), flush=True, end='')
+            # i += 1
+            # if i == 7:
+            #     i = 1
             self.signal1 = self.check_signal1()
             if not self.signal1:
                 # print('等待信号1....................')
@@ -276,14 +274,11 @@ class MaTrade(BaseTrade):
 
     def stop_order(self, profit):
         self.log.info('等待止盈信号')
+        print('等待止盈信号')
         i = 0
         if profit:
             while True:
                 time.sleep(30)
-                i += 1
-                print("\r" + "等待止盈信号" + '.' * i + ' ' * (7 - i), flush=True, end='')
-                if i == 6:
-                    i = 0
                 result = self.tradeAPI.get_orders_history('SWAP', limit='1')
                 order_data = result.get('data')[0]
                 para = {"long": "sell", "short": "buy"}
@@ -321,7 +316,6 @@ class MaTrade(BaseTrade):
             while True:
                 time.sleep(1)
                 # self.log.info('等待止盈信号')
-                print('等待止盈信号')
                 self.df = self._get_candle_data(self.instId, self.bar2)
                 self.df[self.ma] = self.df['close'].rolling(ma).mean()
                 check_flag = self.check_price_to_ma(self.df)
@@ -534,13 +528,10 @@ class MaTrade(BaseTrade):
 
     def check_signal2(self):
         self.log.info('正在判断信号2....................')
-        i = 0
+        print('正在判断信号2....................')
+
         while True:
             self.track_trading_status(update_status=False)
-            i += 1
-            print("\r" + "正在判断信号2" + '.' * i + ' ' * (7 - i), flush=True, end='')
-            if i == 6:
-                i = 0
             time.sleep(5)
             # 获取现在的价格
             self.df = self._get_candle_data(self.instId, self.bar2, [self.ma])
@@ -564,14 +555,9 @@ class MaTrade(BaseTrade):
         """
         t_num = self.get_time_inv(self.bar2, self.big_bar_time)
         self.log.info("开始循环检测信号3")
-        i = 0
+        print("开始循环检测信号3")
         for t in range(t_num):
             self.track_trading_status(update_status=False)
-            i += 1
-            print("\r"+"检测信号3, 持续时间%s秒" % t + '.' * i + ' ' * (7 - i), flush=True, end='')
-            if i == 6:
-                i = 0
-            # print("检测信号3, 持续时间%s秒" % t)
             if signal1 == 'long':
                 # 开多信号
                 signal_order_para = self.get_long_signal_3min_confirm()
@@ -583,9 +569,9 @@ class MaTrade(BaseTrade):
             # signal_order_para = {"side": "buy", "posSide": "long"}
             if signal_order_para:
                 self.log.info('满足3分钟信号')
+                print('满足3分钟信号')
                 return signal_order_para
-
-            time.sleep(1)
+            time.sleep(5)
 
         # 没出现信号
         self.log.info('未出现开仓信号 ，重新开始新一轮检测')

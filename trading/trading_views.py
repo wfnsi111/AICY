@@ -1,3 +1,6 @@
+import json
+import time
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
@@ -32,16 +35,6 @@ trading_status = {
     5:  '开仓成功',
     6:  '止损止盈设置成功',
 }
-
-
-def ajax_test(request):
-    if request.method == "POST":
-        data = request.POST
-        name = data.get('name')
-        if name:
-            return HttpResponse('NO Data')
-    return render(request, 'trading/ajax_test.html')
-
 
 def maalarm(request):
     if request.method == 'GET':
@@ -119,7 +112,18 @@ def login(request):
 
 
 def stop_processing_strategy(request):
-    pass
+    if request.method == 'POST':
+        accountinfo_id = request.POST.get("accountinfo_id")
+        data = {}
+        try:
+            accountinfo = AccountInfo.objects.get(pk=accountinfo_id)
+        except:
+            data['trading_status'] = trading_status.get(-1)
+            return HttpResponse(json.dumps(data))
+        accountinfo.status = -2
+        accountinfo.save()
+        data['trading_status'] = trading_status.get(-2)
+        return HttpResponse(json.dumps(data))
 
 
 def close_positions_one(request):
@@ -192,6 +196,8 @@ def account_info(request):
             try:
                 obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
                 result = obj_api.accountAPI.get_positions('SWAP')
+                balance = obj_api.get_my_balance('eq')
+                show_data['balance'] = balance
                 order_lst = result.get('data', [])
             except Exception as e:
                 order_lst = []
@@ -211,3 +217,10 @@ def account_info(request):
             show_lst.append(show_data)
 
         return render(request, 'trading/accountinfo.html', {"accountinfo": show_lst})
+
+
+def test(request):
+    if request.method == 'POST':
+        time.sleep(5)
+        return HttpResponse('post')
+    return render(request, 'trading/test.html')
