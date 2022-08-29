@@ -21,6 +21,5 @@ from django.views.static import serve
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('trading/', include('trading.urls')),
-    path('', include('trading.urls')),
 
 ]

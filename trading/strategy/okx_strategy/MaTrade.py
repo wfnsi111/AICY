@@ -197,7 +197,7 @@ class MaTrade(BaseTrade):
         down_wick = min(bar1_close, _open) - _low
         vol_ma = float(row2['vol_ma'])
         # 引线, 成交量，价格
-        if down_wick > entity:
+        if down_wick > 0.666 * entity:
             if _volume > 2 * float(front_volume):
                 if _volume >= 2 * vol_ma:
                     code = self.check_price_to_ma_pec(bar1_close)
@@ -222,10 +222,10 @@ class MaTrade(BaseTrade):
         _open = float(row2['open'])
         _high = float(row2['high'])
         entity = abs(bar1_close - _open)
-        down_wick = _high - max(bar1_close, _open)
+        up_wick = _high - max(bar1_close, _open)
         vol_ma = float(row2['vol_ma'])
         # 引线, 成交量，价格
-        if down_wick >= entity:
+        if up_wick >= 0.666 * entity:
             if _volume >= 2 * float(front_volume):
                 if _volume >= 2 * vol_ma:
                     code = self.check_price_to_ma_pec(bar1_close)
