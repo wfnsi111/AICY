@@ -1,5 +1,8 @@
-from django.urls import path
+from django.conf import settings
+from django.urls import path, re_path
 from django.contrib import admin
+from django.views.static import serve
+
 from . import views
 from . import trading_views, account_views
 
@@ -19,6 +22,10 @@ urlpatterns = [
     path('<int:question_id>/vote/', views.vote, name='vote'),
 
     path('admin/', admin.site.urls),
+    re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}, ),
+    re_path(r'^trading/static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT},
+            name='data-front/static'),
+
     path('', trading_views.trading_index, name='trading'),
     path('maalarm/', trading_views.maalarm, name='maalarm'),
     path('matrade/', trading_views.matrade, name='matrade'),
