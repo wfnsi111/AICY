@@ -197,8 +197,12 @@ def account_info(request):
                 obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
                 result = obj_api.accountAPI.get_positions('SWAP')
                 balance = obj_api.get_my_balance('eq')
+                order_algos_info = obj_api.get_order_tp_and_sl_info()
                 show_data['balance'] = balance
                 order_lst = result.get('data', [])
+                if order_algos_info:
+                    show_data['tpTriggerPx'] = order_algos_info.get('tpTriggerPx')
+                    show_data['slTriggerPx'] = order_algos_info.get('slTriggerPx')
             except Exception as e:
                 order_lst = []
             show_data['account_text'] = obj.account_text

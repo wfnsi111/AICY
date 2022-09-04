@@ -85,7 +85,7 @@ table.altrowstable th {
     border-color: #a9c6c9;
 }
 table.altrowstable td {
-    width: 120px;
+    width: 110px;
     border-width: 1px;
     padding: 8px;
     border-style: solid;
@@ -119,6 +119,8 @@ button{
         <th>品种</th>
         <th>持仓量（张）</th>
         <th>开仓均价</th>
+        <th>止盈</th>
+        <th>止损</th>
         <th>方向</th>
         <th>收益(USDT)</th>
         <th>策略</th>
@@ -135,6 +137,8 @@ button{
             <td>{{ one_accountinfo.instId }}</td>
             <td>{{ one_accountinfo.pos }}</td>
             <td>{{ one_accountinfo.avgPx }}</td>
+            <td>{{ one_accountinfo.tpTriggerPx }}</td>
+            <td>{{ one_accountinfo.slTriggerPx }}</td>
             <td>{{ one_accountinfo.posSide }}</td>
             <td>{{ one_accountinfo.upl }}</td>
             <td>{{ one_accountinfo.strategy_name }}</td>
