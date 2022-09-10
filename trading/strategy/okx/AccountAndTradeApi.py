@@ -43,3 +43,13 @@ class AccountAndTradeApi:
             mybalance = -1
             print('get my balance error')
         return "%.2f" % float(mybalance)
+
+    def get_order_tp_and_sl_info(self):
+        result = self.tradeAPI.order_algos_list('oco', instType='SWAP')
+        data = result.get('data')
+        for item in data:
+            if not item:
+                print('没有获取到委托单信息...')
+                return False
+            return item
+        return False
