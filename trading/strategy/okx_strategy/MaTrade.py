@@ -10,7 +10,10 @@
 
 from ...models import AccountInfo
 import pandas as pd
-import mplfinance as mpf
+try:
+    import mplfinance as mpf
+except:
+    print(' import mplfinance error')
 import time
 from ..basetrade.basetrade import BaseTrade
 from ..conf.ma_trade_args import args_dict
@@ -606,8 +609,9 @@ class MaTrade(BaseTrade):
         return ma_percent, bar1, max_stop_loss, set_profit, risk_control
 
     def track_trading_status(self, status=0, update_status=True):
-        one_accountinfo = AccountInfo.objects.get(pk=1)
+        one_accountinfo = AccountInfo.objects.get(pk=self.accountinfo_obj.id)
         if one_accountinfo.status == -2:
+            self.log.info('已强行停止策略')
             raise Exception('已强行停止策略')
         # if self.accountinfo_obj.status == -2:
         #     raise Exception('已强行停止策略')
