@@ -162,3 +162,13 @@ STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+APP_ENV = os.getenv("ENV")
+
+if APP_ENV == 'pro':
+    from .env_settings.pro_settings import *
+else:
+    from .env_settings.dev_settings import *
+
+

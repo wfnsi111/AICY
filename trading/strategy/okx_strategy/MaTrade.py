@@ -567,6 +567,7 @@ class MaTrade(BaseTrade):
             else:
                 signal_order_para = False
             # signal_order_para = {"side": "buy", "posSide": "long"}
+            # signal_order_para = {"side": "sell", "posSide": "short"}
             if signal_order_para:
                 self.log.info('满足3分钟信号')
                 print('满足3分钟信号')
