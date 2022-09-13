@@ -19,3 +19,7 @@ def addaccount(request):
     one_accountinfo.save()
 
     return render(request, 'trading/accountshow.html', {"accountinfo": one_accountinfo})
+
+
+def del_account(request):
+    pass

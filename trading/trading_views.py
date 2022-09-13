@@ -196,7 +196,7 @@ def account_info(request):
             try:
                 obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
                 result = obj_api.accountAPI.get_positions('SWAP')
-                balance = obj_api.get_my_balance('eq')
+                balance = obj_api.get_my_balance('availEq')
                 order_algos_info = obj_api.get_order_tp_and_sl_info()
                 show_data['balance'] = balance
                 order_lst = result.get('data', [])

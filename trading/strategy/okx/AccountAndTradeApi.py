@@ -36,7 +36,7 @@ class AccountAndTradeApi:
         try:
             data = result.get('data')[0].get('details')[0]
             if balance_type is None:
-                mybalance = data.get('availEq', -1)
+                mybalance = data.get('eq', -1)
             else:
                 mybalance = data.get(balance_type, -1)
         except Exception as e:
