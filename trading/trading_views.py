@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from .strategy.main import MyTrade
-from .models import Trader, AccountInfo
+from .models import Trader, AccountInfo, OrderInfo
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from requests.exceptions import ConnectionError
@@ -190,7 +190,7 @@ def trading_index(request):
 def account_info(request):
     if request.method == 'GET':
         show_lst = []
-        account_all = AccountInfo.objects.all()
+        account_all = AccountInfo.objects.filter(is_active=1)
         for obj in account_all:
             show_data = {}
             try:
@@ -228,3 +228,20 @@ def test(request):
         time.sleep(5)
         return HttpResponse('post')
     return render(request, 'trading/test.html')
+
+
+def orderinfo_show(request):
+    if request.method == 'GET':
+        accountinfo_id = request.GET.get('accountinfo_id', None)
+        if accountinfo_id is None:
+            all_accountinfo = AccountInfo.objects.filter(is_active=1)
+            return render(request, 'trading/orderinfo.html', {'all_accountinfo': all_accountinfo})
+    else:
+        accountinfo_id = request.POST.get('accountinfo_id', '')
+    try:
+        orderinfos = OrderInfo.objects.filter(accountinfo_id=int(accountinfo_id))
+    except:
+        return HttpResponse("ERROR")
+    for item in orderinfos:
+        print(item.accountinfo)
+    return render(request, 'trading/orderinfo1.html', {'orderinfos': orderinfos})

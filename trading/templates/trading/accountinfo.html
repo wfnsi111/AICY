@@ -60,14 +60,7 @@ function stop_processing_strategy(accountinfo_id){
       });
 }
 
-
-
 </script>
-
-
-</head>
-<body>
-
 
 <style type="text/css">
 table.altrowstable {
@@ -108,8 +101,9 @@ button{
     color: aqua;
 }
 </style>
+</head>
 
-
+<body>
 <h1>账户持仓情况</h1>
 <!-- Table goes in the document BODY -->
 <table class="altrowstable" id="alternatecolor">
@@ -128,6 +122,7 @@ button{
         <th>状态</th>
         <th>平仓操作</th>
         <th>策略操作</th>
+        <th>历史数据</th>
     </tr>
 
     {% for one_accountinfo in accountinfo  %}
@@ -144,14 +139,14 @@ button{
             <td>{{ one_accountinfo.strategy_name }}</td>
             <td>{{ one_accountinfo.bar2 }}</td>
             <td  id='{{ one_accountinfo.id  }}'>{{ one_accountinfo.status }}</td>
-            <td><a href="{% url 'trading:close_positions_one' %}?accountinfo_id={{ one_accountinfo.id  }}">一键平仓</a></td>
+            <td><a href="{% url 'trading:close_positions_one' %}?accountinfo_id={{ one_accountinfo.id }}">一键平仓</a></td>
             <td>
                 <input type="button" value="停止策略" onclick="stop_processing_strategy({{ one_accountinfo.id }});" />
             </td>
-
+            <td><a href="{% url 'trading:orderinfo' %}?accountinfo_id={{ one_accountinfo.id }}">查看历史数据</a></td>
         </tr>
     {% endfor %}
 
-
+    </table>
 </body>
 </html>

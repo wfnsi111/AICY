@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>订单信息</title>
+</head>
+<body>
+    <form  action="{% url 'trading:orderinfo' %}" method="post" class="smart-green">
+    {% csrf_token %}
+{#                <h2>选择账户</h2>#}
+                <label>选择账户</label>
+                <select name="accountinfo_id" id="accountinfo_id">
+                        {% for info in all_accountinfo %}
+                            <option value={{ info.id }}>{{ info.account_text }}</option>
+
+                        {% endfor %}
+                </select>
+        <input type="submit" value="确定">
+    </form>
+</body>
+</html>

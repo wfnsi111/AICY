@@ -294,7 +294,7 @@ class MaTrade(BaseTrade):
                     pnl = order_data.get('pnl')
                     if self.orderinfo_obj is not None:
                         self.orderinfo_obj.pnl = pnl
-                        self.orderinfo_obj.closeavgpx = order_data.get('avgPx')
+                        self.orderinfo_obj.closeavgpx = "%.2f" % float(order_data.get('avgPx'))
                         self.orderinfo_obj.closeordid = order_data.get('ordId')
                         self.orderinfo_obj.close_position = 1
                         self.orderinfo_obj.save()
