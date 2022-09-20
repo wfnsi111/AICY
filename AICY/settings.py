@@ -108,11 +108,11 @@ WSGI_APPLICATION = 'AICY.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'cy_test',
-        'USER': 'cy_test',
-        'PASSWORD': 'Cy123456',
-        'HOST': 'rm-j6cnmk10t8b7te19j3o.mysql.rds.aliyuncs.com',
-        'PORT': 3306
+        'NAME': 'lgh_test',
+        'USER': 'lgh_test',
+        'PASSWORD': 'Lgh_123123',
+        'HOST': 'rm-j6cdzg803b73a55j5mo.mysql.rds.aliyuncs.com',
+        'PORT': 3306,
     }
 }
 
