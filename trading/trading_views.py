@@ -95,7 +95,7 @@ def matrade(request):
     return HttpResponse('OK')
 
 
-def login(request):
+def trade(request):
     # if request.method == 'GET':
     #     return render(request, 'trading/login.html')
     # username = request.POST.get('username')
@@ -107,8 +107,9 @@ def login(request):
     #     return HttpResponse('error')
     # # selected_accountinfo = trader.accountinfo_set.all()
 
-    trader = Trader.objects.filter(pk=1)[0]
-    return render(request, 'trading/matrade.html', {'trader': trader})
+    # trader = Trader.objects.filter(pk=1)[0]
+    accountinfos = AccountInfo.objects.filter(is_active=1)
+    return render(request, 'trading/matrade.html', {'accountinfos': accountinfos})
 
 
 def stop_processing_strategy(request):

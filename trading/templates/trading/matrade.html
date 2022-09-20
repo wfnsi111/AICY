@@ -41,8 +41,8 @@
             <h2>选择账户
 
                 <select name="accountinfo" id="accountinfo">
-                        {% for info in trader.accountinfo_set.all %}
-                            <option value={{ info.id }}>{{ info.account_text }}</option>
+                        {% for accountinfo in accountinfos %}
+                            <option value={{ accountinfo.id }}>{{ accountinfo.account_text }}</option>
 
                         {% endfor %}
                 </select>

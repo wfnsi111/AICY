@@ -76,7 +76,7 @@ class AccountInfo(models.Model):
     msg = models.TextField(null=True, blank=True, editable=False)
     strategy_name = models.CharField(max_length=20, null=True, editable=False)
     bar2 = models.CharField(max_length=10, null=True, editable=False)
-    is_active = models.IntegerField(default=0, editable=False)
+    is_active = models.IntegerField(default=1, editable=False)
 
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
