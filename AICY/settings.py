@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-nxydsc2q%=jkvyr+cxp*6dfsfamudw9$$$1rh!p@4+=)4aik3e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = ['*', ]
-
+DEBUG = False
+# DEBUG = True
+ALLOWED_HOSTS = ['16.163.29.73', 'localhost', '0.0.0.0:8000', '127.0.0.1', '172.31.22.98']
 
 # Application definition
 
@@ -164,11 +164,11 @@ STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-APP_ENV = os.getenv("ENV")
-
-if APP_ENV == 'pro':
-    from .env_settings.pro_settings import *
-else:
-    from .env_settings.dev_settings import *
-
-
+# APP_ENV = os.getenv("ENV")
+#
+# if APP_ENV == 'pro':
+#     from .env_settings.pro_settings import *
+# else:
+#     from .env_settings.dev_settings import *
+#
+#

@@ -36,6 +36,7 @@ trading_status = {
     6:  '止损止盈设置成功',
 }
 
+
 def maalarm(request):
     if request.method == 'GET':
         return render(request, 'trading/matrade.html')
