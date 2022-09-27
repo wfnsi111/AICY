@@ -5,9 +5,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from .strategy.main import MyTrade
-from .models import Trader, AccountInfo, OrderInfo
-from django.contrib import auth
-from django.contrib.auth.decorators import login_required
+from .models import Trader, AccountInfo, OrderInfo, Strategy
 from requests.exceptions import ConnectionError
 from .strategy.okx.AccountAndTradeApi import AccountAndTradeApi
 
@@ -34,6 +32,8 @@ trading_status = {
     4:  '准备开仓',
     5:  '开仓成功',
     6:  '止损止盈设置成功',
+    7:  '止盈',
+    8:  '止损',
 }
 
 
@@ -46,7 +46,7 @@ def maalarm(request):
     return HttpResponse('提交成功')
 
 
-def matrade(request):
+def matrade_bak(request):
     if request.method == 'GET':
         return render(request, 'trading/matrade.html')
     ma = request.POST.get('ma', '')
@@ -108,12 +108,12 @@ def trade(request):
     #     return HttpResponse('error')
     # # selected_accountinfo = trader.accountinfo_set.all()
 
-    # trader = Trader.objects.filter(pk=1)[0]
-    accountinfos = AccountInfo.objects.filter(is_active=1)
+    # accountinfos = AccountInfo.objects.filter(is_active=1).filter(status__in=(-2, 0)).filter(flag=0)
+    accountinfos = AccountInfo.objects.filter(is_active=1).filter(status__in=(-2, 0)).filter(flag=1)
     return render(request, 'trading/matrade.html', {'accountinfos': accountinfos})
 
 
-def stop_processing_strategy(request):
+def stop_processing_account(request):
     if request.method == 'POST':
         accountinfo_id = request.POST.get("accountinfo_id")
         data = {}
@@ -126,6 +126,21 @@ def stop_processing_strategy(request):
         accountinfo.save()
         data['trading_status'] = trading_status.get(-2)
         return HttpResponse(json.dumps(data))
+
+
+def stop_processing_strategy(request):
+    if request.method == 'GET':
+        strategyinfo_id = request.GET.get("strategyinfo_id")
+        data = {}
+        try:
+            strategyinfo = Strategy.objects.get(pk=strategyinfo_id)
+        except:
+            data['status'] = trading_status.get(-1)
+            return HttpResponse(json.dumps(data))
+        strategyinfo.status = -2
+        strategyinfo.is_active = 0
+        strategyinfo.save()
+        return redirect(reverse('trading:strategyinfo'))
 
 
 def close_positions_one(request):
@@ -155,7 +170,11 @@ def close_positions_all(request):
     if code != '123456':
         return HttpResponse('Who are you!!!')
 
-    account_all = AccountInfo.objects.filter(status__gte=5)
+    # gt 大于某个值
+    # gte 大于或等于某个值
+    # lt  小于某个值
+    # lte 小于或等于某个值
+    account_all = AccountInfo.objects.filter(status__gte=1)
     for obj in account_all:
         obj.status = 0
         obj.save()
@@ -209,7 +228,7 @@ def account_info(request):
                 order_lst = []
             show_data['account_text'] = obj.account_text
             show_data['id'] = obj.id
-            show_data['status'] = trading_status.get(obj.status, '出现错误')
+            show_data['status'] = '策略运行中' if obj.status > 0 else '空闲中'
             show_data['strategy_name'] = obj.strategy_name
             show_data['bar2'] = obj.bar2
             if order_lst:
@@ -247,3 +266,75 @@ def orderinfo_show(request):
     for item in orderinfos:
         print(item.accountinfo)
     return render(request, 'trading/orderinfo1.html', {'orderinfos': orderinfos})
+
+
+def matrade(request):
+    if request.method == 'GET':
+        return render(request, 'trading/matrade.html')
+    ma = request.POST.get('ma', '')
+    instId = request.POST.get('instId', '')
+    bar = request.POST.get('bar', '')
+    if not bar or not instId or not bar:
+        return HttpResponse('参数设置错误---[ma: %s],,,,[instid: %s],,,,[bar: %s]' % (ma, instId, bar))
+    all_accountinfo = request.POST.getlist('select2')
+    if not all_accountinfo:
+        return HttpResponse('未选择账户')
+    strategy = 'MaTrade'
+    strategy_obj = Strategy(name=strategy, ma=ma, instid=instId, bar2=bar, accountinfo=all_accountinfo)
+    # 选择一个账户作为模板
+    accountinfo_id = all_accountinfo[0]
+    try:
+        one_accountinfo = AccountInfo.objects.get(pk=accountinfo_id)
+        # all_accountinfo = AccountInfo.objects.filter(pk__in=all_accountinfo)
+    except:
+        return HttpResponse('没有账户')
+    api_key = one_accountinfo.api_key
+    secret_key = one_accountinfo.secret_key
+    passphrase = one_accountinfo.passphrase
+    flag = one_accountinfo.flag
+    use_server_time = False
+
+    kw = {
+        'instId': instId,
+        "ma": ma,
+        "bar2": bar,
+        "accountinfo": one_accountinfo,
+        "strategy_obj": strategy_obj,
+    }
+
+    try:
+        strategy_obj.is_active = 1
+        strategy_obj.status = 1
+        strategy_obj.msg = ''
+        strategy_obj.save()
+        my_trade = MyTrade(api_key, secret_key, passphrase, use_server_time, flag)
+        my_trade.start_tarde(strategy, **kw)
+    except ConnectionError as e:
+        strategy_obj.msg = e
+    except Exception as e:
+        if strategy_obj.status == -2:
+            strategy_obj.msg = e
+            print(e)
+    strategy_obj.status = 0
+    strategy_obj.is_active = 0
+    strategy_obj.save()
+    return HttpResponse('OK')
+
+
+def strategyinfo(request):
+    if request.method == 'GET':
+        try:
+            strategyinfos = Strategy.objects.filter(is_active=1)
+            for strategyinfo in strategyinfos:
+                account_name_list = []
+                accountinfos = strategyinfo.accountinfo
+                accountinfos = eval(accountinfos)
+                accountinfos = AccountInfo.objects.filter(id__in=accountinfos)
+                for accountinfo in accountinfos:
+                    account_name_list.append(accountinfo.account_text)
+                strategyinfo.accountinfo = ', '.join(account_name_list)
+                strategyinfo.status = trading_status.get(strategyinfo.status)
+
+        except Exception as e:
+            strategyinfos = None
+        return render(request, 'trading/strategy.html', {'strategyinfos': strategyinfos})

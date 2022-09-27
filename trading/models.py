@@ -91,8 +91,13 @@ class Strategy(models.Model):
         verbose_name_plural = "策略"
 
     name = models.CharField(verbose_name='策略名称', max_length=50)
-    operate = models.IntegerField(default=0, editable=False)
+    is_active = models.IntegerField(default=0, editable=False)
     status = models.IntegerField(default=0, editable=False)
+    ma = models.CharField(verbose_name='均线', null=True, max_length=10)
+    bar2 = models.CharField(verbose_name='大周期', null=True, max_length=10)
+    instid = models.CharField(verbose_name='合约', null=True, max_length=50)
+    accountinfo = models.TextField(verbose_name='账户', null=True, blank=True, editable=False)
+    signalinfo = models.TextField(verbose_name='信号信息', null=True, blank=True, editable=False)
     msg = models.TextField(null=True, blank=True, editable=False)
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)

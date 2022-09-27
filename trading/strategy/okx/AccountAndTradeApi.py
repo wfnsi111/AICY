@@ -53,3 +53,12 @@ class AccountAndTradeApi:
                 return False
             return item
         return False
+
+    def set_initialization_account(self, instId, lever='50', mgnMode='cross'):
+        """ 初始化账户 """
+        try:
+            result = self.accountAPI.get_position_mode('long_short_mode')
+            result = self.accountAPI.set_leverage(instId=instId, lever=lever, mgnMode=mgnMode)
+        except Exception as e:
+            print(e)
+            print('初始化账户 error')

@@ -1,0 +1,107 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我的策略</title>
+
+<script type="text/javascript">
+
+function altRows(id){
+    if(document.getElementsByTagName){
+
+        var table = document.getElementById(id);
+        var rows = table.getElementsByTagName("tr");
+
+        for(i = 0; i < rows.length; i++){
+            if(i % 2 == 0){
+                rows[i].className = "evenrowcolor";
+            }else{
+                rows[i].className = "oddrowcolor";
+            }
+        }
+    }
+}
+
+window.οnlοad=function(){
+    altRows('alternatecolor');
+}
+
+
+</script>
+
+
+<style type="text/css">
+table.altrowstable {
+    font-family: verdana,arial,sans-serif;
+    font-size:11px;
+    color:#333333;
+    border-width: 10px;
+    border-color: #a9c6c9;
+    border-collapse: collapse;
+}
+table.altrowstable th {
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #a9c6c9;
+}
+table.altrowstable td {
+    width: 110px;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #a9c6c9;
+    text-align: center;
+}
+.oddrowcolor{
+    background-color:#d4e3e5;
+}
+.evenrowcolor{
+    background-color:#c3dde0;
+}
+
+a{text-decoration: none;}
+a:visited{text-decoration: none;}
+a:hover {text-decoration: none;}
+a:active{text-decoration:none;}
+
+button{
+    color: aqua;
+}
+</style>
+</head>
+
+<body>
+<h1>策略运行情况</h1>
+<!-- Table goes in the document BODY -->
+<table class="altrowstable" id="alternatecolor">
+    <tr>
+        <th>策略</th>
+        <th>品种</th>
+        <th>bar</th>
+        <th>MA</th>
+        <th>运行中的账户</th>
+        <th>状态</th>
+        <th>启动时间</th>
+        <th>策略操作</th>
+
+    </tr>
+
+    {% for strategyinfo in strategyinfos  %}
+        <tr>
+            <td>{{ strategyinfo.name }}</td>
+            <td>{{ strategyinfo.instid }}</td>
+            <td>{{ strategyinfo.bar2 }}</td>
+            <td>{{ strategyinfo.ma }}</td>
+            <td>{{ strategyinfo.accountinfo }}</td>
+            <td>{{ strategyinfo.status }}</td>
+            <td>{{ strategyinfo.update_time }}</td>
+            <td><a href="{% url 'trading:stop_processing_strategy' %}?strategyinfo_id={{ strategyinfo.id }}">停止运行</a></td>
+
+    {% endfor %}
+
+    </table>
+</body>
+</html>

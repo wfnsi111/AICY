@@ -4,6 +4,90 @@
     <meta charset="UTF-8">
     <title>Title</title>
 {#    <script src="/trading/js/jquery-3.6.0.min.js"></script>#}
+     <script>
+            // 选中添加到右边
+            function selectedToRight(){
+
+                // 获取select2标签
+                var select2 = document.getElementById("select2");
+                // 获取select1标签
+                var select1 = document.getElementById("select1");
+                // 获取option
+                var option1 = select1.getElementsByTagName("option");
+                // 遍历
+                for (var i=0;i<option1.length;i++) {
+                    var optioni = option1[i];
+                    //是否被选中
+                    if(optioni.selected == true){
+                        // 添加到select2里面
+                        select2.appendChild(optioni);
+                        //数组长度发生变化，需要处理
+                        i--;
+                    }
+                }
+            }
+
+            // 选中添加到左边
+            function selectedToLeft(){
+
+                // 获取select2标签
+                var select2 = document.getElementById("select2");
+                // 获取select1标签
+                var select1 = document.getElementById("select1");
+                // 获取option
+                var option2 = select2.getElementsByTagName("option");
+                // 遍历
+                for (var i=0;i<option2.length;i++) {
+                    var optioni = option2[i];
+                    //是否被选中
+                    if(optioni.selected == true){
+                        // 添加到select1里面
+                        select1.appendChild(optioni);
+                        //数组长度发生变化，需要处理
+                        i--;
+                    }
+                }
+            }
+
+            // 全部添加到右边
+            function allToRight(){
+                // 获取select2标签
+                var select2 = document.getElementById("select2");
+                // 获取select1标签
+                var select1 = document.getElementById("select1");
+                // 获取option
+                var option1 = select1.getElementsByTagName("option");
+                // 遍历
+                for (var i=0;i<option1.length;i++) {
+                    var optioni = option1[i];
+                    // 添加到select2里面
+                    select2.appendChild(optioni);
+                    //数组长度发生变化，需要处理
+                    i--;
+                }
+            }
+
+
+            // 全部添加到左边
+            function allToLeft(){
+
+                // 获取select2标签
+                var select2 = document.getElementById("select2");
+                // 获取select1标签
+                var select1 = document.getElementById("select1");
+                // 获取option
+                var option2 = select2.getElementsByTagName("option");
+                // 遍历
+                for (var i=0;i<option2.length;i++) {
+                    var optioni = option2[i];
+                    // 添加到select1里面
+                    select1.appendChild(optioni);
+                    //数组长度发生变化，需要处理
+                    i--;
+
+                }
+            }
+        </script>
 </head>
 <body>
     <H1> 周期策略参数设置 </H1>
@@ -11,6 +95,7 @@
         {% csrf_token %}
         <h2>
             均线  <select name="ma" id="maalarm">
+                    <option style="display:none"></option>
                     <option value="60MA">60</option>
                     <option value="90MA">90</option>
             </select>
@@ -18,35 +103,60 @@
 
         <h2>
             品种  <select name="instId" id="instId">
+                    <option style="display:none"></option>
                     <option value="ETH-USDT-SWAP">ETHUSDT</option>
                     <option value="BTC-USDT-SWAP">BTCUSDT</option>
             </select>
         </h2>
 
-        <h2>K线周期</h2>
+        <h2>K线周期
 
-            <p>
-                5min: <input type="checkbox" name="bar" value="5m" /><br />
-                15min: <input type="checkbox" name="bar" value="15m" /><br />
-                30min: <input type="checkbox" name="bar" value="30m" /><br />
-                1H: <input type="checkbox" name="bar" value="1H" /><br />
-                2H: <input type="checkbox" name="bar" value="2H" /><br />
-                4H: <input type="checkbox" name="bar" value="4H" /><br />
-                6H: <input type="checkbox" name="bar" value="6H" /><br />
-                12H: <input type="checkbox" name="bar" value="12H" /><br />
-                1D: <input type="checkbox" name="bar" value="1D" /><br />
-            </p>
+                <select name="bar" id="instId">
+                    <option style="display:none"></option>
+                    <option value="5m">5min</option>
+                    <option value="15m">15m</option>
+                    <option value="30m">30m</option>
+                    <option value="1H">1H</option>
+                    <option value="2H">2H</option>
+                    <option value="4H">4H</option>
+                    <option value="6H">6H</option>
+                    <option value="12H">12H</option>
+                    <option value="1D">1D</option>
+            </select>
+        </h2>
+
         <hr>
 
-            <h2>选择账户
+            <h2>选择账户</h2>
+                <div id="s1" style="float: left;">
+                    <div>
+                        <select name="select1" id="select1" multiple="multiple" style="width: 100px;height: 100px;">
+                            {% for accountinfo in accountinfos %}
+                                <option value={{ accountinfo.id }}>{{ accountinfo.account_text }}</option>
+                            {% endfor %}
+                        </select>
 
-                <select name="accountinfo" id="accountinfo">
-                        {% for accountinfo in accountinfos %}
-                            <option value={{ accountinfo.id }}>{{ accountinfo.account_text }}</option>
+                        <div>
+                            <input type="button" value="选中添加到右边" onclick="selectedToRight();"/><br />
+{#                            <input type="button" value="全部添加到右边" onclick="allToRight();"/>#}
+                        </div>
 
-                        {% endfor %}
-                </select>
-            </h2>
+                    </div>
+                </div>
+
+                <div id="s2" >
+                    <div>
+                        <select name="select2" id="select2" multiple="multiple" style="width: 100px;height: 100px;">
+                        </select>
+
+                        <div>
+                            <input type="button" value="选中添加到左边" onclick="selectedToLeft();"/><br />
+{#                            <input type="button" value="全部添加到左边" onclick="allToLeft();"/>#}
+                        </div>
+
+                    </div>
+                </div>
+
         <br>
         <br>
          <hr>

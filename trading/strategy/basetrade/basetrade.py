@@ -4,16 +4,8 @@ from .mylog import LoggerHandler
 from ..okx import Account_api as Account
 from ..okx import Trade_api as Trade
 from ..okx import Market_api as Market
-from ..okx import Public_api as Public
-from ..okx import status_api as Status
-from ..okx import subAccount_api as SubAccount
-from ..okx import TradingData_api as TradingData
-from ..okx import Broker_api as Broker
-from ..okx import Convert_api as Convert
-from ..okx import Rfq_api as Rfq
-from ..okx import TradingBot_api as TradingBot
-from ..okx import Funding_api as Funding
-from ...models import OrderInfo
+from ..okx.AccountAndTradeApi import AccountAndTradeApi
+from ...models import OrderInfo, AccountInfo
 
 import pandas as pd
 import datetime
@@ -48,12 +40,18 @@ class BaseTrade:
         return date
 
     def get_positions(self):
-        result = self.accountAPI.get_positions('SWAP')
-        self.order_lst = result.get('data', [])
-        for item in self.order_lst:
-            if item:
-                return True
-        return False
+        try:
+            result = self.accountAPI.get_positions('SWAP')
+            self.order_lst = result.get('data', [])
+            if len(self.order_lst) > 1:
+                self.log.info('存在两笔订单')
+            for item in self.order_lst:
+                if item:
+                    return True
+            return False
+        except:
+            self.log.error('get_positions error')
+            raise
 
     def check_order_result_data(self, data, flag_id=None):
         sMsg = ''
@@ -148,17 +146,6 @@ class BaseTrade:
             df['vol_ma'] = df['volume'].rolling(vol_ma).mean()
         return df
 
-    def get_my_balance(self):
-        result = self.accountAPI.get_account('USDT')
-        try:
-            data = result.get('data')[0].get('details')[0]
-            mybalance = float(data.get('availEq'))
-            return mybalance
-        except Exception as e:
-            self.log.error('get balance error')
-            self.log.error(result)
-            raise
-
     def _get_ticker(self, instId):
         result = self.marketAPI.get_ticker(instId)
         instId_detail = result.get('data')[0]
@@ -215,27 +202,50 @@ class BaseTrade:
         sz = currency * coefficient
         return sz
 
-    def set_initialization_account(self, instId, lever='10', mgnMode='cross'):
-        """ 初始化账户 """
-        result = self.accountAPI.get_position_mode('long_short_mode')
-        result = self.accountAPI.set_leverage(instId=instId, lever=lever, mgnMode=mgnMode)
+    def set_initialization_account_all(self, all_accountinfo, strategy_name, instid):
+        all_accountinfo_obj = AccountInfo.objects.filter(pk__in=all_accountinfo)
+        all_accountinfo_data_list = []
+        for obj in all_accountinfo_obj:
+            time.sleep(0.2)
+            accountinfo_data = {}
+            try:
+                obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
+                obj_api.set_initialization_account(instid)
+                balance = obj_api.get_my_balance('availEq')
+                obj.balance = float(balance)
+                obj.strategy_name = strategy_name
+                obj.status = 1
+                obj.save()
+                accountinfo_data['id'] = obj.id
+                accountinfo_data['name'] = obj.account_text
+                accountinfo_data['balance'] = balance
+                accountinfo_data['obj'] = obj
+                accountinfo_data['obj_api'] = obj_api
+                all_accountinfo_data_list.append(accountinfo_data)
+            except Exception as e:
+                self.log.error('set_initialization_account_all error')
+        return all_accountinfo_data_list
 
     def get_atr_data(self, df, limit):
         try:
             new_df = df.tail(int(limit)).copy()
-            tr_lst = []
             new_df['atr'] = pd.to_numeric(new_df['high']) - pd.to_numeric(new_df['low'])
             atr = new_df['atr'].mean()
             return atr
         except:
             self.log.error('get ATR  error!!!!!!!!!!!!!!!!!!!!')
 
-    def set_trading_orderinfo(self, accountinfo, *args, **kwargs):
-        orderinfo = OrderInfo(ordid=kwargs.get('ordId'), instid=kwargs.get('instId'), posside=kwargs.get('posSide'),
-                              side=kwargs.get('side'), avgpx=kwargs.get('avgpx'), tptriggerpx=kwargs.get('tpTriggerPx'),
-                              tpordpx=kwargs.get('tpOrdPx'), sltriggerpx=kwargs.get('slTriggerPx'),
-                              slordpx=kwargs.get('slOrdPx'), sz=kwargs.get('sz'), px=kwargs.get('px'),
-                              lever=kwargs.get('lever'), algo_order_id=kwargs.get('algo_order_id'))
-        orderinfo.accountinfo_id = accountinfo.id
-        orderinfo.save()
-        return orderinfo
+    def set_trading_orderinfo(self, accountinfo, **kwargs):
+        try:
+            orderinfo = OrderInfo(ordid=kwargs.get('ordId'), instid=kwargs.get('instId'), posside=kwargs.get('posSide'),
+                                  side=kwargs.get('side'), avgpx=kwargs.get('avgPx'), tptriggerpx=kwargs.get('tpTriggerPx'),
+                                  tpordpx=kwargs.get('tpOrdPx'), sltriggerpx=kwargs.get('slTriggerPx'),
+                                  slordpx=kwargs.get('slOrdPx'), sz=kwargs.get('sz'), px=kwargs.get('px'),
+                                  lever=kwargs.get('lever'), algo_order_id=kwargs.get('algo_order_id'))
+            orderinfo.accountinfo_id = accountinfo.id
+            orderinfo.save()
+            self.log.info('订单信息保存成功')
+            return orderinfo
+        except Exception as e:
+            self.log.error(e)
+            self.log.error('订单信息保存失败')
