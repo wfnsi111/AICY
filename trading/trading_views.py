@@ -108,8 +108,8 @@ def trade(request):
     #     return HttpResponse('error')
     # # selected_accountinfo = trader.accountinfo_set.all()
 
-    # accountinfos = AccountInfo.objects.filter(is_active=1).filter(status__in=(-2, 0)).filter(flag=0)
-    accountinfos = AccountInfo.objects.filter(is_active=1).filter(status__in=(-2, 0)).filter(flag=1)
+    accountinfos = AccountInfo.objects.filter(is_active=1).filter(status__in=(-2, 0)).filter(flag=0)
+    # accountinfos = AccountInfo.objects.filter(is_active=1).filter(status__in=(-2, 0)).filter(flag=1)
     return render(request, 'trading/matrade.html', {'accountinfos': accountinfos})
 
 
