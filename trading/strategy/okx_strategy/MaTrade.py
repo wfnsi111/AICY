@@ -694,8 +694,11 @@ class MaTrade(BaseTrade):
                 has_order = self.get_positions()
                 if has_order:
                     self.log.error('止损止盈检查错误， 订单ID%s' % order_data.get('ordId'))
-                pnl = order_data.get('pnl')
+                obj = accountinfo['obj']
+                obj.status = 0
+                obj.save()
                 orderinfo_obj = accountinfo['orderinfo_obj']
+                pnl = order_data.get('pnl')
                 orderinfo_obj.pnl = pnl
                 orderinfo_obj.closeavgpx = "%.2f" % float(order_data.get('avgPx'))
                 orderinfo_obj.closeordid = order_data.get('ordId')
