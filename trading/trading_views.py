@@ -36,6 +36,14 @@ trading_status = {
     8:  '止损',
 }
 
+account_status = {
+    -2: "强制退出",
+    -1: '出现错误',
+    0: '空闲中',
+    1:  '策略运行中',
+
+}
+
 
 def maalarm(request):
     if request.method == 'GET':
@@ -228,7 +236,7 @@ def account_info(request):
                 order_lst = []
             show_data['account_text'] = obj.account_text
             show_data['id'] = obj.id
-            show_data['status'] = '策略运行中' if obj.status > 0 else '空闲中'
+            show_data['status'] = account_status.get(obj.status, '无状态')
             show_data['strategy_name'] = obj.strategy_name
             show_data['bar2'] = obj.bar2
             if order_lst:
@@ -263,8 +271,6 @@ def orderinfo_show(request):
         orderinfos = OrderInfo.objects.filter(accountinfo_id=int(accountinfo_id))
     except:
         return HttpResponse("ERROR")
-    for item in orderinfos:
-        print(item.accountinfo)
     return render(request, 'trading/orderinfo1.html', {'orderinfos': orderinfos})
 
 

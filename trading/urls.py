@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.views.static import serve
 
 from . import views
-from . import trading_views, account_views, sync_views
+from . import trading_views, account_views
 
 app_name = 'trading'
 
@@ -37,7 +37,6 @@ urlpatterns = [
     path('addaccount/', account_views.addaccount, name='addaccount'),
     path('test/', trading_views.test, name='test'),
     path('orderinfo/', trading_views.orderinfo_show, name='orderinfo'),
-    path('deploy/', sync_views.deploy, name='deploy'),
     path('strategy/', trading_views.strategyinfo, name='strategyinfo'),
     path('stop_processing_strategy/', trading_views.stop_processing_strategy, name='stop_processing_strategy'),
 

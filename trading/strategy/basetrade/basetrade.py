@@ -203,6 +203,7 @@ class BaseTrade:
         return sz
 
     def set_initialization_account_all(self, all_accountinfo, strategy_name, instid):
+        # 初始化状态， 设置倍数， 账户状态。
         all_accountinfo_obj = AccountInfo.objects.filter(pk__in=all_accountinfo)
         all_accountinfo_data_list = []
         for obj in all_accountinfo_obj:
@@ -215,7 +216,6 @@ class BaseTrade:
                 obj.balance = float(balance)
                 obj.strategy_name = strategy_name
                 obj.status = 1
-                obj.save()
                 accountinfo_data['id'] = obj.id
                 accountinfo_data['name'] = obj.account_text
                 accountinfo_data['balance'] = balance
@@ -223,7 +223,10 @@ class BaseTrade:
                 accountinfo_data['obj_api'] = obj_api
                 all_accountinfo_data_list.append(accountinfo_data)
             except Exception as e:
+                obj.status = -1
                 self.log.error('set_initialization_account_all error')
+                self.log.error(e)
+            obj.save()
         return all_accountinfo_data_list
 
     def get_atr_data(self, df, limit):
