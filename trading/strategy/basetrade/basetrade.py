@@ -234,7 +234,7 @@ class BaseTrade:
             new_df = df.tail(int(limit)).copy()
             new_df['atr'] = pd.to_numeric(new_df['high']) - pd.to_numeric(new_df['low'])
             atr = new_df['atr'].mean()
-            return atr
+            return atr * 1.5
         except:
             self.log.error('get ATR  error!!!!!!!!!!!!!!!!!!!!')
 

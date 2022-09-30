@@ -46,7 +46,7 @@ args_dict = {
         'bar1': '5m',
         'stop_loss': 3,
         'set_profit': 20,
-        'risk_control': 0.08,
+        'risk_control': 0.05,
     },
 
     '12H': {
@@ -54,14 +54,14 @@ args_dict = {
         'bar1': '15m',
         'stop_loss': 3,
         'set_profit': 20,
-        'risk_control': 0.09,
+        'risk_control': 0.05,
     },
     '1D': {
         "ma_percent": 0.03,
         'bar1': '15m',
         'stop_loss': 3,
         'set_profit': 25,
-        'risk_control': 0.12,
+        'risk_control': 0.05,
     },
 
 }
