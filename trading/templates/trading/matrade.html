@@ -1,8 +1,11 @@
+{% extends 'trading/base.html' %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    {% block mystyle %}
 {#    <script src="/trading/js/jquery-3.6.0.min.js"></script>#}
      <script>
             // 选中添加到右边
@@ -88,8 +91,10 @@
                 }
             }
         </script>
+    {% endblock %}
 </head>
 <body>
+{% block basehtml %}
     <H1> 周期策略参数设置 </H1>
     <form action="{% url 'trading:matrade'  %}" method="post">
         {% csrf_token %}
@@ -137,8 +142,8 @@
                         </select>
 
                         <div>
-                            <input type="button" value="选中添加到右边" onclick="selectedToRight();"/><br />
-{#                            <input type="button" value="全部添加到右边" onclick="allToRight();"/>#}
+                            <input type="button" value="添加账户" onclick="selectedToRight();"/><br />
+{#                            <input type="button" value="全部添加" onclick="allToRight();"/>#}
                         </div>
 
                     </div>
@@ -150,8 +155,8 @@
                         </select>
 
                         <div>
-                            <input type="button" value="选中添加到左边" onclick="selectedToLeft();"/><br />
-{#                            <input type="button" value="全部添加到左边" onclick="allToLeft();"/>#}
+                            <input type="button" value="删除账户" onclick="selectedToLeft();"/><br />
+{#                            <input type="button" value="全部删除" onclick="allToLeft();"/>#}
                         </div>
 
                     </div>
@@ -164,5 +169,6 @@
 
     </form>
 
+{% endblock %}
 </body>
 </html>

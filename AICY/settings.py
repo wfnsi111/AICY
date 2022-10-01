@@ -156,12 +156,54 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
+# STATIC_ROOT 是在部署静态文件时(pyhton manage.py collectstatic)所有的静态文静聚合的目录。
+# django会把所有的static文件都复制到STATIC_ROOT文件夹下
+# 这个在聚合命令起作用后，会产生文件复制和转移的功能，这个功能会把app下的static文件汇总到一个STATIC_ROOT指定的目录里
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# celery 配置
+"""
+# 最重要的配置，设置消息broker,格式为：db://user:password@host:port/dbname
+# 如果redis安装在本机，使用localhost
+# 如果docker部署的redis，使用redis://redis:6379
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+
+# celery时区设置，建议与Django settings中TIME_ZONE同样时区，防止时差
+# Django设置时区需同时设置USE_TZ=True和TIME_ZONE = 'Asia/Shanghai'
+CELERY_TIMEZONE = TIME_ZONE
+
+# 为django_celery_results存储Celery任务执行结果设置后台
+# 格式为：db+scheme://user:password@host:port/dbname
+# 支持数据库django-db和缓存django-cache存储任务状态及结果
+CELERY_RESULT_BACKEND = "django-db"
+# celery内容等消息的格式设置，默认json
+CELERY_ACCEPT_CONTENT = ['application/json', ]
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# 为任务设置超时时间，单位秒。超时即中止，执行下个任务。
+CELERY_TASK_TIME_LIMIT = 5
+
+# 为存储结果设置过期日期，默认1天过期。如果beat开启，Celery每天会自动清除。
+# 设为0，存储结果永不过期
+# CELERY_RESULT_EXPIRES = xx
+
+# 任务限流
+CELERY_TASK_ANNOTATIONS = {'tasks.add': {'rate_limit': '10/s'}}
+
+# Worker并发数量，一般默认CPU核数，可以不设置
+CELERY_WORKER_CONCURRENCY = 2
+
+# 每个worker执行了多少任务就会死掉，默认是无限的
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 200
+
+"""
 
 
 # APP_ENV = os.getenv("ENV")

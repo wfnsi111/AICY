@@ -39,3 +39,5 @@ def vote(request, question_id):
     return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
 
+def test2(request):
+    return render(request, 'trading/test2.html')

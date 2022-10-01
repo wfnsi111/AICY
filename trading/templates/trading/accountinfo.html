@@ -1,14 +1,13 @@
+{% extends 'trading/base.html' %}
 {% load static %}
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script type="text/javascript" src="{% static 'trading/js/jquery-3.6.0.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'trading/js/accountinfo.js' %}"></script>
-    <script type="text/javascript" src="{% static 'trading/js/test.js' %}"></script>
     <meta charset="UTF-8">
     <title>账户信息</title>
-
+    {% block mystyle %}
 <script type="text/javascript">
     /*! jQuery v3.6.0 | (c) OpenJS Foundation and other contributors | jquery.org/license */
 
@@ -61,6 +60,7 @@ function stop_processing_account(accountinfo_id){
 
 </script>
 
+
 <style type="text/css">
 table.altrowstable {
     font-family: verdana,arial,sans-serif;
@@ -100,9 +100,12 @@ button{
     color: aqua;
 }
 </style>
+    {% endblock %}
 </head>
 
 <body>
+
+{% block basehtml %}
 <h1>账户持仓情况</h1>
 <!-- Table goes in the document BODY -->
 <table class="altrowstable" id="alternatecolor">
@@ -146,5 +149,7 @@ button{
     {% endfor %}
 
     </table>
+
+{% endblock %}
 </body>
 </html>

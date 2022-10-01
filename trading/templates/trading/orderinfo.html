@@ -1,3 +1,5 @@
+{% extends 'trading/base.html' %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +7,7 @@
     <title>订单信息</title>
 </head>
 <body>
+{% block basehtml %}
     <form  action="{% url 'trading:orderinfo' %}" method="post" class="smart-green">
     {% csrf_token %}
 {#                <h2>选择账户</h2>#}
@@ -17,5 +20,6 @@
                 </select>
         <input type="submit" value="确定">
     </form>
+{% endblock %}
 </body>
 </html>

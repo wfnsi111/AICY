@@ -116,8 +116,8 @@ def trade(request):
     #     return HttpResponse('error')
     # # selected_accountinfo = trader.accountinfo_set.all()
 
-    accountinfos = AccountInfo.objects.filter(is_active=1).filter(status__in=(-2, 0)).filter(flag=0)
-    # accountinfos = AccountInfo.objects.filter(is_active=1).filter(status__in=(-2, 0)).filter(flag=1)
+    # accountinfos = AccountInfo.objects.filter(is_active=1).filter(status__in=(-2, 0)).filter(flag=0)
+    accountinfos = AccountInfo.objects.filter(is_active=1).filter(status__in=(-2, 0))
     return render(request, 'trading/matrade.html', {'accountinfos': accountinfos})
 
 
@@ -281,7 +281,7 @@ def matrade(request):
     instId = request.POST.get('instId', '')
     bar = request.POST.get('bar', '')
     if not bar or not instId or not bar:
-        return HttpResponse('参数设置错误---[ma: %s],,,,[instid: %s],,,,[bar: %s]' % (ma, instId, bar))
+        return HttpResponse('参数设置错误---[均线: %s]---[货币: %s]---[周期: %s]' % (ma, instId, bar))
     all_accountinfo = request.POST.getlist('select2')
     if not all_accountinfo:
         return HttpResponse('未选择账户')

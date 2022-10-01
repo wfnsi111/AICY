@@ -1,9 +1,13 @@
+{% extends 'trading/base.html' %}
 {% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+{#    {% block mystyle %}#}
+{#        <link rel="stylesheet" href="{% static 'trading/css/strategy.css' %}" />#}
+{#    {% endblock %}#}
     <title>我的策略</title>
 
 <script type="text/javascript">
@@ -31,7 +35,7 @@ window.οnlοad=function(){
 
 </script>
 
-
+{% block mystyle %}
 <style type="text/css">
 table.altrowstable {
     font-family: verdana,arial,sans-serif;
@@ -71,9 +75,13 @@ button{
     color: aqua;
 }
 </style>
-</head>
+{% endblock %}
 
+</head>
 <body>
+
+{% block basehtml %}
+
 <h1>策略运行情况</h1>
 <!-- Table goes in the document BODY -->
 <table class="altrowstable" id="alternatecolor">
@@ -103,5 +111,8 @@ button{
     {% endfor %}
 
     </table>
+
+{% endblock %}
 </body>
+
 </html>

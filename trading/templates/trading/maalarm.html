@@ -1,3 +1,5 @@
+{% extends 'trading/base.html' %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +7,7 @@
     <title>Title</title>
 </head>
 <body>
+{% block basehtml %}
     <H1> 均线告警参数设置 </H1>
     <form action="" method="post">
         {% csrf_token %}
@@ -40,5 +43,6 @@
 
     </form>
 
+{% endblock %}
 </body>
 </html>

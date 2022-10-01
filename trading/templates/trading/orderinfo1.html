@@ -1,3 +1,4 @@
+{% extends 'trading/base.html' %}
 {% load static %}
 
 <!DOCTYPE html>
@@ -6,8 +7,7 @@
     <meta charset="UTF-8">
     <title>订单信息</title>
 
-</head>
-
+{% block mystyle %}
 <style type="text/css">
 table.altrowstable {
     font-family: verdana,arial,sans-serif;
@@ -47,8 +47,10 @@ button{
     color: aqua;
 }
 </style>
+{% endblock %}
+</head>
 <body>
-
+{% block basehtml %}
 <h1>账户持仓情况</h1>
 <!-- Table goes in the document BODY -->
 <table class="altrowstable" id="alternatecolor">
@@ -83,5 +85,7 @@ button{
     {% endfor %}
 
 </table>
+
+{% endblock %}
 </body>
 </html>

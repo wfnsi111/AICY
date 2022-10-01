@@ -1,0 +1,43 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+{#    <link rel="stylesheet" href="{% static 'trading/css/base.css' %}" />#}
+    <title>首页</title>
+
+    <style>
+        {#*{margin:0; padding:0; font-size:14px;}#}
+
+
+        .nav{list-style:none; height:30px; border-bottom:10px solid #F60; margin-top:20px; padding-left:50px;}
+
+        .nav li{float:left}
+
+        .nav li a
+        {display:block;height:30px;text-align:center; line-height:30px; width:80px;
+            background:#efefef; margin-left:1px;color:#343;text-decoration:none;}
+
+        .nav li a.on, .nav li a:hover{background:#F60;color:#fff; }
+
+    </style>
+
+    {% block mystyle %}
+    {% endblock %}
+</head>
+<body>
+    <ul class="nav">
+        <li><a class="on" href="{%  url 'trading:trading' %} ">首　　页</a></li>
+        <li><a href="{%  url 'trading:trade' %} "> 登陆交易 </a></li>
+        <li><a href="{%  url 'trading:close_positions_all' %} "> 一键平仓 </a></li>
+        <li><a href="{%  url 'trading:account_info' %} "> 账户状态 </a></li>
+        <li><a href="{%  url 'trading:addaccount' %} "> 添加账户 </a></li>
+        <li><a href="{%  url 'trading:orderinfo' %} "> 订单信息 </a></li>
+        <li><a href="{%  url 'trading:strategyinfo' %} "> 策略信息 </a></li>
+    </ul>
+    {% block basehtml %}
+        <p>original</p>
+    {% endblock %}
+</body>
+</html>

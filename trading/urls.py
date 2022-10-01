@@ -36,6 +36,7 @@ urlpatterns = [
     path('accountinfo/', trading_views.account_info, name='account_info'),
     path('addaccount/', account_views.addaccount, name='addaccount'),
     path('test/', trading_views.test, name='test'),
+    path('test2/', views.test2, name='test2'),
     path('orderinfo/', trading_views.orderinfo_show, name='orderinfo'),
     path('strategy/', trading_views.strategyinfo, name='strategyinfo'),
     path('stop_processing_strategy/', trading_views.stop_processing_strategy, name='stop_processing_strategy'),

@@ -1,0 +1,88 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="{% static 'trading/js/jquery-3.6.0.min.js' %}"></script>
+
+<script>
+
+$(function(){
+    $('#tset1').submit(function (e) {
+        e.preventDefault()   // 阻止表单的默认提交行为
+        alert('tset1')
+    var data = $(this).serialize()  // 快速得到表单中的数据
+    $.post("{% url 'trading:test' %}", data, function (res) {
+        console.log(res)
+        console.log(res.status)
+        console.log(res.readyState)
+        console.log(res.statusCode)
+        console.log(res.code)
+        console.log(data)
+        if (res.status !== 201) {
+            return alert('发表评论失败！')
+        }
+    $('#formAddCmt')[0].reset()
+    })
+  })
+})
+
+
+
+
+$(function () {
+    //  1.监听表单的提交事件
+    alert('tset3')
+    $('#test2').on('submit', function (e) {
+         e.preventDefault()                  // 2.阻止表单的默认行为
+         var formdata = $('#test2').serialize()             // 3. 快速获取表单中的数据
+        //调用的结果：
+        // username=用户名的值&password=密码的值
+        //因为函数返回结果会用表单元素的name属性来表示，
+        //所以使用serialize()快速获取表单数据时需要为每个表单元素设置name属性且不重复
+        // 4.使用$.ajax()发起POST请求
+        $.ajax({
+            type : 'POST',                       //请求方式
+            url : '{% url "trading:test" %}',  //请求的URL地址
+            data: {formdata},
+            statusCode: {
+                200: function () {
+                    console.log('200');
+                },
+            },
+            success: function(res) {            //请求成功后的回调函数
+                alert('OK')
+                console.log('OK');
+                console.log(res)
+                console.log(res.status)
+                console.log(res.readyState)
+                console.log(res.statusCode)
+                console.log(res.code)
+            },
+        })
+    })
+})
+
+
+</script>
+
+<body>
+    <H1> 周期策略参数设置 </H1>
+    <form method="post" id="tset2">
+        {% csrf_token %}
+        <h2>
+            均线  <select name="ma" id="maalarm">
+                    <option value="60MA">60</option>
+                    <option value="90MA">90</option>
+            </select>
+        </h2>
+
+        <br>
+        <br>
+         <hr>
+        <button type="submit" >提交</button>
+    </form>
+</body>
+</html>
