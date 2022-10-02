@@ -1,13 +1,16 @@
 import json
 import time
+import platform
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-from .strategy.main import MyTrade
+from .strategy.main import start_my_strategy
 from .models import Trader, AccountInfo, OrderInfo, Strategy
 from requests.exceptions import ConnectionError
 from .strategy.okx.AccountAndTradeApi import AccountAndTradeApi
+from .task import *
+
 
 """
 status 状态：
@@ -52,57 +55,6 @@ def maalarm(request):
     currency = request.POST.get('currency', '')
     bar = request.POST.getlist('bar', [])
     return HttpResponse('提交成功')
-
-
-def matrade_bak(request):
-    if request.method == 'GET':
-        return render(request, 'trading/matrade.html')
-    ma = request.POST.get('ma', '')
-    instId = request.POST.get('instId', '')
-    bar = request.POST.getlist('bar')
-    if not bar:
-        return HttpResponse('bar error')
-    accountinfo_id = request.POST.get('accountinfo')
-    try:
-        one_accountinfo = AccountInfo.objects.get(pk=accountinfo_id)
-    except:
-        return HttpResponse('没有账户')
-    if one_accountinfo.status == -1:
-        return HttpResponse('交易出现未知错误')
-    if one_accountinfo.status > 0:
-        return HttpResponse('正在交易中')
-    api_key = one_accountinfo.api_key
-    secret_key = one_accountinfo.secret_key
-    passphrase = one_accountinfo.passphrase
-    flag = one_accountinfo.flag
-    use_server_time = False
-    strategy = 'MaTrade'
-    kw = {
-        'instId': instId,
-        "ma": ma,
-        "bar2": bar[0],
-        "accountinfo": one_accountinfo
-    }
-
-    try:
-        one_accountinfo.status = 1
-        one_accountinfo.msg = ''
-        one_accountinfo.save()
-        my_trade = MyTrade(api_key, secret_key, passphrase, use_server_time, flag)
-        my_trade.start_tarde(strategy, **kw)
-    except ConnectionError as e:
-        one_accountinfo.msg = e
-        one_accountinfo.status = 0
-        one_accountinfo.save()
-        return HttpResponse('网络错误')
-    except Exception as e:
-        if one_accountinfo.status == -2:
-            one_accountinfo.status = 0
-            one_accountinfo.save()
-        return HttpResponse('ok')
-
-    return HttpResponse('OK')
-
 
 def trade(request):
     # if request.method == 'GET':
@@ -285,46 +237,30 @@ def matrade(request):
     all_accountinfo = request.POST.getlist('select2')
     if not all_accountinfo:
         return HttpResponse('未选择账户')
-    strategy = 'MaTrade'
-    strategy_obj = Strategy(name=strategy, ma=ma, instid=instId, bar2=bar, accountinfo=all_accountinfo)
-    # 选择一个账户作为模板
-    accountinfo_id = all_accountinfo[0]
-    try:
-        one_accountinfo = AccountInfo.objects.get(pk=accountinfo_id)
-        # all_accountinfo = AccountInfo.objects.filter(pk__in=all_accountinfo)
-    except:
-        return HttpResponse('没有账户')
-    api_key = one_accountinfo.api_key
-    secret_key = one_accountinfo.secret_key
-    passphrase = one_accountinfo.passphrase
-    flag = one_accountinfo.flag
-    use_server_time = False
+    strategy_name = 'MaTrade'
 
     kw = {
         'instId': instId,
         "ma": ma,
         "bar2": bar,
-        "accountinfo": one_accountinfo,
-        "strategy_obj": strategy_obj,
+        "accountinfo": all_accountinfo,
     }
 
     try:
-        strategy_obj.is_active = 1
-        strategy_obj.status = 1
-        strategy_obj.msg = ''
-        strategy_obj.save()
-        my_trade = MyTrade(api_key, secret_key, passphrase, use_server_time, flag)
-        my_trade.start_tarde(strategy, **kw)
-    except ConnectionError as e:
-        strategy_obj.msg = e
+        # result = start_my_strategy_by_celery.delay(strategy_name, kw)
+        start_my_strategy(strategy_name, kw)
+        # plat = platform.system().lower()
+        # if plat == 'windows':
+        #     print('windows系统')
+        #     start_my_strategy(strategy_name, kw)
+        # else:
+        #     print('linux系统')
+        #     # result = add.delay(100, 200)
+        #     result = start_my_strategy_by_celery.delay(strategy_name, kw)
+        #     time.sleep(10)
     except Exception as e:
-        if strategy_obj.status == -2:
-            strategy_obj.msg = e
-            print(e)
-    strategy_obj.status = 0
-    strategy_obj.is_active = 0
-    strategy_obj.save()
-    return HttpResponse('OK')
+        print(e)
+    return HttpResponse('策略启动成功')
 
 
 def strategyinfo(request):

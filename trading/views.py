@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-
+from .task import *
 from .models import Question, Choice
 
 
@@ -41,3 +41,21 @@ def vote(request, question_id):
 
 def test2(request):
     return render(request, 'trading/test2.html')
+
+
+def task_views(request):
+    result = add.delay(100, 200)
+    print(result)
+    return HttpResponse('调用函数结果')
+
+
+from celery import result
+def task_views2(request):
+    task_id = request.GET.get('task_id')
+    ar = result.AsyncResult(task_id)
+    if ar.ready():
+        print(ar.status)
+        return HttpResponse(ar.get())
+    else:
+        print(ar.status)
+        return HttpResponse(ar.status)
