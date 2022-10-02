@@ -191,7 +191,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 # CELERY_TASK_TIME_LIMIT = 5
 
 # 任务结果过期时间
-CELERY_TASK_RESULT_EXPIRES = 60 * 60
+CELERY_TASK_RESULT_EXPIRES = 60 * 5
 
 # 为存储结果设置过期日期，默认1天过期。如果beat开启，Celery每天会自动清除。
 # 设为0，存储结果永不过期

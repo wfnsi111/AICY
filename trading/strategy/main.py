@@ -26,9 +26,9 @@ class MyTrade(BaseTrade):
     def start_tarde(self, strategy_name, **kwargs):
         self.log.info("start trading...............................")
         print('CyTrade 初始化中........')
-        strategy_obj = self.choose_strategy(strategy_name, **kwargs)
+        my_strategy = self.choose_strategy(strategy_name, **kwargs)
         try:
-            strategy_obj.start_my_trade()
+            my_strategy.start_my_trade()
         except ConnectionError as e:
             print('网络异常')
             raise ConnectionError(e)
@@ -71,9 +71,9 @@ def start_my_strategy(strategy_name, kwargs):
     except ConnectionError as e:
         strategy_obj.msg = e
     except Exception as e:
-        if strategy_obj.status == -2:
-            strategy_obj.msg = e
-            print(e)
+        print(e)
+        # if strategy_obj.status == -2:
+        #     strategy_obj.msg = e
 
     strategy_obj.status = 0
     strategy_obj.is_active = 0

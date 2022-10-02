@@ -93,13 +93,20 @@ def stop_processing_strategy(request):
         strategyinfo_id = request.GET.get("strategyinfo_id")
         data = {}
         try:
+            # 更新策略状态
             strategyinfo = Strategy.objects.get(pk=strategyinfo_id)
-        except:
+            strategyinfo.status = -2
+            strategyinfo.is_active = 0
+            strategyinfo.save()
+            # 更新账户状态
+            accountinfos = strategyinfo.accountinfo
+            accountinfos = eval(accountinfos)
+            # update 更改数据 不会改变有auto_now和自增的字段的值
+            AccountInfo.objects.filter(pk__in=accountinfos).update(status=0)
+        except Exception as e:
             data['status'] = trading_status.get(-1)
             return HttpResponse(json.dumps(data))
-        strategyinfo.status = -2
-        strategyinfo.is_active = 0
-        strategyinfo.save()
+
         return redirect(reverse('trading:strategyinfo'))
 
 
@@ -247,17 +254,11 @@ def matrade(request):
     }
 
     try:
-        # result = start_my_strategy_by_celery.delay(strategy_name, kw)
-        start_my_strategy(strategy_name, kw)
-        # plat = platform.system().lower()
-        # if plat == 'windows':
-        #     print('windows系统')
-        #     start_my_strategy(strategy_name, kw)
-        # else:
-        #     print('linux系统')
-        #     # result = add.delay(100, 200)
-        #     result = start_my_strategy_by_celery.delay(strategy_name, kw)
-        #     time.sleep(10)
+        plat = platform.system().lower()
+        if plat == 'windows':
+            start_my_strategy(strategy_name, kw)
+        else:
+            result = start_my_strategy_by_celery.delay(strategy_name, kw)
     except Exception as e:
         print(e)
     return HttpResponse('策略启动成功')

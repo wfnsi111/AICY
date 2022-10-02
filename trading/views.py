@@ -47,15 +47,3 @@ def task_views(request):
     result = add.delay(100, 200)
     print(result)
     return HttpResponse('调用函数结果')
-
-
-from celery import result
-def task_views2(request):
-    task_id = request.GET.get('task_id')
-    ar = result.AsyncResult(task_id)
-    if ar.ready():
-        print(ar.status)
-        return HttpResponse(ar.get())
-    else:
-        print(ar.status)
-        return HttpResponse(ar.status)

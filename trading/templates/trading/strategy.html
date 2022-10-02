@@ -105,7 +105,7 @@ button{
             <td>{{ strategyinfo.ma }}</td>
             <td>{{ strategyinfo.accountinfo }}</td>
             <td>{{ strategyinfo.status }}</td>
-            <td>{{ strategyinfo.update_time }}</td>
+            <td>{{ strategyinfo.create_time }}</td>
             <td><a href="{% url 'trading:stop_processing_strategy' %}?strategyinfo_id={{ strategyinfo.id }}">停止运行</a></td>
 
     {% endfor %}
