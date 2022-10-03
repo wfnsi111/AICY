@@ -11,9 +11,11 @@
         {#*{margin:0; padding:0; font-size:14px;}#}
 
 
-        .nav{list-style:none; height:30px; border-bottom:10px solid #F60; margin-top:20px; padding-left:50px;}
+        .nav{list-style:none; height:30px; border-bottom:10px solid #F60; margin-top:20px; padding-left:50px;
+        padding-right:50px;}
 
         .nav li{float:left}
+        .nav li:last-child {float: right;}
 
         .nav li a
         {display:block;height:30px;text-align:center; line-height:30px; width:80px;
@@ -35,6 +37,7 @@
         <li><a href="{%  url 'trading:addaccount' %} "> 添加账户 </a></li>
         <li><a href="{%  url 'trading:orderinfo' %} "> 订单信息 </a></li>
         <li><a href="{%  url 'trading:strategyinfo' %} "> 策略信息 </a></li>
+        <li class="last_li"><a href="{%  url 'trading:tologout' %} "> 退出登录 </a></li>
     </ul>
     {% block basehtml %}
         <p>original</p>

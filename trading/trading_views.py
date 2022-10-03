@@ -10,6 +10,7 @@ from .models import Trader, AccountInfo, OrderInfo, Strategy
 from requests.exceptions import ConnectionError
 from .strategy.okx.AccountAndTradeApi import AccountAndTradeApi
 from .task import *
+from .login_views import islogin
 
 
 """
@@ -56,6 +57,8 @@ def maalarm(request):
     bar = request.POST.getlist('bar', [])
     return HttpResponse('提交成功')
 
+
+@islogin
 def trade(request):
     # if request.method == 'GET':
     #     return render(request, 'trading/login.html')
@@ -73,6 +76,7 @@ def trade(request):
     return render(request, 'trading/matrade.html', {'accountinfos': accountinfos})
 
 
+@islogin
 def stop_processing_account(request):
     if request.method == 'POST':
         accountinfo_id = request.POST.get("accountinfo_id")
@@ -88,6 +92,7 @@ def stop_processing_account(request):
         return HttpResponse(json.dumps(data))
 
 
+@islogin
 def stop_processing_strategy(request):
     if request.method == 'GET':
         strategyinfo_id = request.GET.get("strategyinfo_id")
@@ -110,6 +115,7 @@ def stop_processing_strategy(request):
         return redirect(reverse('trading:strategyinfo'))
 
 
+@islogin
 def close_positions_one(request):
     accountinfo_id = request.GET.get('accountinfo_id', None)
     if accountinfo_id is None:
@@ -129,6 +135,7 @@ def close_positions_one(request):
     return redirect(reverse('trading:account_info'))
 
 
+@islogin
 def close_positions_all(request):
     if request.method == 'GET':
         return render(request, 'trading/close_positions_all.html')
@@ -171,10 +178,12 @@ def close_positions_all(request):
     return HttpResponse('OK!!!')
 
 
+@islogin
 def trading_index(request):
     return render(request, 'trading/trade.html')
 
 
+@islogin
 def account_info(request):
     if request.method == 'GET':
         show_lst = []
@@ -218,6 +227,7 @@ def test(request):
     return render(request, 'trading/test.html')
 
 
+@islogin
 def orderinfo_show(request):
     if request.method == 'GET':
         accountinfo_id = request.GET.get('accountinfo_id', None)
@@ -233,6 +243,7 @@ def orderinfo_show(request):
     return render(request, 'trading/orderinfo1.html', {'orderinfos': orderinfos})
 
 
+@islogin
 def matrade(request):
     if request.method == 'GET':
         return render(request, 'trading/matrade.html')
@@ -258,12 +269,14 @@ def matrade(request):
         if plat == 'windows':
             start_my_strategy(strategy_name, kw)
         else:
+            # celery 管理任务
             result = start_my_strategy_by_celery.delay(strategy_name, kw)
     except Exception as e:
         print(e)
     return HttpResponse('策略启动成功')
 
 
+@islogin
 def strategyinfo(request):
     if request.method == 'GET':
         try:

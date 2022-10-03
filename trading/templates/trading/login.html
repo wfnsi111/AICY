@@ -1,79 +1,103 @@
 <!DOCTYPE html>
-
-<html lang="zh-hans" dir="ltr">
+<html lang="en">
 <head>
-<title>登录 | 交易</title>
-<link rel="stylesheet" type="text/css" href="/static/admin/css/base.css">
-  <link rel="stylesheet" type="text/css" href="/static/admin/css/nav_sidebar.css">
-  <script src="/trading/js/nav_sidebar.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            height: 100%;
+        }
+        body {
+            height: 100%;
+        }
+        .container {
+            height: 100%;
+            background-image: linear-gradient(to right, #fbc2eb, #a6c1ee);
+        }
+        .login-wrapper {
+            background-color: #fff;
+            width: 358px;
+            height: 588px;
+            border-radius: 15px;
+            padding: 0 50px;
+            position: relative;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .header {
+            font-size: 38px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 200px;
+        }
+        .input-item {
+            display: block;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 0;
+            padding: 10px;
+            border-bottom: 1px solid rgb(128, 125, 125);
+            font-size: 15px;
+            outline: none;
+        }
+        .input-item:placeholder {
+            text-transform: uppercase;
+        }
+        .btn {
+            text-align: center;
+            padding: 10px;
+            width: 100%;
+            margin-top: 40px;
+            background-image: linear-gradient(to right, #a6c1ee, #fbc2eb);
+            color: #fff;
+        }
+        .sub {
+            border: none;
+            outline: none;
+            text-align: center;
+            padding: 2px;
+            width: 100%;
+            font-size: 25px;
+            background-image: linear-gradient(to right, #a6c1ee, #fbc2eb);
+            color: #fff;
+        }
 
-<link rel="stylesheet" type="text/css" href="/static/admin/css/login.css">
 
-    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/static/admin/css/responsive.css">
-
-
-<meta name="robots" content="NONE,NOARCHIVE">
+        .msg {
+            text-align: center;
+            line-height: 88px;
+        }
+        a {
+            text-decoration-line: none;
+            color: #abc1ee;
+        }
+    </style>
 </head>
-
-<body class=" login"
-  data-admin-utc-offset="28800">
-
-<!-- Container -->
-<div id="container">
-
-    <!-- Header -->
-
-    <div id="header">
-        <div id="branding">
-
-<h1 id="site-name"><a href="/admin/">策略管理</a></h1>
-
+<body>
+    <div class="container">
+        <div class="login-wrapper">
+            <div class="header">Login</div>
+            <div class="form-wrapper">
+                <form action="{% url 'trading:tologin'  %}" method="post" id="login-form">
+                    {% csrf_token %}
+                    <input type="text" name="username" placeholder="username" class="input-item" required="required">
+                    <input type="password" name="password" placeholder="password" class="input-item" required="required">
+{#                    <div class="btn">{{ error_msg }}</div>#}
+                    <p>{{ error_msg }}</p>
+                    <div class="btn"><input type="submit" value="login" class="sub"></div>
+                </form>
+            </div>
+            <div class="msg">
+                Don't have account?
+                <a href="#">Sign up</a>
+            </div>
         </div>
     </div>
-
-    <!-- END Header -->
-
-    <div class="main" id="main">
-
-      <div class="content">
-
-        <!-- Content -->
-        <div id="content" class="colM">
-
-<div id="content-main">
-
-
-
-<form action="{% url 'trading:login'  %}" method="post" id="login-form">
-    <input type="hidden" name="csrfmiddlewaretoken" value="quLOm4NUuc7iwYtfWsQbLh06DvcHE2gMHaqSTdgdl15qJGOHs8EpDE3hCn9FD4vd">
-  {% csrf_token %}
-    <div class="form-row">
-
-    <label for="id_username" class="required">用户名:</label> <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username">
-  </div>
-  <div class="form-row">
-
-    <label for="id_password" class="required">密码:</label> <input type="password" name="password" autocomplete="current-password" required id="id_password">
-    <input type="hidden" name="next" value="/admin/">
-  </div>
-
-
-  <div class="submit-row">
-    <input type="submit" value="登录">
-  </div>
-</form>
-
-</div>
-
-
-          <br class="clear">
-        </div>
-        <!-- END Content -->
-        <div id="footer"></div>
-      </div>
-    </div>
-</div>
-<!-- END Container -->
 </body>
 </html>

@@ -146,3 +146,15 @@ class OrderInfo(models.Model):
         return self.accountinfo
 
 
+class NewUser(models.Model):
+    class Meta:
+        verbose_name = "用户"
+        verbose_name_plural = "用户"
+
+    name = models.CharField(verbose_name='登录名', max_length=20)
+    password = models.CharField(verbose_name='密码', max_length=20)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
