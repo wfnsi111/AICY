@@ -2,12 +2,11 @@ import json
 import time
 import platform
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
 from django.urls import reverse
 from .strategy.main import start_my_strategy
 from .models import Trader, AccountInfo, OrderInfo, Strategy
-from requests.exceptions import ConnectionError
 from .strategy.okx.AccountAndTradeApi import AccountAndTradeApi
 from .task import *
 from .login_views import islogin
