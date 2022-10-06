@@ -99,6 +99,9 @@ class MaTrade(BaseTrade):
                 self.track_trading_status(3)
                 self.signal_order_para = self.check_signal3(self.signal1)
                 if self.signal_order_para:
+                    if self.signal_order_para == 'no singnal':
+                        # 未出现开仓信号， 停止交易
+                        break
                     print()
                     print('已检测到信号3.。。。')
                     # 开仓
@@ -121,9 +124,19 @@ class MaTrade(BaseTrade):
                 self.track_trading_status(3)
                 self.signal_order_para = self.check_signal3(self.signal1)
                 if self.signal_order_para:
+                    if self.signal_order_para == 'no singnal':
+                        # 未出现开仓信号， 停止交易
+                        break
                     # 开仓
                     self.track_trading_status(4)
                     self.ready_order()
+
+        # 结束循环，重置账户状态
+        self.log.info('结束策略，重置账户状态')
+        for accountinfo in self.all_accountinfo_data_list:
+            obj = accountinfo['obj']
+            obj.status = 0
+            obj.save()
 
     def set_my_position(self, mybalance, atr):
         # 设置头寸
@@ -626,10 +639,11 @@ class MaTrade(BaseTrade):
             time.sleep(5)
 
         # 没出现信号
-        self.log.info('未出现开仓信号 ，重新开始新一轮检测')
-        print('未出现开仓信号 ，重新开始新一轮检测')
+        self.log.info('未出现开仓信号， 停止交易')
+        # print('未出现开仓信号 ，重新开始新一轮检测')
         self.track_trading_status(0)
-        raise Exception('未出现开仓信号， 停止交易')
+        return 'no singnal'
+        # raise Exception('未出现开仓信号， 停止交易')
 
     def get_time_inv(self, t, big_bar_time):
         t_num = int(re.findall(r"\d+", t)[0])
@@ -694,9 +708,9 @@ class MaTrade(BaseTrade):
                 has_order = self.get_positions()
                 if has_order:
                     self.log.error('止损止盈检查错误， 订单ID%s' % order_data.get('ordId'))
-                obj = accountinfo['obj']
-                obj.status = 0
-                obj.save()
+                # obj = accountinfo['obj']
+                # obj.status = 0
+                # obj.save()
                 orderinfo_obj = accountinfo['orderinfo_obj']
                 pnl = order_data.get('pnl')
                 orderinfo_obj.pnl = pnl
