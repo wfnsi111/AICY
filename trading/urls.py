@@ -29,5 +29,7 @@ urlpatterns = [
     path('orderinfo/', trading_views.orderinfo_show, name='orderinfo'),
     path('strategy/', trading_views.strategyinfo, name='strategyinfo'),
     path('stop_processing_strategy/', trading_views.stop_processing_strategy, name='stop_processing_strategy'),
+    path('log/', trading_views.check_log, name='check_log'),
+    path('showlog/<log_id>', trading_views.show_log, name='show_log'),
 
 ]

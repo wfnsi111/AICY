@@ -12,7 +12,7 @@
 
 
         .nav{list-style:none; height:30px; border-bottom:10px solid #F60; margin-top:20px; padding-left:50px;
-        padding-right:50px;}
+        padding-right:50px; min-width:900px;}
 
         .nav li{float:left}
         .nav li:last-child {float: right;}
@@ -37,6 +37,7 @@
         <li><a href="{%  url 'trading:addaccount' %} "> 添加账户 </a></li>
         <li><a href="{%  url 'trading:orderinfo' %} "> 订单信息 </a></li>
         <li><a href="{%  url 'trading:strategyinfo' %} "> 策略信息 </a></li>
+        <li><a href="{%  url 'trading:check_log' %} "> 查看日志 </a></li>
         <li class="last_li"><a href="{%  url 'trading:tologout' %} "> 退出登录 </a></li>
     </ul>
     {% block basehtml %}

@@ -1,0 +1,23 @@
+{% extends 'trading/base.html' %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>日志浏览</title>
+</head>
+<body>
+{% block basehtml %}
+
+    {% if not logs %}
+        <h1><a href="#"> 没有日志文件 </a> </h1>
+    {% endif %}
+
+    {% for log in logs %}
+        <h1><a href="{%  url 'trading:show_log' log %} "> {{ log }} </a> </h1>
+    {% endfor %}
+
+{% endblock %}
+</body>
+</html>

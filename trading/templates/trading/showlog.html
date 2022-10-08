@@ -1,0 +1,41 @@
+{% extends 'trading/base.html' %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>日志浏览</title>
+    {% block mystyle %}
+
+        <style type="text/css">
+            .bg{
+                min-width:900px;
+                width: 95%;
+                text-align: center;
+            }
+
+
+            .logdata{
+
+                background: #E0FFFF;
+                margin-left: 100px;
+                width: 90%;
+                resize: none;
+                font-size: 17px;
+
+            }
+        </style>
+    {% endblock %}
+</head>
+
+<body>
+{% block basehtml %}
+    <div class="bg">
+        <label>
+        <textarea class="logdata" name=text rows=65 readonly="readonly"> {{ file_content }} </textarea>
+        </label>
+    </div>
+{% endblock %}
+</body>
+</html>
