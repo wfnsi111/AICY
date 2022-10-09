@@ -1,20 +1,20 @@
 args_dict = {
     '5m': {
-        "ma_percent": 0.003,
+        "ma_percent": 0.001,
         'bar1': '1m',
         'stop_loss': 1,
         'set_profit': 5,
         'risk_control': 0.007,
     },
     '15m': {
-        "ma_percent": 0.005,
+        "ma_percent": 0.002,
         'bar1': '1m',
         'stop_loss': 1,
         'set_profit': 7,
         'risk_control': 0.01,
     },
     '30m': {
-        "ma_percent": 0.008,
+        "ma_percent": 0.003,
         'bar1': '3m',
         'stop_loss': 1,
         'set_profit': 9,
@@ -35,14 +35,14 @@ args_dict = {
         'risk_control': 0.035,
     },
     '4H': {
-        "ma_percent": 0.015,
+        "ma_percent": 0.01,
         'bar1': '5m',
         'stop_loss': 2,
         'set_profit': 15,
         'risk_control': 0.05,
     },
     '6H': {
-        "ma_percent": 0.015,
+        "ma_percent": 0.01,
         'bar1': '5m',
         'stop_loss': 3,
         'set_profit': 20,
@@ -50,14 +50,14 @@ args_dict = {
     },
 
     '12H': {
-        "ma_percent": 0.02,
+        "ma_percent": 0.01,
         'bar1': '15m',
         'stop_loss': 3,
         'set_profit': 20,
         'risk_control': 0.05,
     },
     '1D': {
-        "ma_percent": 0.03,
+        "ma_percent": 0.01,
         'bar1': '15m',
         'stop_loss': 3,
         'set_profit': 25,
