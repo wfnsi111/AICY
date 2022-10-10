@@ -1,16 +1,14 @@
 import json
-import time
 import platform
 import os
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.urls import reverse
-from .strategy.main import start_my_strategy
-from .models import Trader, AccountInfo, OrderInfo, Strategy
-from .strategy.okx.AccountAndTradeApi import AccountAndTradeApi
-from .task import *
-from .login_views import islogin
+from trading.models import AccountInfo, OrderInfo, Strategy
+from trading.strategy.okx.AccountAndTradeApi import AccountAndTradeApi
+from trading.task import *
+from trading.tradingviews.login_views import islogin
 
 
 trading_status = {
@@ -287,7 +285,7 @@ def strategyinfo(request):
 def check_log(request):
     # 获取日志文件路径
     cur_dir = os.path.dirname(os.path.abspath(__file__))
-    log_dir = os.path.join(cur_dir, 'strategy', 'log')
+    log_dir = os.path.join(cur_dir, '../strategy', 'log')
     try:
         logs = os.listdir(log_dir)
     except FileNotFoundError:
@@ -298,7 +296,7 @@ def check_log(request):
 @islogin
 def show_log(request, log_id):
     cur_dir = os.path.dirname(os.path.abspath(__file__))
-    log_file = os.path.join(cur_dir, 'strategy', 'log', log_id)
+    log_file = os.path.join(cur_dir, '../strategy', 'log', log_id)
     try:
         f = open(log_file, 'r')
         file_content = f.read()

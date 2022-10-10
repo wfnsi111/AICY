@@ -1,10 +1,7 @@
-from django.conf import settings
-from django.urls import path, re_path
-from django.contrib import admin
-from django.views.static import serve
+from django.urls import path
 
 from . import views
-from . import trading_views, account_views, login_views
+from .tradingviews import login_views, trading_views, account_views
 
 app_name = 'trading'
 

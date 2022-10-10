@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import AccountInfo
+from trading.models import AccountInfo
 
 
 def addaccount(request):
