@@ -403,6 +403,8 @@ class MaTrade(BaseTrade):
             'px': '',
             'posSide': self.posSide
         }
+        place_order_code = False
+        place_order_error_code = False
         for accountinfo in self.all_accountinfo_data_list:
             orderinfo_dict = {}
             obj = accountinfo['obj']
@@ -420,6 +422,7 @@ class MaTrade(BaseTrade):
             # result = self.tradeAPI.place_order(**para)
             ordId, sCode, sMsg= self.check_order_result_data(result, 'ordId')
             if sCode == "0":
+                place_order_code = True
                 orderinfo_dict['ordId'] = ordId
                 # 获取持仓信息
                 # self.get_order_details(self.instId, ordId)
@@ -427,7 +430,7 @@ class MaTrade(BaseTrade):
                 self.order_times += 1
                 print('%s 开仓成功！！！！！！' % obj.account_text)
                 self.log.info('%s 开仓成功！！！！！！' % obj.account_text)
-                self.track_trading_status(5)
+                # self.track_trading_status(5)
                 # 设置止损止盈
                 algo_para = self.set_place_algo_order_oco(obj_api, atr, sz)
                 orderinfo_dict.update(algo_para)
@@ -435,14 +438,21 @@ class MaTrade(BaseTrade):
                 # 设置订单信息
                 # self.orderinfo_obj = self.set_trading_orderinfo(self.accountinfo_obj, **self.orderinfo)
             else:
+                place_order_error_code = True
                 obj.status = -1
                 obj.save()
                 # self.track_trading_status(-1)
-                self.log.error(obj.account_text)
-                self.log.error('place_order error!!!!')
+                self.log.error('%s 账户异常！！！开仓失败！！！！！！' % obj.account_text)
                 self.has_order = False
             accountinfo['orderinfo'] = orderinfo_dict
 
+        if place_order_code:
+            self.has_order = True
+            self.track_trading_status(5)
+            # 发消息提示
+            self.send_msg_to_me()
+        if place_order_error_code:
+            self.track_trading_status(6)
         # 保存订单信息
         for accountinfo in self.all_accountinfo_data_list:
             orderinfo_dict = accountinfo['orderinfo']
@@ -574,7 +584,6 @@ class MaTrade(BaseTrade):
             msg = "止损止盈设置成功 市价委托"
             self.log.info(msg)
             self.log.info(price_para)
-            self.track_trading_status(6)
         else:
             # 事件执行失败时的msg
             self.log.error("止损止盈设置错误，，，%s" % msg)

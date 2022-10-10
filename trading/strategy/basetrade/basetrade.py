@@ -6,7 +6,7 @@ from ..okx import Trade_api as Trade
 from ..okx import Market_api as Market
 from ..okx.AccountAndTradeApi import AccountAndTradeApi
 from ...models import OrderInfo, AccountInfo
-
+from ..weixin_msg.work import WeixinSMS
 import pandas as pd
 import datetime
 import re
@@ -252,3 +252,14 @@ class BaseTrade:
         except Exception as e:
             self.log.error(e)
             self.log.error('订单信息保存失败')
+
+    def send_msg_to_me(self):
+        try:
+            sendmsg = WeixinSMS()
+            msg = sendmsg.send_msg_with_param()
+            if msg == 'ok':
+                self.log.info('成功发送短信到手机')
+            else:
+                self.log.info('发送短信到手机失败')
+        except Exception as e:
+            self.log.error(e)
