@@ -1,11 +1,13 @@
 from . import Account_api as Account
 from . import Trade_api as Trade
+from . import Funding_api as Funding
 
 
 class AccountAndTradeApi:
     def __init__(self, api_key, api_secret_key, passphrase, use_server_time=False, flag='0'):
         self.accountAPI = Account.AccountAPI(api_key, api_secret_key, passphrase, use_server_time, flag)
         self.tradeAPI = Trade.TradeAPI(api_key, api_secret_key, passphrase, use_server_time, flag)
+        self.fundingAPI = Funding.FundingAPI(api_key, api_secret_key, passphrase, use_server_time, flag)
 
     def close_positions_all(self, order_lst=None):
         """ 市价平仓 """
@@ -62,3 +64,12 @@ class AccountAndTradeApi:
         except Exception as e:
             print(e)
             print('初始化账户 error')
+
+    def check_account_funding_(self):
+        result = self.fundingAPI.transfer_state(transId=1, type='')
+        return result
+
+    def get_asset_bills(self):
+        result = self.fundingAPI.get_bills()
+        data_list = result.get('data', [])
+        return data_list

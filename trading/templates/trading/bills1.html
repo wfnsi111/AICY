@@ -1,0 +1,85 @@
+{% extends 'trading/base.html' %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block mytitle %} 资金流水 {% endblock %}</title>
+
+{% block mystyle %}
+<style type="text/css">
+table.altrowstable {
+    font-family: verdana,arial,sans-serif;
+    font-size:11px;
+    color:#333333;
+    border-width: 10px;
+    border-color: #a9c6c9;
+    border-collapse: collapse;
+}
+table.altrowstable th {
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #a9c6c9;
+}
+table.altrowstable td {
+    width: 110px;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #a9c6c9;
+    text-align: center;
+}
+.oddrowcolor{
+    background-color:#d4e3e5;
+}
+.evenrowcolor{
+    background-color:#c3dde0;
+}
+
+a{text-decoration: none;}
+a:visited{text-decoration: none;}
+a:hover {text-decoration: none;}
+a:active{text-decoration:none;}
+
+button{
+    color: aqua;
+}
+</style>
+{% endblock %}
+</head>
+<body>
+
+{% block basehtml %}
+<h1>账户资金流水</h1>
+<!-- Table goes in the document BODY -->
+<table class="altrowstable" id="alternatecolor">
+    <tr>
+        <th>账户</th>
+        <th>账户层面的余额数量</th>
+        <th>账户层面的余额变动数量</th>
+        <th>账单类型</th>
+        <th>日期</th>
+        <th>账户余额币种</th>
+
+    </tr>
+
+    {% for bill in bills  %}
+        <tr>
+            <td>{{ bill.accountinfo }}</td>
+            <td>{{ bill.bal }}</td>
+            <td>{{ bill.balchg }}</td>
+            <td>{{ bill.type }}</td>
+            <td>{{ bill.bill_date }}</td>
+            <td>{{ bill.ccy }}</td>
+
+        </tr>
+    {% endfor %}
+
+</table>
+
+{% endblock %}
+
+</body>
+</html>

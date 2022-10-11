@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 
 from django.contrib import admin
-from .models import Trader, AccountInfo, Strategy, OrderInfo, NewUser
+from .models import Trader, AccountInfo, Strategy, OrderInfo, NewUser, AccountAssetBills
 
 
 admin.site.site_header = '交易员管理'
@@ -16,4 +16,5 @@ admin.site.register(AccountInfo)
 admin.site.register(Strategy)
 admin.site.register(OrderInfo)
 admin.site.register(NewUser)
+admin.site.register(AccountAssetBills)
 

@@ -65,11 +65,14 @@
         <li><a href="{%  url 'trading:addaccount' %} "> 添加账户 </a></li>
         <li><a href="{%  url 'trading:orderinfo' %} "> 订单信息 </a></li>
         <li><a href="{%  url 'trading:strategyinfo' %} "> 策略信息 </a></li>
+        <li><a href="{%  url 'trading:check_account_asset_bills' %} "> 查看流水 </a></li>
         <li><a href="{%  url 'trading:check_log' %} "> 查看日志 </a></li>
         <li class="last_li"><a href="{%  url 'trading:tologout' %} "> 退出登录 </a></li>
     </ul>
-    {% block basehtml %}
-        <p>original</p>
-    {% endblock %}
+    <div style="margin-left: 100px">
+        {% block basehtml %}
+            <p>original</p>
+        {% endblock %}
+    </div>
 </body>
 </html>

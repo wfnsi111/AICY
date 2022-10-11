@@ -63,7 +63,7 @@ class AccountInfo(models.Model):
 
     trader = models.ForeignKey(Trader, on_delete=models.CASCADE)
     account_text = models.CharField(verbose_name='用户名称', max_length=50)
-    api_key = models.CharField(max_length=50)
+    api_key = models.CharField(max_length=50, unique=True)
     secret_key = models.CharField(max_length=50)
     passphrase = models.CharField(max_length=50)
     balance = models.IntegerField(verbose_name='保证金（USD）', default=0)
@@ -158,3 +158,22 @@ class NewUser(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class AccountAssetBills(models.Model):
+    class Meta:
+        verbose_name = "资金流水"
+        verbose_name_plural = "资金流水"
+
+    accountinfo = models.ForeignKey(AccountInfo, on_delete=models.CASCADE)
+    billid = models.CharField(verbose_name='账单 ID', max_length=20, unique=True)
+    bal = models.CharField(verbose_name='账户层面的余额数量', max_length=20)
+    balchg = models.CharField(verbose_name='账户层面的余额变动数量', max_length=20)
+    ccy = models.CharField(verbose_name='账户余额币种', max_length=20)
+    type = models.CharField(verbose_name='账单类型', max_length=10, null=True)
+    bill_date = models.CharField(verbose_name='时间', max_length=50)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.accountinfo

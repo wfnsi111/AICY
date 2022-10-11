@@ -29,4 +29,9 @@ urlpatterns = [
     path('log/', trading_views.check_log, name='check_log'),
     path('showlog/<log_id>', trading_views.show_log, name='show_log'),
 
+    path('funding/', account_views.check_account_funding, name='check_account_funding'),
+    path('bills/', account_views.check_account_asset_bills, name='check_account_asset_bills'),
+
+
+
 ]
