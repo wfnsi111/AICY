@@ -103,6 +103,6 @@ def check_account_asset_bills(request):
     if request.method == 'POST':
         accountinfo_id = request.POST.get('accountinfo_id', '')
         acc = AccountInfo.objects.get(pk=accountinfo_id)
-        bills = acc.accountassetbills_set.all()
+        bills = acc.accountassetbills_set.all().order_by('-bill_date')
         # bills = AccountAssetBills.objects.filter(accountinfo_id=int(accountinfo_id))
         return render(request, 'trading/bills1.html', {"bills": bills})
