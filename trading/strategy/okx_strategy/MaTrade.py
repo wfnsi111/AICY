@@ -43,6 +43,10 @@ class MaTrade(BaseTrade):
         self.signal_info_dict = {}
         self.ma_percent, self.bar1, self.max_stop_loss, self.set_profit, self.risk_control = self.set_args(self.bar2)
         self.lever = "50"
+        self.test1 = False
+        # self.test1 = 'long'
+        # self.test1 = 'short'
+
 
     def drow_k(self, df, ma_list=None):
         ma_list = [self.ma]
@@ -72,11 +76,15 @@ class MaTrade(BaseTrade):
         if not self.all_accountinfo_data_list:
             self.log.info('no account info data')
             return
-        self.track_trading_status(1)
+        if self.strategy_obj.status < 5:
+            self.track_trading_status(1)
         self.has_order = self.get_positions()
         while True:
             self.signal_info_dict = {}
-            time.sleep(60)
+            if self.test1:
+                time.sleep(1)
+            else:
+                time.sleep(60)
             # 检测持仓
             # self.has_order = self.get_positions()
             if self.has_order:
@@ -110,7 +118,7 @@ class MaTrade(BaseTrade):
                     continue
 
             # 判断信号1
-            self.track_trading_status(1)
+            # self.track_trading_status(1)
             self.signal1 = self.check_signal1()
             if not self.signal1:
                 # print('等待信号1....................')
@@ -596,7 +604,8 @@ class MaTrade(BaseTrade):
         self.track_trading_status(update_status=False)
         self.trend_analyze()
         signal1 = self.set_signal_1h()
-        # signal1 = 'short'
+        if self.test1:
+            signal1 = self.test1
         return signal1
 
     def check_signal2(self):
@@ -614,7 +623,8 @@ class MaTrade(BaseTrade):
             last_p = row['close']
             # 2 判断价格接近均线 %1 附近，
             signal2 = self.price_to_ma(last_p, ma, self.ma_percent)
-            # signal2 = True
+            if self.test1:
+                signal2 = True
             if signal2:
                 print()
                 print("信号2已确认！")
@@ -639,8 +649,9 @@ class MaTrade(BaseTrade):
                 signal_order_para = self.get_short_signal_3min_confirm()
             else:
                 signal_order_para = False
-            # signal_order_para = {"side": "buy", "posSide": "long"}
-            # signal_order_para = {"side": "sell", "posSide": "short"}
+            if self.test1:
+                signal_order_para = {"side": "sell", "posSide": "short"} if self.test1 == 'short' else \
+                    {"side": "buy", "posSide": "long"}
             if signal_order_para:
                 self.log.info('满足3分钟信号')
                 print('满足3分钟信号')

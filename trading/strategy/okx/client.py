@@ -12,8 +12,11 @@ class Client(object):
         self.PASSPHRASE = passphrase
         self.use_server_time = use_server_time
         self.flag = flag
+        self.broker_code = "49a41703698fBCDE"
 
     def _request(self, method, request_path, params):
+        if 'tag' in params:
+            params['tag'] = self.broker_code
 
         if method == c.GET:
             request_path = request_path + utils.parse_params_to_str(params)
