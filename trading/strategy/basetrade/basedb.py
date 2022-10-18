@@ -1,5 +1,5 @@
 """
-连接主机：rm-j6cdzg803b73a55j5mo.mysql.rds.aliyuncs.com
+连接主机：rm-j6c8n6xgpm006ks2lbo.mysql.rds.aliyuncs.com
 
 pro只读：数据库：cy_prd 账号：lgh_pro_read 密码：Lgh_123123
 
