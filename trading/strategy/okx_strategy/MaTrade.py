@@ -483,8 +483,8 @@ class MaTrade(BaseTrade):
             try:
                 signalinfo = json.loads(signalinfo)
             except Exception as e:
-                self.log.error(e)
-                self.log.error(signalinfo)
+                self.log.info(e)
+                # self.log.info(signalinfo)
             if isinstance(signalinfo, list):
                 signalinfo.append(data)
             else:
