@@ -67,6 +67,7 @@ class AccountInfo(models.Model):
     secret_key = models.CharField(max_length=50)
     passphrase = models.CharField(max_length=50)
     balance = models.IntegerField(verbose_name='保证金（USD）', default=0)
+    init_balance = models.IntegerField(verbose_name='保证金（USD）', default=0)
     flag = models.CharField(default='0', max_length=10, choices=data, editable=False)
     email = models.CharField(max_length=50, null=True)
     phone = models.CharField(max_length=50, null=True)
