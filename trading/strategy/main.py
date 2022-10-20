@@ -7,8 +7,8 @@ from ..models import Strategy, AccountInfo
 
 
 class MyTrade(BaseTrade):
-    def __init__(self, api_key, secret_key, passphrase, use_server_time=False, flag="1"):
-        super().__init__(api_key, secret_key, passphrase, use_server_time, flag)
+    def __init__(self, api_key, secret_key, passphrase, use_server_time=False, flag="1", logfile=None):
+        super().__init__(api_key, secret_key, passphrase, use_server_time, flag, logfile)
         self.passphrase = passphrase
         self.api_key = api_key
         self.secret_key = secret_key
@@ -58,15 +58,17 @@ def start_my_strategy(strategy_name, kwargs):
     strategy_obj = Strategy(name=strategy_name, ma=kwargs.get('ma'), instid=kwargs.get('instId'),
                             bar2=kwargs.get('bar2'), accountinfo=all_accountinfo)
 
+    logfile = kwargs.get('bar2') + '_log'
     kwargs['strategy_obj'] = strategy_obj
     kwargs['accountinfo'] = one_accountinfo
+    kwargs['logfile'] = logfile
 
     try:
         strategy_obj.is_active = 1
         strategy_obj.status = 1
         strategy_obj.msg = ''
         strategy_obj.save()
-        my_trade = MyTrade(api_key, secret_key, passphrase, use_server_time, flag)
+        my_trade = MyTrade(api_key, secret_key, passphrase, use_server_time, flag, logfile)
         my_trade.start_tarde(strategy_name, **kwargs)
     except ConnectionError as e:
         strategy_obj.msg = e

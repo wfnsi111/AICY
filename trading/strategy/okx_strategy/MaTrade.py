@@ -23,7 +23,7 @@ import re
 
 class MaTrade(BaseTrade):
     def __init__(self, api_key=None, secret_key=None, passphrase=None, use_server_time=False, flag='1', **kwargs):
-        super().__init__(api_key, secret_key, passphrase, use_server_time, flag)
+        super().__init__(api_key, secret_key, passphrase, use_server_time, flag, logfile=kwargs.get('logfile', None))
         self.df = None
         self.df_3mins = None
         self.stop_loss = 0

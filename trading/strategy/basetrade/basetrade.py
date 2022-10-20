@@ -14,11 +14,11 @@ import time
 
 
 class BaseTrade:
-    def __init__(self, api_key, secret_key, passphrase, use_server_time=False, flag='1'):
+    def __init__(self, api_key, secret_key, passphrase, use_server_time=False, flag='1', logfile=None):
         self.marketAPI = Market.MarketAPI(api_key, secret_key, passphrase, use_server_time, flag)
         self.accountAPI = Account.AccountAPI(api_key, secret_key, passphrase, use_server_time, flag)
         self.tradeAPI = Trade.TradeAPI(api_key, secret_key, passphrase, use_server_time, flag)
-        self.log = LoggerHandler(file='testlog')
+        self.log = LoggerHandler(file=logfile)
         self.side = 'buy'
         self.trade_ok = False
         self.posSide = ''
