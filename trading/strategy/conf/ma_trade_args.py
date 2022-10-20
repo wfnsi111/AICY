@@ -7,7 +7,7 @@ args_dict = {
         'risk_control': 0.007,
     },
     '15m': {
-        "ma_percent": 0.005,
+        "ma_percent": 0.003,
         'bar1': '1m',
         'stop_loss': 1,
         'set_profit': 7,
@@ -18,7 +18,7 @@ args_dict = {
         'bar1': '3m',
         'stop_loss': 1,
         'set_profit': 9,
-        'risk_control': 0.009,
+        'risk_control': 0.0012,
     },
     '1H': {
         "ma_percent": 0.004,
