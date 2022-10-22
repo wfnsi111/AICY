@@ -14,7 +14,7 @@ import pandas as pd
 try:
     import mplfinance as mpf
 except:
-    print(' import mplfinance error')
+    pass
 import time
 from ..basetrade.basetrade import BaseTrade
 from ..conf.ma_trade_args import args_dict
@@ -46,6 +46,7 @@ class MaTrade(BaseTrade):
         self.test1 = False
         # self.test1 = 'long'
         # self.test1 = 'short'
+        self.signal_recorder = {}
 
 
     def drow_k(self, df, ma_list=None):
@@ -124,11 +125,15 @@ class MaTrade(BaseTrade):
                 # print('等待信号1....................')
                 continue
 
+            self.signal_recorder["signal1"] = {"signal1": self.signal1}
             self.log.info('信号1已确认!')
+            self.log.info(self.signal_recorder['signal1'])
             # 判断信号2
             self.track_trading_status(2)
             self.signal2 = self.check_signal2()
             if self.signal2:
+                self.log.info("信号2已确认！")
+                self.log.info(self.signal_recorder['signal2'])
                 self.track_trading_status(3)
                 self.signal_order_para = self.check_signal3(self.signal1)
                 if self.signal_order_para:
@@ -214,7 +219,7 @@ class MaTrade(BaseTrade):
         # df_3mins = self.get_3_min_data()
         # df_3mins = self.get_3min_data_history()
         df_3mins = self._get_market_data(self.instId, self.bar1, vol_ma=20, limit='100')
-        front_volume = df_3mins.iloc[-2, :]['volume']
+        before_volume = df_3mins.iloc[-2, :]['volume']
         row2 = df_3mins.iloc[-1, :]
         bar1_close = float(row2['close'])
         _volume = float(row2['volume'])
@@ -225,12 +230,17 @@ class MaTrade(BaseTrade):
         vol_ma = float(row2['vol_ma'])
         # 引线, 成交量，价格
         if down_wick > 0.666 * entity:
-            if _volume > 2 * float(front_volume):
+            if _volume > 2 * float(before_volume):
                 if _volume >= 2 * vol_ma:
-                    code = self.check_price_to_ma_pec(bar1_close)
+                    code, bar2_ma = self.check_price_to_ma_pec(bar1_close)
                     if code:
                         # 满足条件
                         self.signal_info_dict['price'] = bar1_close
+                        self.signal_recorder['signal3'] = {'bar1': self.bar1, 'high': float(row2['high']),
+                                                           'open': _open, 'low': _low, 'close': bar1_close,
+                                                           'volume': _volume, "vol_ma20": vol_ma,
+                                                           "before_volume": before_volume, "bar2_ma": bar2_ma,
+                                                           "side": "buy", "posSide": "long"}
                         self.record_price(df_3mins)
                     return {"side": "buy", "posSide": "long"}
         return False
@@ -242,7 +252,7 @@ class MaTrade(BaseTrade):
             2 vol是前K线的2倍
         """
         df_3mins = self._get_market_data(self.instId, self.bar1, vol_ma=20, limit='100')
-        front_volume = df_3mins.iloc[-2, :]['volume']
+        before_volume = df_3mins.iloc[-2, :]['volume']
         row2 = df_3mins.iloc[-1, :]
         bar1_close = float(row2['close'])
         _volume = float(row2['volume'])
@@ -254,22 +264,30 @@ class MaTrade(BaseTrade):
         vol_ma = float(row2['vol_ma'])
         # 引线, 成交量，价格
         if up_wick >= 0.666 * entity:
-            if _volume >= 2 * float(front_volume):
+            if _volume >= 2 * float(before_volume):
                 if _volume >= 2 * vol_ma:
-                    code = self.check_price_to_ma_pec(bar1_close)
+                    code, bar2_ma = self.check_price_to_ma_pec(bar1_close)
                     if code:
                         # 满足条件
                         self.record_price(df_3mins)
+                        self.signal_recorder['signal3'] = {'bar1': self.bar1, 'high': _high, 'open': _open,
+                                                           'low': float(row2['low']), 'close': bar1_close,
+                                                           'volume': _volume, "vol_ma20": vol_ma,
+                                                           "before_volume": before_volume, "bar2_ma": bar2_ma,
+                                                           "side": "sell", "posSide": "short"}
                         return {"side": "sell", "posSide": "short"}
         return False
 
     def record_price(self, df):
-        pd.set_option("display.max_columns", None)
-        pd.set_option('display.width', 100)
-        self.log.info('信号出现， 准备开仓')
-        self.log.info(df.tail(2))
-        print('信号出现， 准备开仓')
-        print(df.tail(2))
+        try:
+            pd.set_option("display.max_columns", None)
+            pd.set_option('display.width', 100)
+            self.log.info('信号出现， 准备开仓')
+            self.log.info(df.tail(2))
+            # print('信号出现， 准备开仓')
+            # print(df.tail(2))
+        except Exception as e:
+            pass
 
     '''
     def stop_order(self):
@@ -304,62 +322,68 @@ class MaTrade(BaseTrade):
         self.log.info('等待止盈信号')
         print('等待止盈信号')
         i = 0
-        if profit:
-            while True:
-                time.sleep(30)
-                result = self.tradeAPI.get_orders_history('SWAP', limit='1')
-                order_data = result.get('data')[0]
-                para = {"long": "sell", "short": "buy"}
-                if para.get(order_data.get('posSide')) == order_data.get('side'):
-                    # 平仓单
-                    self.has_order = self.get_positions()
-                    if self.has_order:
-                        self.log.error('止损止盈检查错误， 订单ID%s' % order_data.get('ordId'))
-                    self.stop_order_all()
-                    pnl = order_data.get('pnl')
-                    if float(pnl) >= 0:
-                        self.track_trading_status(7)
-                        print('止盈')
-                        self.log.info('止盈')
+        try:
+            if profit:
+                while True:
+                    time.sleep(30)
+                    result = self.tradeAPI.get_orders_history('SWAP', limit='1')
+                    order_data = result.get('data')[0]
+                    para = {"long": "sell", "short": "buy"}
+                    if para.get(order_data.get('posSide')) == order_data.get('side'):
+                        # 平仓单
+                        self.has_order = self.get_positions()
+                        if self.has_order:
+                            self.log.error('止损止盈检查错误， 订单ID%s' % order_data.get('ordId'))
+                        try:
+                            self.stop_order_all()
+                        except Exception as e:
+                            self.log.error(e)
+                        pnl = order_data.get('pnl')
+                        if float(pnl) >= 0:
+                            self.track_trading_status(7)
+                            print('止盈')
+                            self.log.info('止盈')
+                            self.stop_loss = 0
+                            return self.has_order, 1
+                        else:
+                            self.track_trading_status(8)
+                            print('亏损')
+                            self.log.info('亏损')
+                            self.stop_loss += 1
+                            if self.stop_loss < self.max_stop_loss:
+                                bar1_num = int(re.findall(r"\d+", self.bar1)[0])
+                                print('止损啦！本人需要冷静片刻。。。')
+                                self.log.info('止损， 休息%s在继续运行' % self.bar1)
+                                time.sleep(bar1_num*60)
+                        return self.has_order, 0
+
+            else:
+                ma = int(re.findall(r"\d+", self.ma)[0])
+                # 实时价格突破60MA. 且超过1个ATR值，平仓止盈
+                while True:
+                    time.sleep(1)
+                    # self.log.info('等待止盈信号')
+                    self.df = self._get_candle_data(self.instId, self.bar2)
+                    self.df[self.ma] = self.df['close'].rolling(ma).mean()
+                    check_flag = self.check_price_to_ma(self.df)
+                    if check_flag:
+                        self.close_positions_all()
+                        self.track_trading_status(0)
+                        self.has_order = False
                         self.stop_loss = 0
                         return self.has_order, 1
-                    else:
-                        self.track_trading_status(8)
-                        print('亏损')
-                        self.log.info('亏损')
+
+                    self.has_order = self.get_positions()
+                    if not self.has_order:
+                        # 已经触发了止损
+                        self.track_trading_status(0)
+                        self.log.info('止损.......')
+                        print('止损.......')
+                        self.has_order = False
                         self.stop_loss += 1
-                        if self.stop_loss < self.max_stop_loss:
-                            bar1_num = int(re.findall(r"\d+", self.bar1)[0])
-                            print('止损啦！本人需要冷静片刻。。。')
-                            self.log.info('止损， 休息%s在继续运行' % self.bar1)
-                            time.sleep(bar1_num*60)
-                    return self.has_order, 0
-
-        else:
-            ma = int(re.findall(r"\d+", self.ma)[0])
-            # 实时价格突破60MA. 且超过1个ATR值，平仓止盈
-            while True:
-                time.sleep(1)
-                # self.log.info('等待止盈信号')
-                self.df = self._get_candle_data(self.instId, self.bar2)
-                self.df[self.ma] = self.df['close'].rolling(ma).mean()
-                check_flag = self.check_price_to_ma(self.df)
-                if check_flag:
-                    self.close_positions_all()
-                    self.track_trading_status(0)
-                    self.has_order = False
-                    self.stop_loss = 0
-                    return self.has_order, 1
-
-                self.has_order = self.get_positions()
-                if not self.has_order:
-                    # 已经触发了止损
-                    self.track_trading_status(0)
-                    self.log.info('止损.......')
-                    print('止损.......')
-                    self.has_order = False
-                    self.stop_loss += 1
-                    return self.has_order, 0
+                        return self.has_order, 0
+        except Exception as e:
+            self.log.error(e)
 
     def check_price_to_ma(self, df):
         # 实时价格突破60MA
@@ -394,7 +418,7 @@ class MaTrade(BaseTrade):
         # else:
         #     print('价格远离均线，信号无效，重新检测中')
         #     self.log.info('价格远离均线，信号无效，重新检测中')
-        return code
+        return code, ma
 
     def ready_order(self):
         # isolated cross保证金模式.全仓, market：市价单  limit：限价单 post_only：只做maker单
@@ -458,7 +482,8 @@ class MaTrade(BaseTrade):
             self.has_order = True
             self.track_trading_status(5)
             # 发消息提示
-            self.send_msg_to_me()
+            if not self.test1:
+                self.send_msg_to_me()
         if place_order_error_code:
             self.track_trading_status(6)
         # 保存订单信息
@@ -626,9 +651,9 @@ class MaTrade(BaseTrade):
             if self.test1:
                 signal2 = True
             if signal2:
-                print()
-                print("信号2已确认！")
-                self.log.info("信号2已确认！")
+                self.signal_recorder["signal2"] = {'bar2': self.bar2, 'last': last_p, 'ma': ma,
+                                                   'ma_percent': self.ma_percent}
+
                 return True
 
     def check_signal3(self, signal1):
@@ -653,8 +678,8 @@ class MaTrade(BaseTrade):
                 signal_order_para = {"side": "sell", "posSide": "short"} if self.test1 == 'short' else \
                     {"side": "buy", "posSide": "long"}
             if signal_order_para:
-                self.log.info('满足3分钟信号')
-                print('满足3分钟信号')
+                self.log.info("信号3已确认！")
+                self.log.info(self.signal_recorder['signal3'])
                 return signal_order_para
             time.sleep(5)
 
