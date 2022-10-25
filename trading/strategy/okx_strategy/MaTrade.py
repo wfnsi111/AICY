@@ -9,7 +9,7 @@
 """
 import json
 
-from ...models import AccountInfo, Strategy
+from ...models import AccountInfo, Strategy, PlaceAlgo
 import pandas as pd
 try:
     import mplfinance as mpf
@@ -242,7 +242,7 @@ class MaTrade(BaseTrade):
                                                            "before_volume": before_volume, "bar2_ma": bar2_ma,
                                                            "side": "buy", "posSide": "long"}
                         self.record_price(df_3mins)
-                    return {"side": "buy", "posSide": "long"}
+                        return {"side": "buy", "posSide": "long"}
         return False
 
     def get_short_signal_3min_confirm(self):
@@ -437,6 +437,7 @@ class MaTrade(BaseTrade):
         }
         place_order_code = False
         place_order_error_code = False
+        placc_algo_order_info_list = []
         for accountinfo in self.all_accountinfo_data_list:
             orderinfo_dict = {}
             obj = accountinfo['obj']
@@ -455,7 +456,6 @@ class MaTrade(BaseTrade):
             ordId, sCode, sMsg= self.check_order_result_data(result, 'ordId')
             if sCode == "0":
                 place_order_code = True
-                orderinfo_dict['ordId'] = ordId
                 # 获取持仓信息
                 # self.get_order_details(self.instId, ordId)
                 self.has_order = self.get_positions()
@@ -463,12 +463,21 @@ class MaTrade(BaseTrade):
                 print('%s 开仓成功！！！！！！' % obj.account_text)
                 self.log.info('%s 开仓成功！！！！！！' % obj.account_text)
                 # self.track_trading_status(5)
+
+                avgpx = '0'
+                if self.order_lst:
+                    avgpx = "%.2f" % float(self.order_lst[0].get('avgPx'))
+                orderinfo_dict['ordId'] = ordId
+                orderinfo_dict['avgPx'] = avgpx
+
                 # 设置止损止盈
-                algo_para = self.set_place_algo_order_oco(obj_api, atr, sz)
+                algo_para = self.set_place_algo_order_oco(obj_api, atr, sz, avgpx)
+                algo_para['orderid'] = ordId
+                algo_para['accountinfo_id'] = obj.id
+                algo_para['instid'] = self.instId
+                placc_algo_order_info_list.append(algo_para)
                 orderinfo_dict.update(algo_para)
                 self.has_order = True
-                # 设置订单信息
-                # self.orderinfo_obj = self.set_trading_orderinfo(self.accountinfo_obj, **self.orderinfo)
             else:
                 place_order_error_code = True
                 obj.status = -1
@@ -486,9 +495,11 @@ class MaTrade(BaseTrade):
                 self.send_msg_to_me()
         if place_order_error_code:
             self.track_trading_status(6)
+
         # 保存订单信息
         for accountinfo in self.all_accountinfo_data_list:
             orderinfo_dict = accountinfo['orderinfo']
+            orderinfo_dict['strategyid'] = self.strategy_obj.id
             accountinfo_obj = accountinfo['obj']
             orderinfo_obj = self.set_trading_orderinfo(accountinfo_obj, **orderinfo_dict)
             accountinfo['orderinfo_obj'] = orderinfo_obj
@@ -501,6 +512,15 @@ class MaTrade(BaseTrade):
         self.signal_info_dict['atr'] = atr
         self.signal_info_dict['p'] = p
         self.set_strategy_info(self.signal_info_dict)
+
+        # 保存委托订单信息
+        for item in placc_algo_order_info_list:
+            new_dict = {}
+            for i, j in item.items():
+                # 把key转小写
+                new_dict[i.lower()] = j
+            algo = PlaceAlgo(**new_dict, strategyid=self.strategy_obj.id)
+            algo.save()
 
     def set_strategy_info(self, data):
         signalinfo = self.strategy_obj.signalinfo
@@ -538,7 +558,7 @@ class MaTrade(BaseTrade):
             return True
         return False
 
-    def set_place_algo_order_price(self, atr):
+    def set_place_algo_order_price(self, atr, avgPx):
         """ 设置止损止盈价格
             -1是市价止盈止损
 
@@ -548,7 +568,6 @@ class MaTrade(BaseTrade):
         p = self.get_algo_p(atr)
         if self.order_lst:
             for data in self.order_lst:
-                avgPx = "%.2f" % float(data.get('avgPx'))
                 posSide = data.get('posSide')
                 if self.set_profit:
                     if posSide == 'long':
@@ -574,12 +593,12 @@ class MaTrade(BaseTrade):
                 }
                 # msg = "止损止盈设置成功， 止盈触发价：%s, 止损触发价： %s， 市价平仓" % (tp, sl)
                 # self.log.info(msg)
-                return price_para, avgPx
+                return price_para
         else:
             self.log.error("no order details!!!*******************************")
             return
 
-    def set_place_algo_order_oco(self, obj_api, atr, sz):
+    def set_place_algo_order_oco(self, obj_api, atr, sz, avgpx):
         """策略委托下单
         ordType:
             conditional：单向止盈止损
@@ -596,7 +615,8 @@ class MaTrade(BaseTrade):
         tpTriggerPxType = 'last' 最新价格
         """
         side = {"long": "sell", "short": "buy"}.get(self.posSide)
-        price_para, avgPx = self.set_place_algo_order_price(atr)
+
+        price_para = self.set_place_algo_order_price(atr, avgpx)
 
         try:
             # result = self.tradeAPI.place_algo_order(self.instId, self.tdMode, self.side, ordType=self.ordType,
@@ -605,8 +625,8 @@ class MaTrade(BaseTrade):
             #                                         tpTriggerPxType='last', slTriggerPxType='last')
 
             result = obj_api.tradeAPI.place_algo_order(self.instId, self.tdMode, side, ordType=self.ordType,
-                                                    sz=sz, posSide=self.posSide, **price_para,
-                                                    tpTriggerPxType='last', slTriggerPxType='last')
+                                                       sz=sz, posSide=self.posSide, **price_para,
+                                                       tpTriggerPxType='last', slTriggerPxType='last')
         except Exception as e:
             self.log.error("委托单错误")
             self.log.error(e)
@@ -614,14 +634,21 @@ class MaTrade(BaseTrade):
         algoId, sCode, msg = self.check_order_result_data(result, "algoId")
         if sCode == "0":
             # 事件执行结果的code，0代表成功
-            msg = "止损止盈设置成功 市价委托"
-            self.log.info(msg)
-            self.log.info(price_para)
+            status = 1
+            self.log.info("止损止盈设置成功 市价委托")
+            # self.log.info(price_para)
         else:
             # 事件执行失败时的msg
-            self.log.error("止损止盈设置错误，，，%s" % msg)
-        price_para['algo_order_id'] = algoId
-        price_para['avgPx'] = avgPx
+            status = -1
+            msg = "止损止盈设置错误，，，%s" % msg
+            self.log.error(msg)
+        price_para['algoid'] = algoId
+        price_para['posside'] = self.posSide
+        price_para['side'] = side
+        price_para['sz'] = sz
+        price_para['scode'] = sCode
+        price_para['smsg'] = msg
+        price_para['status'] = status
         return price_para
 
     def check_signal1(self):
@@ -679,7 +706,7 @@ class MaTrade(BaseTrade):
                     {"side": "buy", "posSide": "long"}
             if signal_order_para:
                 self.log.info("信号3已确认！")
-                self.log.info(self.signal_recorder['signal3'])
+                self.log.info(self.signal_recorder.get('signal3'))
                 return signal_order_para
             time.sleep(5)
 

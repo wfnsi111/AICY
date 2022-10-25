@@ -113,6 +113,7 @@ class OrderInfo(models.Model):
         verbose_name_plural = "订单信息"
 
     accountinfo = models.ForeignKey(AccountInfo, on_delete=models.CASCADE)
+    strategyid = models.IntegerField(default=0, null=True)
     ordid = models.CharField(max_length=50)
     instid = models.CharField(max_length=50)
     posside = models.CharField(max_length=10, null=True)
@@ -173,6 +174,37 @@ class AccountAssetBills(models.Model):
     ccy = models.CharField(verbose_name='账户余额币种', max_length=20)
     type = models.CharField(verbose_name='账单类型', max_length=10, null=True)
     bill_date = models.CharField(verbose_name='时间', max_length=50)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.accountinfo
+
+
+class PlaceAlgo(models.Model):
+    class Meta:
+        verbose_name = "策略委托订单"
+        verbose_name_plural = "策略委托订单"
+
+    accountinfo = models.ForeignKey(AccountInfo, on_delete=models.CASCADE)
+    algoid = models.CharField(verbose_name='委托订单 ID', max_length=50, unique=True)
+    clordid = models.CharField(verbose_name='自定义 ID', max_length=50, null=True)
+    orderid = models.CharField(verbose_name='开仓 ID', max_length=50)
+    strategyid = models.IntegerField(verbose_name='策略 ID', default=0)
+    instid = models.CharField(max_length=50, null=True)
+    posside = models.CharField(max_length=10, null=True)
+    side = models.CharField(max_length=10, null=True)
+    sz = models.CharField(max_length=10, null=True)
+
+    tptriggerpx = models.CharField(max_length=20, null=True)
+    tpordpx = models.CharField(max_length=20, null=True)
+    sltriggerpx = models.CharField(max_length=20, null=True)
+    slordpx = models.CharField(max_length=20, null=True)
+    scode = models.CharField(max_length=5, null=True)
+    smsg = models.TextField(null=True)
+
+    status = models.IntegerField(default=0)
+
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
 

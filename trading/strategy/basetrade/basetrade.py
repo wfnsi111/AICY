@@ -99,7 +99,10 @@ class BaseTrade:
         result = self.marketAPI.get_history_candlesticks(instId, bar=bar, limit=limit)
         data_lst = result.get("data")
         new_data_lst = []
-        columns_lst = ['date', 'open', 'high', 'low', 'close', 'volume', 'volCcy']
+        if len(data_lst[0]) == 8:
+            columns_lst = ['date', 'open', 'high', 'low', 'close', 'vols', 'volume', 'volCcy']
+        else:
+            columns_lst = ['date', 'open', 'high', 'low', 'close', 'volume', 'volCcy']
         # 按时间从小到大排序
         l = int(limit)
         for i in range(l, 0, -1):
@@ -126,7 +129,10 @@ class BaseTrade:
         result = self.marketAPI.get_candlesticks(instId, bar=bar, limit=limit)
         data_lst = result.get("data")
         new_data_lst = []
-        columns_lst = ['date', 'open', 'high', 'low', 'close', 'volume', 'volCcy']
+        if len(data_lst[0]) == 8:
+            columns_lst = ['date', 'open', 'high', 'low', 'close', 'vols', 'volume', 'volCcy']
+        else:
+            columns_lst = ['date', 'open', 'high', 'low', 'close', 'volume', 'volCcy']
         # 按时间从小到大排序
         l = int(limit)
         for i in range(l, 0, -1):
@@ -150,16 +156,6 @@ class BaseTrade:
         result = self.marketAPI.get_ticker(instId)
         instId_detail = result.get('data')[0]
         return instId_detail
-
-    def cancel_algo_order_(self, algoID, instId):
-        """ 撤销委托单 """
-        if not algoID:
-            algoID = self.get_algoid_data()
-        if not algoID:
-            return False
-        result = self.tradeAPI.cancel_algo_order([{'algoId': algoID, 'instId': instId}])
-        algoId, sCode, sMsg = self.check_order_result_data(result, 'algoId')
-        return algoId
 
     def get_algoid_data(self, ordType='oco'):
         """ 获取未完成策略委托单 """
@@ -246,7 +242,8 @@ class BaseTrade:
                                   side=kwargs.get('side'), avgpx=kwargs.get('avgPx'), tptriggerpx=kwargs.get('tpTriggerPx'),
                                   tpordpx=kwargs.get('tpOrdPx'), sltriggerpx=kwargs.get('slTriggerPx'),
                                   slordpx=kwargs.get('slOrdPx'), sz=kwargs.get('sz'), px=kwargs.get('px'),
-                                  lever=kwargs.get('lever'), algo_order_id=kwargs.get('algo_order_id'))
+                                  lever=kwargs.get('lever'), algo_order_id=kwargs.get('algo_order_id'),
+                                  strategyid=kwargs.get('strategyid'))
             orderinfo.accountinfo_id = accountinfo.id
             orderinfo.save()
             self.log.info('订单信息保存成功')

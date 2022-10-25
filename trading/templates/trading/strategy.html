@@ -94,12 +94,13 @@ button{
         <th>状态</th>
         <th>启动时间</th>
         <th>策略操作</th>
+        <th>委托订单</th>
 
     </tr>
 
     {% for strategyinfo in strategyinfos  %}
         <tr>
-            <td>{{ strategyinfo.name }}</td>
+            <td>{{ strategyinfo.id }}</td>
             <td>{{ strategyinfo.instid }}</td>
             <td>{{ strategyinfo.bar2 }}</td>
             <td>{{ strategyinfo.ma }}</td>

@@ -73,3 +73,18 @@ class AccountAndTradeApi:
         result = self.fundingAPI.get_bills()
         data_list = result.get('data', [])
         return data_list
+
+    def cancel_place_algo_order(self, algoid, instid):
+        """ 撤销委托单 """
+        result = self.tradeAPI.cancel_algo_order([{'algoId': algoid, 'instId': instid}])
+        datas = result.get('data')
+        msg = ''
+        for data in datas:
+            if data.get("sCode") == '0':
+                code = True
+            else:
+                code = False
+                msg = data.get("sMsg")
+            return code, msg
+
+
