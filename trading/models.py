@@ -124,7 +124,7 @@ class OrderInfo(models.Model):
     tpordpx = models.CharField(max_length=20, null=True)
     sltriggerpx = models.CharField(max_length=20, null=True)
     slordpx = models.CharField(max_length=20, null=True)
-    algo_order_id = models.CharField(max_length=50, null=True)
+    algoid = models.CharField(max_length=50, null=True)
     closeordid = models.CharField(max_length=50, null=True)
 
     tdmode = models.CharField(default='cross', max_length=20, null=True)

@@ -242,7 +242,7 @@ class BaseTrade:
                                   side=kwargs.get('side'), avgpx=kwargs.get('avgPx'), tptriggerpx=kwargs.get('tpTriggerPx'),
                                   tpordpx=kwargs.get('tpOrdPx'), sltriggerpx=kwargs.get('slTriggerPx'),
                                   slordpx=kwargs.get('slOrdPx'), sz=kwargs.get('sz'), px=kwargs.get('px'),
-                                  lever=kwargs.get('lever'), algo_order_id=kwargs.get('algo_order_id'),
+                                  lever=kwargs.get('lever'), algoid=kwargs.get('algoid'),
                                   strategyid=kwargs.get('strategyid'))
             orderinfo.accountinfo_id = accountinfo.id
             orderinfo.save()
