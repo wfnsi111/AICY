@@ -467,6 +467,9 @@ class MaTrade(BaseTrade):
                 avgpx = '0'
                 if self.order_lst:
                     avgpx = "%.2f" % float(self.order_lst[0].get('avgPx'))
+                    orderinfo_dict['order_ctime'] = self.timestamp_to_date(self.order_lst[0].get('cTime'))
+                    orderinfo_dict['order_utime'] = self.timestamp_to_date(self.order_lst[0].get('uTime'))
+
                 orderinfo_dict['ordId'] = ordId
                 orderinfo_dict['avgPx'] = avgpx
 
@@ -477,6 +480,8 @@ class MaTrade(BaseTrade):
                 algo_para['instid'] = self.instId
                 placc_algo_order_info_list.append(algo_para)
                 orderinfo_dict.update(algo_para)
+                orderinfo_dict['posside'] = self.posSide
+                orderinfo_dict['side'] = self.side
                 self.has_order = True
             else:
                 place_order_error_code = True
@@ -636,7 +641,11 @@ class MaTrade(BaseTrade):
             # 事件执行结果的code，0代表成功
             status = 1
             self.log.info("止损止盈设置成功 市价委托")
-            # self.log.info(price_para)
+            try:
+                result = self.tradeAPI.order_algos_list(ordType=self.ordType, algoId=algoId, instType='SWAP')
+                price_para['algo_ctime'] = self.timestamp_to_date(result.get('data')[0].get('cTime'))
+            except Exception as e:
+                self.log.error(e)
         else:
             # 事件执行失败时的msg
             status = -1

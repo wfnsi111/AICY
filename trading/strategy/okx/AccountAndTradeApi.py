@@ -59,8 +59,8 @@ class AccountAndTradeApi:
     def set_initialization_account(self, instId, lever='50', mgnMode='cross'):
         """ 初始化账户 """
         try:
-            result = self.accountAPI.get_position_mode('long_short_mode')
             result = self.accountAPI.set_leverage(instId=instId, lever=lever, mgnMode=mgnMode)
+            result = self.accountAPI.get_position_mode('long_short_mode')
         except Exception as e:
             print(e)
             print('初始化账户 error')

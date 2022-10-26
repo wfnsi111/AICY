@@ -61,7 +61,7 @@ args_dict = {
         'bar1': '15m',
         'stop_loss': 3,
         'set_profit': 10,
-        'risk_control': 0.05,
+        'risk_control': 0.075,
     },
 
 }

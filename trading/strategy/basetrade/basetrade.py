@@ -239,11 +239,13 @@ class BaseTrade:
     def set_trading_orderinfo(self, accountinfo, **kwargs):
         try:
             orderinfo = OrderInfo(ordid=kwargs.get('ordId'), instid=kwargs.get('instId'), posside=kwargs.get('posSide'),
-                                  side=kwargs.get('side'), avgpx=kwargs.get('avgPx'), tptriggerpx=kwargs.get('tpTriggerPx'),
-                                  tpordpx=kwargs.get('tpOrdPx'), sltriggerpx=kwargs.get('slTriggerPx'),
-                                  slordpx=kwargs.get('slOrdPx'), sz=kwargs.get('sz'), px=kwargs.get('px'),
-                                  lever=kwargs.get('lever'), algoid=kwargs.get('algoid'),
-                                  strategyid=kwargs.get('strategyid'))
+                                  side=kwargs.get('side'), avgpx=kwargs.get('avgPx'),
+                                  tptriggerpx=kwargs.get('tpTriggerPx'), tpordpx=kwargs.get('tpOrdPx'),
+                                  sltriggerpx=kwargs.get('slTriggerPx'), slordpx=kwargs.get('slOrdPx'),
+                                  sz=kwargs.get('sz'), px=kwargs.get('px'), lever=kwargs.get('lever'),
+                                  algoid=kwargs.get('algoid'), strategyid=kwargs.get('strategyid'),
+                                  order_ctime=kwargs.get('order_ctime'), order_utime=kwargs.get('order_utime'),
+                                  algo_ctime=kwargs.get('algo_ctime'))
             orderinfo.accountinfo_id = accountinfo.id
             orderinfo.save()
             self.log.info('订单信息保存成功')

@@ -144,6 +144,10 @@ class OrderInfo(models.Model):
     update_time = models.DateTimeField(auto_now=True)
     # date = models.DateTimeField('date published')
 
+    order_ctime = models.CharField(max_length=40, null=True)    # 订单创建时间
+    order_utime = models.CharField(max_length=40, null=True)    # 订单更新时间
+    algo_ctime = models.CharField(max_length=40, null=True)
+
     def __str__(self):
         return self.accountinfo
 
@@ -207,6 +211,8 @@ class PlaceAlgo(models.Model):
 
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
+
+    algo_ctime = models.CharField(max_length=40, null=True)    # 订单创建时间
 
     def __str__(self):
         return self.accountinfo
