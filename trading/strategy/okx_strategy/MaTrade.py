@@ -87,7 +87,7 @@ class MaTrade(BaseTrade):
             else:
                 time.sleep(60)
             # 检测持仓
-            # self.has_order = self.get_positions()
+            # self.has_order = True
             if self.has_order:
                 self.has_order, code = self.stop_order(profit=self.set_profit)
                 if code == 1:
@@ -642,7 +642,7 @@ class MaTrade(BaseTrade):
             status = 1
             self.log.info("止损止盈设置成功 市价委托")
             try:
-                result = self.tradeAPI.order_algos_list(ordType=self.ordType, algoId=algoId, instType='SWAP')
+                result = obj_api.tradeAPI.order_algos_list(ordType=self.ordType, algoId=algoId, instType='SWAP')
                 price_para['algo_ctime'] = self.timestamp_to_date(result.get('data')[0].get('cTime'))
             except Exception as e:
                 self.log.error(e)
