@@ -43,9 +43,7 @@ class MaTrade(BaseTrade):
         self.signal_info_dict = {}
         self.ma_percent, self.bar1, self.max_stop_loss, self.set_profit, self.risk_control = self.set_args(self.bar2)
         self.lever = "50"
-        self.test1 = False
-        # self.test1 = 'long'
-        # self.test1 = 'short'
+        self.matrade_open_order = kwargs.get('posside', None)   # 直接开仓
         self.signal_recorder = {}
 
 
@@ -82,7 +80,7 @@ class MaTrade(BaseTrade):
         self.has_order = self.get_positions()
         while True:
             self.signal_info_dict = {}
-            if self.test1:
+            if self.matrade_open_order:
                 time.sleep(1)
             else:
                 time.sleep(60)
@@ -496,7 +494,7 @@ class MaTrade(BaseTrade):
             self.has_order = True
             self.track_trading_status(5)
             # 发消息提示
-            if not self.test1:
+            if not self.matrade_open_order:
                 self.send_msg_to_me()
         if place_order_error_code:
             self.track_trading_status(6)
@@ -665,8 +663,8 @@ class MaTrade(BaseTrade):
         self.track_trading_status(update_status=False)
         self.trend_analyze()
         signal1 = self.set_signal_1h()
-        if self.test1:
-            signal1 = self.test1
+        if self.matrade_open_order:
+            signal1 = self.matrade_open_order
         return signal1
 
     def check_signal2(self):
@@ -684,7 +682,7 @@ class MaTrade(BaseTrade):
             last_p = row['close']
             # 2 判断价格接近均线 %1 附近，
             signal2 = self.price_to_ma(last_p, ma, self.ma_percent)
-            if self.test1:
+            if self.matrade_open_order:
                 signal2 = True
             if signal2:
                 self.signal_recorder["signal2"] = {'bar2': self.bar2, 'last': last_p, 'ma': ma,
@@ -710,8 +708,8 @@ class MaTrade(BaseTrade):
                 signal_order_para = self.get_short_signal_3min_confirm()
             else:
                 signal_order_para = False
-            if self.test1:
-                signal_order_para = {"side": "sell", "posSide": "short"} if self.test1 == 'short' else \
+            if self.matrade_open_order:
+                signal_order_para = {"side": "sell", "posSide": "short"} if self.matrade_open_order == 'short' else \
                     {"side": "buy", "posSide": "long"}
             if signal_order_para:
                 self.log.info("信号3已确认！")

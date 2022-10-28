@@ -14,11 +14,11 @@ args_dict = {
         'risk_control': 0.01,
     },
     '30m': {
-        "ma_percent": 0.004,
+        "ma_percent": 0.005,
         'bar1': '3m',
         'stop_loss': 1,
         'set_profit': 5,
-        'risk_control': 0.0012,
+        'risk_control': 0.02,
     },
     '1H': {
         "ma_percent": 0.004,
@@ -28,11 +28,11 @@ args_dict = {
         'risk_control': 0.015,
     },
     '2H': {
-        "ma_percent": 0.005,
+        "ma_percent": 0.01,
         'bar1': '5m',
         'stop_loss': 2,
         'set_profit': 5,
-        'risk_control': 0.02,
+        'risk_control': 0.027,
     },
     '4H': {
         "ma_percent": 0.006,

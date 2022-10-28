@@ -1,6 +1,5 @@
 import json
 import platform
-import os
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -23,14 +22,6 @@ trading_status = {
     6:  '有账户异常',
     7:  '止盈',
     8:  '止损',
-}
-
-account_status = {
-    -2: "强制退出",
-    -1: '出现错误',
-    0: '空闲中',
-    1:  '策略运行中',
-
 }
 
 
@@ -168,45 +159,6 @@ def trading_index(request):
     return render(request, 'trading/trade.html')
 
 
-@islogin
-def account_info(request):
-    if request.method == 'GET':
-        show_lst = []
-        account_all = AccountInfo.objects.filter(is_active=1)
-        for obj in account_all:
-            show_data = {}
-            try:
-                obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
-                balance = obj_api.get_my_balance('availEq')
-                show_data['balance'] = balance
-                result = obj_api.accountAPI.get_positions('SWAP')
-                order_lst = result.get('data', [])
-                if order_lst:
-                    order_algos_info = obj_api.get_order_tp_and_sl_info()
-                    if order_algos_info:
-                        show_data['tpTriggerPx'] = order_algos_info.get('tpTriggerPx')
-                        show_data['slTriggerPx'] = order_algos_info.get('slTriggerPx')
-            except Exception as e:
-                print(e)
-                order_lst = []
-            show_data['account_text'] = obj.account_text
-            show_data['id'] = obj.id
-            show_data['status'] = account_status.get(obj.status, '无状态')
-            show_data['strategy_name'] = obj.strategy_name
-            show_data['bar2'] = obj.bar2
-            if order_lst:
-                for item in order_lst:
-                    show_data.update(item)
-                    show_data['upl'] = "%.2f" % float(item['upl'])
-
-            else:
-                pass
-
-            show_lst.append(show_data)
-
-        return render(request, 'trading/accountinfo.html', {"accountinfo": show_lst})
-
-
 def test(request):
     if request.method == 'POST':
         time.sleep(5)
@@ -284,25 +236,41 @@ def strategyinfo(request):
 
 
 @islogin
-def check_log(request):
-    # 获取日志文件路径
-    cur_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    log_dir = os.path.join(cur_dir, 'strategy', 'log')
-    try:
-        logs = os.listdir(log_dir)
-    except FileNotFoundError:
-        logs = ["系统找不到指定的日志文件路径"]
-    return render(request, 'trading/checklog.html', {'logs': logs})
+def matrade_open_order(request):
+    accountinfos = AccountInfo.objects.filter(is_active=1).filter(status__in=(-2, 0))
+    if request.method == 'GET':
+        return render(request, 'trading/matrade_open_order.html', {'accountinfos': accountinfos})
+    trade_code = request.POST.get('trade_code', '')
+    if not trade_code.strip().lower() == 'lgh':
+        return HttpResponse('验证码错误')
+    ma = request.POST.get('ma', '')
+    instId = request.POST.get('instId', '')
+    bar = request.POST.get('bar', '')
+    posside = request.POST.get('posside', '')
+    if posside not in ('short', 'long'):
+        return HttpResponse('方向错误')
+    if not all([ma, instId, bar, posside]):
+        return HttpResponse('参数设置错误---[均线: %s]---[货币: %s]---[周期: %s]----[方向: %s]' % (ma, instId, bar, posside))
+    all_accountinfo = request.POST.getlist('select2')
+    if not all_accountinfo:
+        return HttpResponse('未选择账户')
+    strategy_name = 'MaTrade'
 
+    kw = {
+        'instId': instId,
+        "ma": ma,
+        "bar2": bar,
+        "posside": posside,
+        "accountinfo": all_accountinfo,
+    }
 
-@islogin
-def show_log(request, log_id):
-    cur_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    log_file = os.path.join(cur_dir, 'strategy', 'log', log_id)
     try:
-        f = open(log_file, 'r', encoding='utf-8')
-        file_content = f.read()
-        f.close()
-    except FileNotFoundError:
-        return render(request, 'trading/checklog.html', {'logs': ''})
-    return render(request, 'trading/showlog.html', {'file_content': file_content})
+        plat = platform.system().lower()
+        if plat == 'windows':
+            start_my_strategy(strategy_name, kw)
+        else:
+            # celery 管理任务
+            result = start_my_strategy_by_celery.delay(strategy_name, kw)
+    except Exception as e:
+        print(e)
+    return HttpResponse('策略启动成功')

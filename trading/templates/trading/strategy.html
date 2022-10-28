@@ -108,6 +108,7 @@ button{
             <td>{{ strategyinfo.status }}</td>
             <td>{{ strategyinfo.create_time }}</td>
             <td><a href="{% url 'trading:stop_processing_strategy' %}?strategyinfo_id={{ strategyinfo.id }}">停止运行</a></td>
+            <td><input type="button" onclick="reset_algo()" value="重置止损"></td>
 
     {% endfor %}
 
