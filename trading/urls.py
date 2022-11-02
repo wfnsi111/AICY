@@ -11,6 +11,9 @@ urlpatterns = [
     path('login/', login_views.tologin, name='tologin'),
     path('logout/', login_views.tologout, name='tologout'),
 
+    # views
+    path('boot2/', views.boot2, name='boot2'),
+
     # trading_views
     path('', trading_views.trading_index, name='trading'),
     path('maalarm/', trading_views.maalarm, name='maalarm'),
@@ -36,7 +39,5 @@ urlpatterns = [
 
     # algo_views
     path('algo/', algo_views.reset_place_algo, name='reset_place_algo'),
-    path('p1/', algo_views.p1, name="p1"),
-    path('p2/', algo_views.p2, name="p2"),
 
 ]

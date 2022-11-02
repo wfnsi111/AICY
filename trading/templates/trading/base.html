@@ -5,72 +5,44 @@
 <head>
     <meta charset="UTF-8">
     <title>交易 | {% block mytitle %} base {% endblock %}</title>
+        <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.css"/>
 
-    <script type="text/javascript">
-        function altRows(id){
-            if(document.getElementsByTagName){
-                var table = document.getElementById(id);
-                var rows = table.getElementsByTagName("tr");
-                for(i = 0; i < rows.length; i++){
-                    if(i % 2 == 0){
-                        rows[i].className = "evenrowcolor";
-                    }else{
-                        rows[i].className = "oddrowcolor";
-                    }
-                }
-            }
-        }
-
-        window.onload=function(){
-            altRows('alternatecolor');
-        }
-    </script>
     {% block myscirpt %}
     {% endblock %}
+
     <style>
-        {#*{margin:0; padding:0; font-size:14px;}#}
-        .nav{list-style:none; height:30px; border-bottom:10px solid #F60; margin-top:20px; padding-left:50px;
-        padding-right:50px; min-width:900px;}
-
-        .nav li{float:left}
-        .nav li:last-child {float: right;}
-
-        .nav li a
-        {display:block;height:30px;text-align:center; line-height:30px; width:80px;
-            background:#efefef; margin-left:1px;color:#343;text-decoration:none;}
-
-        .nav li a.on, .nav li a:hover{background:#F60;color:#fff; }
-
-        .oddrowcolor{
-            background-color:#d4e3e5;
+        .nav-last-li li:last-child {float: right;}
+        .container-xl {
+            max-width: 1600px;
+            margin-top: 20px;
+            padding-top: 20px;
         }
-        .evenrowcolor{
-            background-color:#c3dde0;
-        }
-        th{
-            background-color:#5c929a;
-        }
-
     </style>
 
     {% block mystyle %}
     {% endblock %}
 </head>
 <body>
-    <ul class="nav">
-        <li><a class="on" href="{%  url 'trading:trading' %} ">首　　页</a></li>
-        <li><a href="{%  url 'trading:trade' %} "> 登陆交易 </a></li>
-        <li><a href="{%  url 'trading:close_positions_all' %} "> 一键平仓 </a></li>
-        <li><a href="{%  url 'trading:account_info' %} "> 账户状态 </a></li>
-        <li><a href="{%  url 'trading:addaccount' %} "> 添加账户 </a></li>
-        <li><a href="{%  url 'trading:orderinfo' %} "> 订单信息 </a></li>
-        <li><a href="{%  url 'trading:strategyinfo' %} "> 策略信息 </a></li>
-        <li><a href="{%  url 'trading:check_account_asset_bills' %} "> 查看流水 </a></li>
-        <li><a href="{%  url 'trading:check_log' %} "> 查看日志 </a></li>
-        <li><a href="{%  url 'trading:matrade_open_order' %} "> 直接下单 </a></li>
-        <li class="last_li"><a href="{%  url 'trading:tologout' %} "> 退出登录 </a></li>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light " style="background-color: #e3f2fd !important;">
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto nav-last-li">
+      <li class="nav-item active"><a class="nav-link" href="{%  url 'trading:trading' %} ">首　　页 <span class="sr-only">(current)</span></a></li>
+      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:trade' %} ">登陆交易</a></li>
+      <li class="nav-item"><a class="nav-link" href="#{%  url 'trading:close_positions_all' %} ">一键平仓</a></li>
+      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:account_info' %} "> 账户状态 </a></li>
+      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:addaccount' %} "> 添加账户 </a></li>
+      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:orderinfo' %} "> 历史记录 </a></li>
+      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:strategyinfo' %} "> 策略 </a></li>
+      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:check_account_asset_bills' %} "> 流水 </a></li>
+      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:check_log' %} "> 日志 </a></li>
+      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:matrade_open_order' %} "> 直接下单 </a></li>
+      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:tologout' %} "> 退出登录 </a></li>
     </ul>
-    <div style="margin-left: 100px">
+  </div>
+</nav>
+
+    <div class="container-xl">
         {% block basehtml %}
             <p>original</p>
         {% endblock %}

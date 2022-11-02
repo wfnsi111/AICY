@@ -1,0 +1,47 @@
+table.altrowstable {
+    font-family: verdana,arial,sans-serif;
+    font-size:11px;
+    color:#333333;
+    border-width: 10px;
+    border-color: #a9c6c9;
+    border-collapse: collapse;
+}
+table.altrowstable th {
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #a9c6c9;
+}
+table.altrowstable td {
+    width: 110px;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #a9c6c9;
+    text-align: center;
+}
+.oddrowcolor{
+    background-color:#d4e3e5;
+}
+.evenrowcolor{
+    background-color:#c3dde0;
+}
+
+a{text-decoration: none;}
+a:visited{text-decoration: none;}
+a:hover {text-decoration: none;}
+a:active{text-decoration:none;}
+
+button{
+    color: aqua;
+}
+
+.model-input{
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+
+.form-group{
+    padding-left: 20px;
+    padding-right: 20px;
+}

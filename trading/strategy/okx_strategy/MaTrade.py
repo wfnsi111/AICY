@@ -737,7 +737,11 @@ class MaTrade(BaseTrade):
         return t_num * big_bar_time
 
     def set_args(self, bar):
-        data_dict = args_dict.get(bar, None)
+        from ..conf import ma_trade_args
+        from importlib import reload
+        reload(ma_trade_args)
+        data_dict = ma_trade_args.args_dict.get(bar, None)
+        self.log.info(data_dict)
         if data_dict is None:
             self.track_trading_status(0)
             self.log.error('大周期错误')

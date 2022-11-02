@@ -1,0 +1,16 @@
+.form-control {
+    width: 200px;
+}
+
+
+#btn-add, #btn-del {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 150px;
+}
+
+
+#select1, #select2{
+    width: 150px;
+    height: 150px;
+}

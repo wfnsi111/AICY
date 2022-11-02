@@ -1,5 +1,6 @@
 import json
 import platform
+import os
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -194,6 +195,10 @@ def matrade(request):
     all_accountinfo = request.POST.getlist('select2')
     if not all_accountinfo:
         return HttpResponse('未选择账户')
+    filename = request.FILES.get("args_file")
+    if filename:
+        save_args_file(filename)
+
     strategy_name = 'MaTrade'
 
     kw = {
@@ -274,3 +279,15 @@ def matrade_open_order(request):
     except Exception as e:
         print(e)
     return HttpResponse('策略启动成功')
+
+
+def save_args_file(file):
+    try:
+        cur_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        ma_trade_args = os.path.join(cur_dir, 'strategy', 'conf', 'ma_trade_args.py')
+        with open(ma_trade_args, 'wb') as f:
+            for chunk in file.chunks():
+                f.write(chunk)
+
+    except Exception as e:
+        print(e)

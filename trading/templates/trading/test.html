@@ -8,81 +8,73 @@
     <script type="text/javascript" src="{% static 'trading/js/jquery-3.6.0.min.js' %}"></script>
 
 <script>
-
-$(function(){
-    $('#tset1').submit(function (e) {
-        e.preventDefault()   // 阻止表单的默认提交行为
-        alert('tset1')
-    var data = $(this).serialize()  // 快速得到表单中的数据
-    $.post("{% url 'trading:test' %}", data, function (res) {
-        console.log(res)
-        console.log(res.status)
-        console.log(res.readyState)
-        console.log(res.statusCode)
-        console.log(res.code)
-        console.log(data)
-        if (res.status !== 201) {
-            return alert('发表评论失败！')
-        }
-    $('#formAddCmt')[0].reset()
-    })
-  })
-})
-
-
-
-
-$(function () {
-    //  1.监听表单的提交事件
-    alert('tset3')
-    $('#test2').on('submit', function (e) {
-         e.preventDefault()                  // 2.阻止表单的默认行为
-         var formdata = $('#test2').serialize()             // 3. 快速获取表单中的数据
-        //调用的结果：
-        // username=用户名的值&password=密码的值
-        //因为函数返回结果会用表单元素的name属性来表示，
-        //所以使用serialize()快速获取表单数据时需要为每个表单元素设置name属性且不重复
-        // 4.使用$.ajax()发起POST请求
-        $.ajax({
-            type : 'POST',                       //请求方式
-            url : '{% url "trading:test" %}',  //请求的URL地址
-            data: {formdata},
-            statusCode: {
-                200: function () {
-                    console.log('200');
-                },
-            },
-            success: function(res) {            //请求成功后的回调函数
-                alert('OK')
-                console.log('OK');
-                console.log(res)
-                console.log(res.status)
-                console.log(res.readyState)
-                console.log(res.statusCode)
-                console.log(res.code)
-            },
-        })
-    })
-})
-
-
 </script>
 
 <body>
-    <H1> 周期策略参数设置 </H1>
-    <form method="post" id="tset2">
-        {% csrf_token %}
-        <h2>
-            均线  <select name="ma" id="maalarm">
-                    <option value="60MA">60</option>
-                    <option value="90MA">90</option>
-            </select>
-        </h2>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document" id="stuadd_modal">
+          <div class="modal-content">
 
-        <br>
-        <br>
-         <hr>
-        <button type="submit" >提交</button>
-    </form>
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                          aria-hidden="true">×</span></button>
+                  <h4 class="modal-title" id="myModalLabel">处理</h4>
+              </div><!-- end .modal-header -->
+              <div class="modal-body">
+
+                  <form class="form-horizontal">
+
+                      <div class="form-group">
+                          <label for="stu_name" class="col-sm-2 control-label">姓名</label>
+                          <div class="col-sm-10">
+                              <input type="text" class="form-control" id="stu_name" name="stu_name" placeholder="name">
+                          </div>
+                      </div>
+                      <!-- group  -->
+                      <div class="form-group">
+                          <label for="stu_age" class="col-sm-2 control-label">年龄</label>
+                          <div class="col-sm-10">
+                              <input type="text" class="form-control" id="stu_age" name="stu_age" placeholder="age">
+                          </div>
+                      </div>
+                      <!-- group  -->
+
+                      <div class="form-group">
+                          <label class="col-sm-2 control-label">性别</label>
+                          <div class="col-sm-5">
+                              <label class="radio-inline">
+                                  <input type="radio" name="gender" id="inlineRadio1" value="1" checked="checked"> 男
+                              </label>
+                              <label class="radio-inline">
+                                  <input type="radio" name="gender" id="inlineRadio2" value="0"> 女
+                              </label>
+                          </div>
+                      </div><!-- group  -->
+
+                      <div class="form-group">
+                          <label for="class_name" class="col-sm-2 control-label">实验员</label>
+                          <div class="col-sm-3">
+                              <select class="form-control" id="class_name" name="class_name">
+                                  {% for syy in syy_list %}
+                                      <option>{{ syy }}</option>
+                                  {% endfor %}
+                              </select>
+                          </div>
+                      </div><!-- group  -->
+
+                  </form><!-- end form -->
+              </div><!-- end .modal-body  -->
+
+              <div class="modal-footer">
+                  <div class="col-lg-6">
+                      <span id="modal_error_msg"  style="color: red"></span>
+                  </div>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                  <button type="button" class="btn btn-primary" id="stuadd_modal_submit">确定</button>
+              </div><!-- end .modal-footer-->
+
+          </div> <!--end .modal-content -->
+      </div> <!-- end .modal-dialog-->
+    </div>
 </body>
 </html>

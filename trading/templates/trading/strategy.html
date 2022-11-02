@@ -5,101 +5,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-{#    {% block mystyle %}#}
-{#        <link rel="stylesheet" href="{% static 'trading/css/strategy.css' %}" />#}
-{#    {% endblock %}#}
     <title>{% block mytitle %} 我的策略 {% endblock %}</title>
 
-<script type="text/javascript">
+    {% block myscirpt %}
+        <script type="text/javascript" src="/static/trading/js/jquery-3.6.1.min.js"></script>
+        <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
+        <script type="text/javascript" src="{% static 'trading/js/strategy.js' %}"></script>
+    {% endblock %}
 
-function altRows(id){
-    if(document.getElementsByTagName){
+    {% block mystyle %}
+        <link rel="stylesheet" type="text/css" href="{% static 'trading/css/strayegy.css' %}"/>
+    {% endblock %}
 
-        var table = document.getElementById(id);
-        var rows = table.getElementsByTagName("tr");
-
-        for(i = 0; i < rows.length; i++){
-            if(i % 2 == 0){
-                rows[i].className = "evenrowcolor";
-            }else{
-                rows[i].className = "oddrowcolor";
-            }
-        }
-    }
-}
-
-window.οnlοad=function(){
-    altRows('alternatecolor');
-}
-
-
-</script>
-
-{% block mystyle %}
-<style type="text/css">
-table.altrowstable {
-    font-family: verdana,arial,sans-serif;
-    font-size:11px;
-    color:#333333;
-    border-width: 10px;
-    border-color: #a9c6c9;
-    border-collapse: collapse;
-}
-table.altrowstable th {
-    border-width: 1px;
-    padding: 8px;
-    border-style: solid;
-    border-color: #a9c6c9;
-}
-table.altrowstable td {
-    width: 110px;
-    border-width: 1px;
-    padding: 8px;
-    border-style: solid;
-    border-color: #a9c6c9;
-    text-align: center;
-}
-.oddrowcolor{
-    background-color:#d4e3e5;
-}
-.evenrowcolor{
-    background-color:#c3dde0;
-}
-
-a{text-decoration: none;}
-a:visited{text-decoration: none;}
-a:hover {text-decoration: none;}
-a:active{text-decoration:none;}
-
-button{
-    color: aqua;
-}
-</style>
-{% endblock %}
-
-</head>
 <body>
 
 {% block basehtml %}
 
-<h1>策略运行情况</h1>
-<!-- Table goes in the document BODY -->
-<table class="altrowstable" id="alternatecolor">
-    <tr>
-        <th>策略</th>
-        <th>品种</th>
-        <th>bar</th>
-        <th>MA</th>
-        <th>运行中的账户</th>
-        <th>状态</th>
-        <th>启动时间</th>
-        <th>策略操作</th>
-        <th>委托订单</th>
-
-    </tr>
-
-    {% for strategyinfo in strategyinfos  %}
+    <h1>策略运行情况</h1>
+    <!-- Table goes in the document BODY -->
+    <table class="altrowstable" id="alternatecolor">
         <tr>
+            <th>策略</th>
+            <th>品种</th>
+            <th>bar</th>
+            <th>MA</th>
+            <th>运行中的账户</th>
+            <th>状态</th>
+            <th>启动时间</th>
+            <th>策略操作</th>
+            <th>委托订单</th>
+
+        </tr>
+
+        {% for strategyinfo in strategyinfos %}
+            <tr>
             <td>{{ strategyinfo.id }}</td>
             <td>{{ strategyinfo.instid }}</td>
             <td>{{ strategyinfo.bar2 }}</td>
@@ -107,12 +46,74 @@ button{
             <td>{{ strategyinfo.accountinfo }}</td>
             <td>{{ strategyinfo.status }}</td>
             <td>{{ strategyinfo.create_time }}</td>
-            <td><a href="{% url 'trading:stop_processing_strategy' %}?strategyinfo_id={{ strategyinfo.id }}">停止运行</a></td>
-            <td><input type="button" onclick="reset_algo()" value="重置止损"></td>
+            <td>
+                <a href="{% url 'trading:stop_processing_strategy' %}?strategyinfo_id={{ strategyinfo.id }}">停止运行</a>
+            </td>
+            <td>
+                <button class="btn btn-primary">不可用</button>
+            </td>
 
-    {% endfor %}
+        {% endfor %}
 
     </table>
+    <hr>
+    <!-- 模态框 -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticBackdrop">重置委托</button>
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">设置止损止盈</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{% url 'trading:reset_place_algo' %}" method="post" id="fm">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="input-group input-group-lg model-input">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">编 号</span>
+                            </div>
+                            <input name="algo_number" type="number" class="form-control"
+                                   aria-label="Sizing example input"
+                                   aria-describedby="inputGroup-sizing-sm" required="required" autocomplete="off">
+                        </div>
+                        <div class="input-group input-group-lg model-input">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">止 盈</span>
+                            </div>
+                            <input name="algo_tp" type="number" class="form-control" aria-label="Sizing example input"
+                                   aria-describedby="inputGroup-sizing-sm" required="required" autocomplete="off">
+                        </div>
+                        <div class="input-group input-group-lg model-input">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">止 损</span>
+                            </div>
+                            <input name="algo_sl" type="number" class="form-control" aria-label="Sizing example input"
+                                   aria-describedby="inputGroup-sizing-sm" required="required" autocomplete="off">
+                        </div>
+                        <div class="input-group input-group-lg model-input">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">密 码</span>
+                            </div>
+                            <input name="trade_code" type="text" class="form-control" aria-label="Sizing example input"
+                                   aria-describedby="inputGroup-sizing-sm" required="required" autocomplete="off">
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn btn-primary">确定</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
 
 {% endblock %}
 </body>
