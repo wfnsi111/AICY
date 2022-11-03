@@ -109,8 +109,8 @@ def reset_place_algo(request):
         if error_code:
             return HttpResponse("某些账户出现未知错误， 请再出确认！！！")
 
-        # return redirect(reverse('trading:account_info'))
-        return redirect(reverse('trading:trade'))
+        return redirect(reverse('trading:account_info'))
+
 
 
 

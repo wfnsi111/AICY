@@ -197,7 +197,9 @@ def matrade(request):
         return HttpResponse('未选择账户')
     filename = request.FILES.get("args_file")
     if filename:
-        save_args_file(filename)
+        result = save_args_file(filename)
+        if not result:
+            return HttpResponse('配置文件错误')
 
     strategy_name = 'MaTrade'
 
@@ -282,12 +284,20 @@ def matrade_open_order(request):
 
 
 def save_args_file(file):
+    result = True
     try:
-        cur_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        ma_trade_args = os.path.join(cur_dir, 'strategy', 'conf', 'ma_trade_args.py')
-        with open(ma_trade_args, 'wb') as f:
-            for chunk in file.chunks():
-                f.write(chunk)
-
+        if file.name == '参数信息.txt':
+            cur_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            ma_trade_args = os.path.join(cur_dir, 'strategy', 'conf', 'ma_trade_args.py')
+            with open(ma_trade_args, 'wb') as f:
+                for chunk in file.chunks():
+                    if not chunk:
+                        result = False
+                    f.write(chunk)
+        else:
+            result = False
     except Exception as e:
         print(e)
+        result = False
+
+    return result
