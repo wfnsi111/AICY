@@ -1,5 +1,5 @@
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from trading.models import AccountInfo, AccountAssetBills
 from trading.strategy.okx.AccountAndTradeApi import AccountAndTradeApi
 from trading.tradingviews.login_views import islogin
@@ -91,7 +91,7 @@ def get_account_asset_bills(request):
             AccountAssetBills.objects.bulk_create(bills_list_to_insert)
         except Exception as e:
             print(e)
-    return HttpResponse('OK')
+    return redirect(reverse('trading:check_account_asset_bills'))
 
 
 def timestamp_to_date(t):
