@@ -1,186 +1,133 @@
 {% extends 'trading/base.html' %}
+{% load static %}
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block mytitle %} 直接开仓 {% endblock %}</title>
+    <title>{% block mytitle %} 参数设置 {% endblock %}</title>
+
     {% block mystyle %}
-{#    <script src="/trading/js/jquery-3.6.0.min.js"></script>#}
-     <script>
-            // 选中添加到右边
-            function selectedToRight(){
-
-                // 获取select2标签
-                var select2 = document.getElementById("select2");
-                // 获取select1标签
-                var select1 = document.getElementById("select1");
-                // 获取option
-                var option1 = select1.getElementsByTagName("option");
-                // 遍历
-                for (var i=0;i<option1.length;i++) {
-                    var optioni = option1[i];
-                    //是否被选中
-                    if(optioni.selected == true){
-                        // 添加到select2里面
-                        select2.appendChild(optioni);
-                        //数组长度发生变化，需要处理
-                        i--;
-                    }
-                }
-            }
-
-            // 选中添加到左边
-            function selectedToLeft(){
-
-                // 获取select2标签
-                var select2 = document.getElementById("select2");
-                // 获取select1标签
-                var select1 = document.getElementById("select1");
-                // 获取option
-                var option2 = select2.getElementsByTagName("option");
-                // 遍历
-                for (var i=0;i<option2.length;i++) {
-                    var optioni = option2[i];
-                    //是否被选中
-                    if(optioni.selected == true){
-                        // 添加到select1里面
-                        select1.appendChild(optioni);
-                        //数组长度发生变化，需要处理
-                        i--;
-                    }
-                }
-            }
-
-            // 全部添加到右边
-            function allToRight(){
-                // 获取select2标签
-                var select2 = document.getElementById("select2");
-                // 获取select1标签
-                var select1 = document.getElementById("select1");
-                // 获取option
-                var option1 = select1.getElementsByTagName("option");
-                // 遍历
-                for (var i=0;i<option1.length;i++) {
-                    var optioni = option1[i];
-                    // 添加到select2里面
-                    select2.appendChild(optioni);
-                    //数组长度发生变化，需要处理
-                    i--;
-                }
-            }
-
-
-            // 全部添加到左边
-            function allToLeft(){
-
-                // 获取select2标签
-                var select2 = document.getElementById("select2");
-                // 获取select1标签
-                var select1 = document.getElementById("select1");
-                // 获取option
-                var option2 = select2.getElementsByTagName("option");
-                // 遍历
-                for (var i=0;i<option2.length;i++) {
-                    var optioni = option2[i];
-                    // 添加到select1里面
-                    select1.appendChild(optioni);
-                    //数组长度发生变化，需要处理
-                    i--;
-
-                }
-            }
-        </script>
+        <link rel="stylesheet" type="text/css" href="{% static 'trading/css/matrade.css' %}"/>
     {% endblock %}
+
+    {% block myscirpt %}
+        <script type="text/javascript" src="/static/trading/js/jquery-3.6.1.min.js"></script>
+        <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
+        <script type="text/javascript" src="{% static 'trading/js/matrade.js' %}"></script>
+    {% endblock %}
+
 </head>
 <body>
 {% block basehtml %}
-    <H1> 周期策略参数设置 </H1>
-    <form action="{% url 'trading:matrade_open_order'  %}" method="post">
+    <form action="{% url 'trading:matrade_open_order' %}" method="post" id="fm" enctype="multipart/form-data">
         {% csrf_token %}
-        <h2>
-            均线  <select name="ma" id="maalarm">
-                    <option style="display:none"></option>
-                    <option value="60MA">60</option>
-                    <option value="90MA">90</option>
-            </select>
-        </h2>
+        <div class="bd-example" style="width: 1200px">
+            <div class="alert alert-secondary" role="alert"><h3> 周期策略参数设置</h3></div>
+            <div style="padding-left: 30px;">
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">均线</label>
+                    <select name="ma" class="form-control" id="exampleFormControlSelect1" required="required">
+                        <option style="display:none"></option>
+                        <option value="60MA">60</option>
+                        <option value="90MA">90</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">合约</label>
+                    <select name="instId" class="form-control" id="exampleFormControlSelect1" required="required">
+                        <option style="display:none"></option>
+                        <option value="ETH-USDT-SWAP">ETHUSDT</option>
+                        <option value="BTC-USDT-SWAP">BTCUSDT</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">K线周期</label>
+                    <select name="bar" class="form-control" id="exampleFormControlSelect1" required="required">
+                        <option style="display:none"></option>
+                        <option value="5m">5min</option>
+                        <option value="15m">15m</option>
+                        <option value="30m">30m</option>
+                        <option value="1H">1H</option>
+                        <option value="2H">2H</option>
+                        <option value="4H">4H</option>
+                        <option value="6H">6H</option>
+                        <option value="12H">12H</option>
+                        <option value="1D">1D</option>
+                    </select>
 
-        <h2>
-            品种  <select name="instId" id="instId">
-                    <option style="display:none"></option>
-                    <option value="ETH-USDT-SWAP">ETHUSDT</option>
-                    <option value="BTC-USDT-SWAP">BTCUSDT</option>
-            </select>
-        </h2>
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">方向</label>
+                    <select name="posside" class="form-control" id="exampleFormControlSelect1" required="required">
+                        <option style="display:none"></option>
+                        <option value="long">buy</option>
+                        <option value="short">sell</option>
+                    </select>
+                </div>
 
-        <h2>K线周期
+                <div class="input-group mb-3  form-control">
+                    <input name="args_file" onchange="showFilename(this.files[0])" type="file" class="custom-file-input"
+                           id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                    <label class="custom-file-label" for="inputGroupFile01" id="filename_label">上传配置文件</label>
+                </div>
 
-                <select name="bar" id="instId">
-                    <option style="display:none"></option>
-                    <option value="5m">5min</option>
-                    <option value="15m">15m</option>
-                    <option value="30m">30m</option>
-                    <option value="1H">1H</option>
-                    <option value="2H">2H</option>
-                    <option value="4H">4H</option>
-                    <option value="6H">6H</option>
-                    <option value="12H">12H</option>
-                    <option value="1D">1D</option>
-            </select>
-        </h2>
-
-        <h2>方向
-            <select name="posside" id="posside">
-                <option style="display:none"></option>
-                <option value="long">buy</option>
-                <option value="short">sell</option>
-        </select>
-        </h2>
-
-        <hr>
-
-            <h2>选择账户</h2>
+            </div>
+            <hr>
+            <div class="alert alert-secondary" role="alert"><h3>选择账户</h3></div>
+            <div class="form-group" style="padding-left: 30px;">
                 <div id="s1" style="float: left;">
-                    <div>
-                        <select name="select1" id="select1" multiple="multiple" style="width: 100px;height: 100px;">
+                    <div style="margin-right: 30px">
+                        <select name="select1" class="form-control" id="select1" multiple="multiple">
                             {% for accountinfo in accountinfos %}
                                 <option value={{ accountinfo.id }}>{{ accountinfo.account_text }}</option>
                             {% endfor %}
                         </select>
 
                         <div>
-                            <input type="button" value="添加账户" onclick="selectedToRight();"/><br />
-{#                            <input type="button" value="全部添加" onclick="allToRight();"/>#}
+                            <input type="button" value="添加账户" class="btn btn-success" id="btn-add"
+                                   onclick="selectedToRight();"/><br/>
+                            {#                            <input type="button" value="全部添加" onclick="allToRight();"/>#}
                         </div>
 
                     </div>
                 </div>
 
-                <div id="s2" >
+                <div id="s2">
                     <div>
-                        <select name="select2" id="select2" multiple="multiple" style="width: 100px;height: 100px;">
+                        <select name="select2" class="form-control" id="select2" multiple="multiple"
+                                required="required">
                         </select>
 
                         <div>
-                            <input type="button" value="删除账户" onclick="selectedToLeft();"/><br />
-{#                            <input type="button" value="全部删除" onclick="allToLeft();"/>#}
+                            <input type="button" value="删除账户" class="btn btn-warning" id="btn-del"
+                                   onclick="selectedToLeft();"/><br/>
+                            {#                            <input type="button" value="全部删除" onclick="allToLeft();"/>#}
                         </div>
 
                     </div>
                 </div>
 
-        <br>
-        <br>
-            <h2>验证码 <input type="text" name="trade_code" required="required" autocomplete="off">
+                <br>
+                <br>
+                <hr>
 
-            </h2>
-        <br>
-         <hr>
-        <input type="submit" value="确定">
+            </div>
 
+            <div class="form-group">
+                <label for="exampleFormControlInput1">验证码</label>
+                <input name="trade_code" type="text" class="form-control" id="exampleFormControlInput1"
+                       required="required" autocomplete="off">
+            </div>
+        </div>
+        {#        <input type="submit" value="确定">#}
+        <button class="btn btn-primary btn-sm btn-lg" id="fm_submit">确定</button>
     </form>
 
 {% endblock %}
 </body>
 </html>
+
+
+

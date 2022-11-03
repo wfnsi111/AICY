@@ -24,8 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-nxydsc2q%=jkvyr+cxp*6dfsfamudw9$$$1rh!p@4+=)4aik3e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = False
-DEBUG = True
+DEBUG = False
+# DEBUG = True
 
 ALLOWED_HOSTS = ['16.163.29.73', 'localhost', '0.0.0.0:8000', '127.0.0.1', '172.31.22.98', '192.168.1.108']
 
@@ -153,6 +153,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = '/static/'  # 别名
+
+# 公共静态文件
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
@@ -160,11 +162,11 @@ STATICFILES_DIRS = [
 # STATIC_ROOT 是在部署静态文件时(pyhton manage.py collectstatic)所有的静态文静聚合的目录。
 # django会把所有的static文件都复制到STATIC_ROOT文件夹下
 # 这个在聚合命令起作用后，会产生文件复制和转移的功能，这个功能会把app下的static文件汇总到一个STATIC_ROOT指定的目录里
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'collect_static/')
 
 # 上传参数文件存放路径
-MEDIA_ROOT = os.path.join(BASE_DIR, 'trading', 'strategy', 'conf')
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'trading', 'strategy', 'conf')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

@@ -5,13 +5,18 @@
 <head>
     <meta charset="UTF-8">
     <title>交易 | {% block mytitle %} base {% endblock %}</title>
-        <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.css"/>
 
     {% block myscirpt %}
+        <script type="text/javascript" src="/static/trading/js/jquery-3.6.1.min.js"></script>
+        <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
     {% endblock %}
 
     <style>
-        .nav-last-li li:last-child {float: right;}
+        .nav-last-li li:last-child {
+            float: right;
+        }
+
         .container-xl {
             max-width: 1600px;
             margin-top: 20px;
@@ -23,29 +28,44 @@
     {% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light " style="background-color: #e3f2fd !important;">
+<nav class="navbar navbar-expand-lg navbar-light bg-light " style="background-color: #e3f2fd !important;">
 
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto nav-last-li">
-      <li class="nav-item active"><a class="nav-link" href="{%  url 'trading:trading' %} ">首　　页 <span class="sr-only">(current)</span></a></li>
-      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:trade' %} ">登陆交易</a></li>
-      <li class="nav-item"><a class="nav-link" href="#{%  url 'trading:close_positions_all' %} ">一键平仓</a></li>
-      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:account_info' %} "> 账户状态 </a></li>
-      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:addaccount' %} "> 添加账户 </a></li>
-      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:orderinfo' %} "> 历史记录 </a></li>
-      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:strategyinfo' %} "> 策略 </a></li>
-      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:check_account_asset_bills' %} "> 流水 </a></li>
-      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:check_log' %} "> 日志 </a></li>
-      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:matrade_open_order' %} "> 直接下单 </a></li>
-      <li class="nav-item"><a class="nav-link" href="{%  url 'trading:tologout' %} "> 退出登录 </a></li>
-    </ul>
-  </div>
+    <div class="collapse navbar-collapse row" id="navbarSupportedContent">
+        <div class="col-11">
+            <ul class="navbar-nav mr-auto nav-last-li">
+                <li class="nav-item active"><a class="nav-link" href="{% url 'trading:trading' %} ">首　　页 <span class="sr-only">(current)</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'trading:trade' %} ">登陆交易</a></li>
+                <li class="nav-item"><a class="nav-link" href="#{% url 'trading:close_positions_all' %} ">一键平仓</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'trading:account_info' %} "> 账户状态 </a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'trading:addaccount' %} "> 添加账户 </a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'trading:orderinfo' %} "> 历史记录 </a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'trading:strategyinfo' %} "> 策略 </a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">资金</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{% url 'trading:check_account_asset_bills' %}">查看流水</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'trading:get_account_asset_bills' %}">更新流水</a>
+                    </div>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'trading:check_log' %} "> 日志 </a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'trading:matrade_open_order' %} "> 直接下单 </a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-1">
+            <ul class="navbar-nav mr-auto nav-last-li">
+                <li class="nav-item"><a class="nav-link" href="{% url 'trading:tologout' %} "> 退出登录 </a></li>
+            </ul>
+        </div>
+    </div>
 </nav>
 
-    <div class="container-xl">
-        {% block basehtml %}
-            <p>original</p>
-        {% endblock %}
-    </div>
+<div class="container-xl">
+    {% block basehtml %}
+        <p>original</p>
+    {% endblock %}
+</div>
 </body>
 </html>

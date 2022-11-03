@@ -36,6 +36,7 @@ urlpatterns = [
     path('addaccount/', account_views.addaccount, name='addaccount'),
     path('funding/', account_views.check_account_funding, name='check_account_funding'),
     path('bills/', account_views.check_account_asset_bills, name='check_account_asset_bills'),
+    path('up_bills/', account_views.get_account_asset_bills, name='get_account_asset_bills'),
 
     # algo_views
     path('algo/', algo_views.reset_place_algo, name='reset_place_algo'),

@@ -104,7 +104,6 @@ def timestamp_to_date(t):
 
 @islogin
 def check_account_asset_bills(request):
-    # get_account_asset_bills(request)
     if request.method == 'GET':
         all_accountinfo = AccountInfo.objects.filter(is_active=1).filter(flag=0)
         return render(request, 'trading/bills.html', {'all_accountinfo': all_accountinfo})
