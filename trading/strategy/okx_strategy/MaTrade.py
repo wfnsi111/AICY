@@ -740,7 +740,11 @@ class MaTrade(BaseTrade):
         from ..conf import ma_trade_args
         from importlib import reload
         reload(ma_trade_args)
-        data_dict = ma_trade_args.args_dict.get(bar, None)
+        try:
+            data_dict = ma_trade_args.args_dict.get(bar, None)
+        except Exception as e:
+            self.log.error(e)
+            raise
         self.log.info(data_dict)
         if data_dict is None:
             self.track_trading_status(0)
