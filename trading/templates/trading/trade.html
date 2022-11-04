@@ -7,9 +7,67 @@
     <title>{% block mytitle %} 首页 {% endblock %}</title>
 </head>
 <body>
-    {% block basehtml %}
-        <br>
-        <h1 align="center">This is a great strategy!!!</h1>
-    {% endblock %}
+
+{% block jumpart %}
+
+    <div class="bd-example">
+        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators">
+                <li data-target="#carouselExampleIndicators" data-slide-to="0" class=""></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="1" class=""></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="2" class="active"></li>
+            </ol>
+            <div class="carousel-inner">
+                <div class="carousel-item">
+                    <img src="/static/trading/images/jumtest.png" class="d-block w-100" alt="第一张幻灯片">
+
+                </div>
+                <div class="carousel-item active carousel-item-left">
+                    <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" width="800" height="400"
+                         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="占位符：第二张幻灯片"
+                         preserveAspectRatio="xMidYMid slice" focusable="false" _mstaria-label="44093101"><title
+                            _mstHash="1566825" _mstTextHash="7742150">占 位 符</title>
+                        <rect width="100%" height="100%" fill="#666"></rect>
+                        <text x="50%" y="50%" fill="#444" dy=".3em" _mstHash="2026674" _mstTextHash="19633887">
+                            第二张幻灯片
+                        </text>
+                    </svg>
+
+                </div>
+                <div class="carousel-item carousel-item-next carousel-item-left">
+                    <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" width="800" height="400"
+                         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Third slide"
+                         preserveAspectRatio="xMidYMid slice" focusable="false" _mstHidden="A" _mstHiddenAttr="1328860"
+                         _mstaria-label="508378"><title _mstHash="1567046" _mstTextHash="7742150">占 位 符</title>
+                        <rect width="100%" height="100%" fill="#555"></rect>
+                        <text x="50%" y="50%" fill="#333" dy=".3em" _mstHash="2026986" _mstTextHash="155675"
+                              _mstHidden="1">第三张幻灯片
+                        </text>
+                    </svg>
+
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-target="#carouselExampleIndicators"
+                    data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only" _msthash="1467362" _msttexthash="4029103">以前</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-target="#carouselExampleIndicators"
+                    data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only" _msthash="1467635" _msttexthash="6235931">下一个</span>
+            </button>
+        </div>
+    </div>
+    <div class="lb-tiny-hide lb-small-show lb-mid-show lb-large-show lb-xlarge-show lb-none-pad lb-box">
+
+    </div>
+
+{% endblock %}
+{% block basehtml %}
+
+    <br>
+    <h1 align="center">This is a great strategy!!!</h1>
+{% endblock %}
 </body>
 </html>

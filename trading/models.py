@@ -44,6 +44,7 @@ class Trader(models.Model):
     strategy = models.CharField(max_length=50, default='MaTrade', editable=False)
     trading = models.BooleanField(default=False, editable=False)
     trader_text = models.CharField(max_length=200, null=True, editable=False)
+    lever = models.IntegerField(verbose_name="交易等级", default=1, null=True)
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
 
