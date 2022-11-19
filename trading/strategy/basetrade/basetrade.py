@@ -7,6 +7,7 @@ from ..okx import Market_api as Market
 from ..okx.AccountAndTradeApi import AccountAndTradeApi
 from ...models import OrderInfo, AccountInfo
 from ..weixin_msg.work import WeixinSMS
+from ..conf.pieces_of_coin import pieces_of_coin
 import pandas as pd
 import datetime
 import re
@@ -101,8 +102,10 @@ class BaseTrade:
         new_data_lst = []
         if len(data_lst[0]) == 8:
             columns_lst = ['date', 'open', 'high', 'low', 'close', 'vols', 'volume', 'volCcy']
-        else:
+        elif len(data_lst[0]) == 7:
             columns_lst = ['date', 'open', 'high', 'low', 'close', 'volume', 'volCcy']
+        else:
+            columns_lst = ['date', 'open', 'high', 'low', 'close', 'volume', 'volCcy', '?', '??']
         # 按时间从小到大排序
         l = int(limit)
         for i in range(l, 0, -1):
@@ -131,8 +134,10 @@ class BaseTrade:
         new_data_lst = []
         if len(data_lst[0]) == 8:
             columns_lst = ['date', 'open', 'high', 'low', 'close', 'vols', 'volume', 'volCcy']
-        else:
+        elif len(data_lst[0]) == 7:
             columns_lst = ['date', 'open', 'high', 'low', 'close', 'volume', 'volCcy']
+        else:
+            columns_lst = ['date', 'open', 'high', 'low', 'close', 'volume', 'volCcy', '?', '??']
         # 按时间从小到大排序
         l = int(limit)
         for i in range(l, 0, -1):
@@ -188,13 +193,7 @@ class BaseTrade:
 
     def currency_to_sz(self, instId, currency):
         """ 币转张 """
-        coefficient = 1
-        if 'ETH' in instId:
-            coefficient = 10
-        elif 'DOG' in instId:
-            coefficient = 1000
-        elif 'BTC' in instId:
-            coefficient = 100
+        coefficient = pieces_of_coin.get(instId)
         sz = currency * coefficient
         return sz
 

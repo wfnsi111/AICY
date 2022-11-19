@@ -102,6 +102,8 @@ class MaTrade(BaseTrade):
 
             if self.stop_loss < self.max_stop_loss and self.stop_loss > 0:
                 # 止损了1次， 直接检测信号3
+                if self.matrade_open_order:
+                    break
                 self.signal_info_dict = {}
                 self.track_trading_status(3)
                 self.signal_order_para = self.check_signal3(self.signal1)
@@ -324,6 +326,7 @@ class MaTrade(BaseTrade):
             if profit:
                 while True:
                     time.sleep(30)
+                    self.track_trading_status(update_status=False)
                     result = self.tradeAPI.get_orders_history('SWAP', limit='1')
                     order_data = result.get('data')[0]
                     para = {"long": "sell", "short": "buy"}

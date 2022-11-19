@@ -7,7 +7,7 @@
     <title>{% block mytitle %} 资金流水 {% endblock %}</title>
 </head>
 <body>
-{% block basehtml %}
+{% block mybody %}
     <form  action="{% url 'trading:check_account_asset_bills' %}" method="post" class="smart-green">
     {% csrf_token %}
                 <h2>查看账户资金流水</h2>

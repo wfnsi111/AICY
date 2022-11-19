@@ -6,8 +6,8 @@ import datetime
 """
 在models.py中修改模型；
 python manage.py makemigrations --empty trading  重来
-python manage.py makemigrations 为改动创建迁移记录文件；
-python manage.py migrate 将操作同步到数据库。
+python manage.py makemigrations trading 为改动创建迁移记录文件；
+python manage.py migrate trading 将操作同步到数据库。
 """
 
 

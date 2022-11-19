@@ -7,7 +7,7 @@
     <title>{% block mytitle %} 一键平仓 {% endblock %}</title>
 </head>
 <body>
-{% block basehtml %}
+{% block mybody %}
 <h1> 一键平仓 </h1>
     <form action="{% url 'trading:close_positions_all'  %}" method="post">
         {% csrf_token %}

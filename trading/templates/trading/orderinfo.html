@@ -7,7 +7,7 @@
     <title>{% block mytitle %} 订单信息 {% endblock %}</title>
 </head>
 <body>
-{% block basehtml %}
+{% block mybody %}
     <form  action="{% url 'trading:orderinfo' %}" method="post" class="smart-green">
     {% csrf_token %}
 {#                <h2>选择账户</h2>#}

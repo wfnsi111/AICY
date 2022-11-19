@@ -35,3 +35,7 @@ def add_smoke(request):
 
 def boot2(request):
     return render(request, 'trading/boot2.html')
+
+
+def boot3(request):
+    return render(request, 'trading/boot3.html')

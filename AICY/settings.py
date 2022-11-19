@@ -204,7 +204,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 # CELERY_TASK_TIME_LIMIT = 5
 
 # 任务结果过期时间
-CELERY_TASK_RESULT_EXPIRES = 60 * 5
+CELERY_TASK_RESULT_EXPIRES = 10
 
 # 为存储结果设置过期日期，默认1天过期。如果beat开启，Celery每天会自动清除。
 # 设为0，存储结果永不过期
@@ -213,8 +213,8 @@ CELERY_TASK_RESULT_EXPIRES = 60 * 5
 # 任务限流
 # CELERY_TASK_ANNOTATIONS = {'tasks.add': {'rate_limit': '10/s'}}
 
-# Worker并发数量，一般默认CPU核数，可以不设置
-# CELERY_WORKER_CONCURRENCY = 2
+# 单个Worker并发数量，一般默认CPU核数，可以不设置
+CELERY_WORKER_CONCURRENCY = 4
 
 # 每个worker执行了多少任务就会死掉，默认是无限的
 CELERY_WORKER_MAX_TASKS_PER_CHILD = 200

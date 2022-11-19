@@ -13,14 +13,14 @@
     {% endblock %}
 
     {% block myscirpt %}
-        <script type="text/javascript" src="/static/trading/js/jquery-3.6.1.min.js"></script>
+        <script type="text/javascript" src="/static/js/jquery-3.6.1.min.js"></script>
         <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
         <script type="text/javascript" src="{% static 'trading/js/matrade.js' %}"></script>
     {% endblock %}
 
 </head>
 <body>
-{% block basehtml %}
+{% block mybody %}
     <form action="{% url 'trading:matrade_open_order' %}" method="post" id="fm" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="bd-example" style="width: 1200px">
@@ -40,6 +40,10 @@
                         <option style="display:none"></option>
                         <option value="ETH-USDT-SWAP">ETHUSDT</option>
                         <option value="BTC-USDT-SWAP">BTCUSDT</option>
+                        <option value="DOG-USDT-SWAP">DOGUSDT</option>
+                        <option value="NEAR-USDT-SWAP">NEARUSDT</option>
+                        <option value="DYDX-USDT-SWAP">DYDXUSDT</option>
+{#                        <option value="CHZ-USDT-SWAP">CHZUSDT</option>#}
                     </select>
                 </div>
                 <div class="form-group">

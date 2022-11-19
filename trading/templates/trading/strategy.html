@@ -8,7 +8,7 @@
     <title>{% block mytitle %} 我的策略 {% endblock %}</title>
 
     {% block myscirpt %}
-        <script type="text/javascript" src="/static/trading/js/jquery-3.6.1.min.js"></script>
+        <script type="text/javascript" src="/static/js/jquery-3.6.1.min.js"></script>
         <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
         <script type="text/javascript" src="{% static 'trading/js/strategy.js' %}"></script>
     {% endblock %}
@@ -19,7 +19,7 @@
 
 <body>
 
-{% block basehtml %}
+{% block mybody %}
 
     <h1>策略运行情况</h1>
     <!-- Table goes in the document BODY -->

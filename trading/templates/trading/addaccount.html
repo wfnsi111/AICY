@@ -93,7 +93,7 @@ margin-bottom: 10px;
 
 </head>
 <body>
-{% block basehtml %}
+{% block mybody %}
 <form  action="{% url 'trading:addaccount' %}" method="post" class="smart-green">
     {% csrf_token %}
     <label><span>用户姓名 :</span><input id="account_text" type="text" name="account_text" required="required" /><div class="error-msg"></div></label>
