@@ -17,7 +17,7 @@ urlpatterns = [
 
     # trading_views
     path('', trading_views.trading_index, name='trading'),
-    path('betago/', trading_views.trading_index_no_login, name='trading_no_login'),
+    path('betago/', trading_views.trading_index_no_login, name='trading_no_login'),     # 不需要登录
     path('maalarm/', trading_views.maalarm, name='maalarm'),
     path('matrade/', trading_views.matrade, name='matrade'),
     path('matrade_open_order/', trading_views.matrade_open_order, name='matrade_open_order'),

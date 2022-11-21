@@ -54,4 +54,4 @@ def tologin(request):
 
 def tologout(request):
     request.session.flush()
-    return redirect(reverse('trading:tologin'))
+    return redirect(reverse('trading:trading_no_login'))
