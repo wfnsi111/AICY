@@ -153,3 +153,41 @@ def account_info(request):
             show_lst.append(show_data)
 
         return render(request, 'trading/accountinfo.html', {"accountinfo": show_lst})
+
+
+def account_info_no_login(request):
+    if request.method == 'GET':
+        show_lst = []
+        account_all = AccountInfo.objects.filter(is_active=1)
+        for obj in account_all:
+            show_data = {}
+            try:
+                obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
+                balance = obj_api.get_my_balance('availEq')
+                show_data['balance'] = balance
+                result = obj_api.accountAPI.get_positions('SWAP')
+                order_lst = result.get('data', [])
+                if order_lst:
+                    order_algos_info = obj_api.get_order_tp_and_sl_info()
+                    if order_algos_info:
+                        show_data['tpTriggerPx'] = order_algos_info.get('tpTriggerPx')
+                        show_data['slTriggerPx'] = order_algos_info.get('slTriggerPx')
+            except Exception as e:
+                print(e)
+                order_lst = []
+            show_data['account_text'] = obj.account_text
+            show_data['id'] = obj.id
+            show_data['status'] = account_status.get(obj.status, '无状态')
+            show_data['strategy_name'] = obj.strategy_name
+            show_data['bar2'] = obj.bar2
+            if order_lst:
+                for item in order_lst:
+                    show_data.update(item)
+                    show_data['upl'] = "%.2f" % float(item['upl'])
+
+            else:
+                pass
+
+            show_lst.append(show_data)
+
+        return render(request, 'trading/accountinfo_no_login.html', {"accountinfo": show_lst})

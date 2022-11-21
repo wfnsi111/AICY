@@ -17,6 +17,7 @@ urlpatterns = [
 
     # trading_views
     path('', trading_views.trading_index, name='trading'),
+    path('betago/', trading_views.trading_index_no_login, name='trading_no_login'),
     path('maalarm/', trading_views.maalarm, name='maalarm'),
     path('matrade/', trading_views.matrade, name='matrade'),
     path('matrade_open_order/', trading_views.matrade_open_order, name='matrade_open_order'),
@@ -25,7 +26,9 @@ urlpatterns = [
     path('close_positions_all/', trading_views.close_positions_all, name='close_positions_all'),
     path('close_positions_one/', trading_views.close_positions_one, name='close_positions_one'),
     path('orderinfo/', trading_views.orderinfo_show, name='orderinfo'),
+    path('orderinfo2/', trading_views.orderinfo_show_no_login, name='orderinfo_no_login'),
     path('strategy/', trading_views.strategyinfo, name='strategyinfo'),
+    path('strategy2/', trading_views.strategyinfo_no_login, name='strategyinfo_no_login'),
     path('stop_processing_strategy/', trading_views.stop_processing_strategy, name='stop_processing_strategy'),
 
     # log_views
@@ -34,6 +37,7 @@ urlpatterns = [
 
     # account_views
     path('accountinfo/', account_views.account_info, name='account_info'),
+    path('accountinfo2/', account_views.account_info_no_login, name='account_info_no_login'),
     path('addaccount/', account_views.addaccount, name='addaccount'),
     path('funding/', account_views.check_account_funding, name='check_account_funding'),
     path('bills/', account_views.check_account_asset_bills, name='check_account_asset_bills'),

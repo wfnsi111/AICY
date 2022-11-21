@@ -160,6 +160,10 @@ def trading_index(request):
     return render(request, 'trading/trade.html')
 
 
+def trading_index_no_login(request):
+    return render(request, 'trading/trade_no_login.html')
+
+
 def test(request):
     if request.method == 'POST':
         time.sleep(5)
@@ -181,6 +185,21 @@ def orderinfo_show(request):
     except:
         return HttpResponse("ERROR")
     return render(request, 'trading/orderinfo1.html', {'orderinfos': orderinfos})
+
+
+def orderinfo_show_no_login(request):
+    if request.method == 'GET':
+        accountinfo_id = request.GET.get('accountinfo_id', None)
+        if accountinfo_id is None:
+            all_accountinfo = AccountInfo.objects.filter(is_active=1)
+            return render(request, 'trading/orderinfo_no_login.html', {'all_accountinfo': all_accountinfo})
+    else:
+        accountinfo_id = request.POST.get('accountinfo_id', '')
+    try:
+        orderinfos = OrderInfo.objects.filter(accountinfo_id=int(accountinfo_id))
+    except:
+        return HttpResponse("ERROR")
+    return render(request, 'trading/orderinfo1_no_login.html', {'orderinfos': orderinfos})
 
 
 @islogin
@@ -240,6 +259,25 @@ def strategyinfo(request):
         except Exception as e:
             strategyinfos = None
         return render(request, 'trading/strategy.html', {'strategyinfos': strategyinfos})
+
+
+def strategyinfo_no_login(request):
+    if request.method == 'GET':
+        try:
+            strategyinfos = Strategy.objects.filter(is_active=1)
+            for strategyinfo in strategyinfos:
+                account_name_list = []
+                accountinfos = strategyinfo.accountinfo
+                accountinfos = eval(accountinfos)
+                accountinfos = AccountInfo.objects.filter(id__in=accountinfos)
+                for accountinfo in accountinfos:
+                    account_name_list.append(accountinfo.account_text)
+                strategyinfo.accountinfo = ', '.join(account_name_list)
+                strategyinfo.status = trading_status.get(strategyinfo.status)
+
+        except Exception as e:
+            strategyinfos = None
+        return render(request, 'trading/strategy_no_login.html', {'strategyinfos': strategyinfos})
 
 
 @islogin

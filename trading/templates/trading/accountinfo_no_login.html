@@ -1,0 +1,147 @@
+{% extends 'trading/base_no_login.html' %}
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> {% block mytitle %} 账户信息 {% endblock %}</title>
+    {% block mystyle %}
+<script type="text/javascript">
+
+function altRows(id){
+    if(document.getElementsByTagName){
+
+        var table = document.getElementById(id);
+        var rows = table.getElementsByTagName("tr");
+
+        for(i = 0; i < rows.length; i++){
+            if(i % 2 == 0){
+                rows[i].className = "evenrowcolor";
+            }else{
+                rows[i].className = "oddrowcolor";
+            }
+        }
+    }
+}
+
+window.onload=function(){
+    altRows('alternatecolor');
+}
+
+
+function close_positon(accountinfo_id){
+    alert('平仓成功');
+}
+
+
+function stop_processing_account(accountinfo_id){
+    console.log(accountinfo_id)
+    $.ajax({
+            url: '{% url "trading:stop_processing_account" %}',
+            type: 'POST',
+            async: true,
+            datatype: 'json',
+            data: {
+                'accountinfo_id': accountinfo_id
+            },
+            success: function(arg){
+                var obj = jQuery.parseJSON(arg);
+                alert('该账户已停止策略运行');
+                $('#'+accountinfo_id).html(obj.trading_status);
+            },
+            error: function () {
+                 alert('请求失败 ')
+            }
+      });
+}
+
+</script>
+
+
+<style type="text/css">
+table.altrowstable {
+    font-family: verdana,arial,sans-serif;
+    font-size:11px;
+    color:#333333;
+    border-width: 10px;
+    border-color: #a9c6c9;
+    border-collapse: collapse;
+}
+table.altrowstable th {
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #a9c6c9;
+}
+table.altrowstable td {
+    width: 110px;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #a9c6c9;
+    text-align: center;
+}
+.oddrowcolor{
+    background-color:#d4e3e5;
+}
+.evenrowcolor{
+    background-color:#c3dde0;
+}
+
+a{text-decoration: none;}
+a:visited{text-decoration: none;}
+a:hover {text-decoration: none;}
+a:active{text-decoration:none;}
+
+button{
+    color: aqua;
+}
+</style>
+    {% endblock %}
+</head>
+
+<body>
+
+{% block mybody %}
+<h1>账户持仓情况</h1>
+<!-- Table goes in the document BODY -->
+<table class="altrowstable" id="alternatecolor">
+    <tr>
+        <th>账户</th>
+        <th>账户余额</th>
+        <th>品种</th>
+        <th>持仓量（张）</th>
+        <th>开仓均价</th>
+        <th>止盈</th>
+        <th>止损</th>
+        <th>方向</th>
+        <th>收益(USDT)</th>
+        <th>策略</th>
+        <th>状态</th>
+        <th>历史数据</th>
+    </tr>
+
+    {% for one_accountinfo in accountinfo  %}
+        <tr>
+            <td>{{ one_accountinfo.account_text }}</td>
+            <td>{{ one_accountinfo.balance }}</td>
+            <td>{{ one_accountinfo.instId }}</td>
+            <td>{{ one_accountinfo.pos }}</td>
+            <td>{{ one_accountinfo.avgPx }}</td>
+            <td>{{ one_accountinfo.tpTriggerPx }}</td>
+            <td>{{ one_accountinfo.slTriggerPx }}</td>
+            <td>{{ one_accountinfo.posSide }}</td>
+            <td>{{ one_accountinfo.upl }}</td>
+            <td>{{ one_accountinfo.strategy_name }}</td>
+            <td  id='{{ one_accountinfo.id  }}'>{{ one_accountinfo.status }}</td>
+            <td><a href="{% url 'trading:orderinfo_no_login' %}?accountinfo_id={{ one_accountinfo.id }}">查看历史数据</a></td>
+        </tr>
+    {% endfor %}
+
+    </table>
+
+{% endblock %}
+</body>
+</html>

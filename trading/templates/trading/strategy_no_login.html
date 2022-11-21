@@ -1,0 +1,60 @@
+{% extends 'trading/base_no_login.html' %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block mytitle %} 机器人 {% endblock %}</title>
+
+    {% block myscirpt %}
+        <script type="text/javascript" src="/static/js/jquery-3.6.1.min.js"></script>
+        <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
+        <script type="text/javascript" src="{% static 'trading/js/strategy.js' %}"></script>
+    {% endblock %}
+
+    {% block mystyle %}
+        <link rel="stylesheet" type="text/css" href="{% static 'trading/css/strayegy.css' %}"/>
+    {% endblock %}
+
+<body>
+
+{% block mybody %}
+
+    <h1>机器人运行情况</h1>
+    <!-- Table goes in the document BODY -->
+    <table class="altrowstable" id="alternatecolor">
+        <tr>
+            <th>机器人</th>
+            <th>合约</th>
+            <th>bar</th>
+            <th>MA</th>
+            <th>运行中的账户</th>
+            <th>状态</th>
+            <th>启动时间</th>
+
+        </tr>
+
+        {% for strategyinfo in strategyinfos %}
+            <tr>
+            <td>{{ strategyinfo.id }}</td>
+            <td>{{ strategyinfo.instid }}</td>
+            <td>{{ strategyinfo.bar2 }}</td>
+            <td>{{ strategyinfo.ma }}</td>
+            <td>{{ strategyinfo.accountinfo }}</td>
+            <td>{{ strategyinfo.status }}</td>
+            <td>{{ strategyinfo.create_time }}</td>
+
+
+        {% endfor %}
+
+    </table>
+    <hr>
+
+
+
+
+{% endblock %}
+</body>
+
+</html>
