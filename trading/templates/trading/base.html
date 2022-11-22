@@ -45,20 +45,6 @@
                 </div>
             </li>
 
-            <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#auth" aria-expanded="false" aria-controls="auth">
-              <i class="mdi mdi-account menu-icon"></i>
-              <span class="menu-title">流水</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="dropdown-menu" id="auth">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="{% url 'trading:check_account_asset_bills' %}"> 查看流水 </a></li>
-                <li class="nav-item"> <a class="nav-link" href="{% url 'trading:get_account_asset_bills' %}"> 更新流水 </a></li>
-              </ul>
-            </div>
-          </li>
-
             <li class="nav-item"><a class="nav-link" href="{% url 'trading:check_log' %} "> 日志 </a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'trading:matrade_open_order' %} "> 直接下单 </a>
             </li>
