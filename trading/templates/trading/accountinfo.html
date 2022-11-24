@@ -138,7 +138,7 @@ button{
             <td>{{ one_accountinfo.upl }}</td>
             <td>{{ one_accountinfo.strategy_name }}</td>
             <td  id='{{ one_accountinfo.id  }}'>{{ one_accountinfo.status }}</td>
-            <td><a href="{% url 'trading:close_positions_one' %}?accountinfo_id={{ one_accountinfo.id }}">一键平仓</a></td>
+            <td><a href="{% url 'trading:close_positions_one' %}?accountinfo_id={{ one_accountinfo.id }}">市价平仓</a></td>
             <td>
                 <a href="{% url 'trading:strategyinfo' %}">查看策略</a>
 {#                 <input type="button" value="停止策略" onclick="stop_processing_account({{ one_accountinfo.id }});" />#}
