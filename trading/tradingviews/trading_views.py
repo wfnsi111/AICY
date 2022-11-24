@@ -5,7 +5,7 @@ import os
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.urls import reverse
-from trading.models import AccountInfo, OrderInfo, Strategy
+from trading.models import AccountInfo, OrderInfo, Strategy, PlaceAlgo
 from trading.strategy.okx.AccountAndTradeApi import AccountAndTradeApi
 from trading.task import *
 from trading.tradingviews.login_views import islogin
@@ -24,6 +24,12 @@ trading_status = {
     7:  '止盈',
     8:  '止损',
 }
+
+
+# gt 大于某个值
+# gte 大于或等于某个值
+# lt  小于某个值
+# lte 小于或等于某个值
 
 
 def maalarm(request):
@@ -114,45 +120,66 @@ def close_positions_one(request):
 
 @islogin
 def close_positions_all(request):
-    if request.method == 'GET':
-        return render(request, 'trading/close_positions_all.html')
+    if request.method == 'POST':
+        trade_code = request.POST.get('trade_code', '').strip()
+        strategy_id = request.POST.get('algo_number', '').strip()
+        if trade_code != 'lgh':
+            return HttpResponse('Who are you!!!')
+        try:
+            account_id_list = []
+            strategyinfo = Strategy.objects.get(pk=int(strategy_id))
+            for account_id in eval(strategyinfo.accountinfo):
+                account_id_list.append(int(account_id))
+            accountinfo_all = AccountInfo.objects.filter(id__in=account_id_list).filter(status__gte=2)
+        except Exception as e:
+            print(e)
+            return HttpResponse('委托单设置错误')
 
-    code = request.POST.get('code', '').strip()
-    if code != '123456':
-        return HttpResponse('Who are you!!!')
+        if not accountinfo_all:
+            return HttpResponse('未查询到之前的委托信息')
 
-    # gt 大于某个值
-    # gte 大于或等于某个值
-    # lt  小于某个值
-    # lte 小于或等于某个值
-    account_all = AccountInfo.objects.filter(status__gte=1)
-    for obj in account_all:
-        obj.status = 0
-        obj.save()
-        obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
-        result = obj_api.accountAPI.get_positions('SWAP')
-        order_lst = result.get('data', [])
-        for item in order_lst:
-            if item:
-                para = {
-                    "instId": item.get("instId"),
-                    'mgnMode': item.get('mgnMode'),
-                    "ccy": item.get('ccy'),
-                    "posSide": item.get('posSide'),
-                    'autoCxl': True
-                }
-                # self.posSide = {"buy": "long", "sell": "short"}.get(self.side, '')
-                # 检测是否有委托 ，如果有委托， 先撤销委托，在平仓
-                # self.algo = self.cancel_algo_order_(algoid)
-                try:
-                    result = obj_api.tradeAPI.close_positions(**para)
-                    obj.status = 0
-                    obj.save()
-                except:
-                    obj.status = -1
-                    obj.save()
+        status_list = []
+        for accountinfo in accountinfo_all:
+            obj_api = AccountAndTradeApi(accountinfo.api_key, accountinfo.secret_key, accountinfo.passphrase, False,
+                                         accountinfo.flag)
 
-    return HttpResponse('OK!!!')
+            status = accountinfo.status
+            result = obj_api.accountAPI.get_positions('SWAP')
+            order_lst = result.get('data', [])
+            if not order_lst:
+                status = 0
+            for item in order_lst:
+                if item:
+                    para = {
+                        "instId": item.get("instId"),
+                        'mgnMode': item.get('mgnMode'),
+                        "ccy": item.get('ccy'),
+                        "posSide": item.get('posSide'),
+                        'autoCxl': True
+                    }
+
+                    try:
+                        result = obj_api.tradeAPI.close_positions(**para)
+                        if result.get("code") == '0':
+                            status = 0
+                        else:
+                            status = -1
+                    except Exception as e:
+                        print(e)
+                        status = -1
+            status_list.append({'obj': accountinfo, "status": status})
+
+        # 更新数据库状态
+        for item in status_list:
+            obj = item['obj']
+            obj.status = item['status']
+            obj.save()
+
+        strategyinfo.status = 0
+        strategyinfo.is_active = 0
+        strategyinfo.save()
+
+        return redirect(reverse('trading:account_info'))
 
 
 @islogin
@@ -250,10 +277,8 @@ def strategyinfo(request):
                 account_name_list = []
                 accountinfos = strategyinfo.accountinfo
                 accountinfos = eval(accountinfos)
-                accountinfos = AccountInfo.objects.filter(id__in=accountinfos)
-                for accountinfo in accountinfos:
-                    account_name_list.append(accountinfo.account_text)
-                strategyinfo.accountinfo = ', '.join(account_name_list)
+                accountinfos_obj = AccountInfo.objects.filter(id__in=accountinfos)
+                strategyinfo.accountinfo = [accountinfo.account_text for accountinfo in accountinfos_obj]
                 strategyinfo.status = trading_status.get(strategyinfo.status)
 
         except Exception as e:

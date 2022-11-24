@@ -12,8 +12,8 @@ account_status = {
     -2: "强制退出",
     -1: '出现错误',
     0: '空闲中',
-    1:  '策略运行中',
-
+    1: '运行中',
+    2: '运行中',
 }
 
 
@@ -39,20 +39,6 @@ def addaccount(request):
 @islogin
 def del_account(request):
     pass
-
-
-@islogin
-def check_account_funding(request):
-    account_all = AccountInfo.objects.filter(is_active=0).filter(flag=0)
-    for account_obj in account_all:
-        show_data = {}
-        try:
-            api_obj = AccountAndTradeApi(account_obj.api_key, account_obj.secret_key, account_obj.passphrase,
-                                         False, account_obj.flag)
-            # api_obj.check_account_funding_()
-            api_obj.get_asset_bills()
-        except Exception as e:
-            print(e)
 
 
 @islogin

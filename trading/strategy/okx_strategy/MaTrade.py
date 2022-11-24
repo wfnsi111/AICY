@@ -456,6 +456,7 @@ class MaTrade(BaseTrade):
             # result = self.tradeAPI.place_order(**para)
             ordId, sCode, sMsg= self.check_order_result_data(result, 'ordId')
             if sCode == "0":
+                accountinfo['status'] = 2
                 place_order_code = True
                 # 获取持仓信息
                 # self.get_order_details(self.instId, ordId)
@@ -486,10 +487,11 @@ class MaTrade(BaseTrade):
                 self.has_order = True
             else:
                 place_order_error_code = True
-                obj.status = -1
-                obj.save()
                 # self.track_trading_status(-1)
-                self.log.error('%s 账户异常！！！开仓失败！！！！！！' % obj.account_text)
+                msg = '%s 账户异常！！！开仓失败！！！！！！' % obj.account_text
+                accountinfo['status'] = -1
+                accountinfo['msg'] = msg
+                self.log.error(msg)
                 self.has_order = False
             accountinfo['orderinfo'] = orderinfo_dict
 
@@ -507,8 +509,14 @@ class MaTrade(BaseTrade):
             orderinfo_dict = accountinfo['orderinfo']
             orderinfo_dict['strategyid'] = self.strategy_obj.id
             accountinfo_obj = accountinfo['obj']
+
+            # 保存订单信
             orderinfo_obj = self.set_trading_orderinfo(accountinfo_obj, **orderinfo_dict)
             accountinfo['orderinfo_obj'] = orderinfo_obj
+
+            # 保存账户状态
+            accountinfo_obj.status = accountinfo['status']
+            accountinfo_obj.save()
 
         # 保存策略信息
         p = self.get_algo_p(atr)     # 止损点数

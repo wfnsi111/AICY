@@ -39,7 +39,6 @@ urlpatterns = [
     path('accountinfo/', account_views.account_info, name='account_info'),
     path('accountinfo2/', account_views.account_info_no_login, name='account_info_no_login'),
     path('addaccount/', account_views.addaccount, name='addaccount'),
-    path('funding/', account_views.check_account_funding, name='check_account_funding'),
     path('bills/', account_views.check_account_asset_bills, name='check_account_asset_bills'),
     path('up_bills/', account_views.get_account_asset_bills, name='get_account_asset_bills'),
 

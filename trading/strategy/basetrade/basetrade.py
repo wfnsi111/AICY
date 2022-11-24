@@ -8,6 +8,7 @@ from ..okx.AccountAndTradeApi import AccountAndTradeApi
 from ...models import OrderInfo, AccountInfo
 from ..weixin_msg.work import WeixinSMS
 from ..conf.pieces_of_coin import pieces_of_coin
+from ..conf.robot_name import robot_name
 import pandas as pd
 import datetime
 import re
@@ -211,7 +212,7 @@ class BaseTrade:
                 obj.balance = float(balance)
                 if obj.init_balance == -1:
                     obj.balance = float(balance)
-                obj.strategy_name = strategy_name
+                obj.strategy_name = robot_name.get(strategy_name)
                 obj.status = 1
                 accountinfo_data['id'] = obj.id
                 accountinfo_data['name'] = obj.account_text
