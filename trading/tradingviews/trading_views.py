@@ -311,7 +311,7 @@ def matrade_open_order(request):
     if request.method == 'GET':
         return render(request, 'trading/matrade_open_order.html', {'accountinfos': accountinfos})
     trade_code = request.POST.get('trade_code', '')
-    if not trade_code.strip().lower() == 'lgh':
+    if not trade_code.strip().lower() == '123456':
         return HttpResponse('验证码错误')
     ma = request.POST.get('ma', '')
     instId = request.POST.get('instId', '')
