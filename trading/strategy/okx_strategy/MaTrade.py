@@ -45,6 +45,7 @@ class MaTrade(BaseTrade):
         self.lever = "50"
         self.matrade_open_order = kwargs.get('posside', None)   # 直接开仓
         self.signal_recorder = {}
+        self.last_price = ''
 
 
     def drow_k(self, df, ma_list=None):
@@ -222,6 +223,7 @@ class MaTrade(BaseTrade):
         before_volume = df_3mins.iloc[-2, :]['volume']
         row2 = df_3mins.iloc[-1, :]
         bar1_close = float(row2['close'])
+        self.last_price = float(row2['close'])
         _volume = float(row2['volume'])
         _open = float(row2['open'])
         _low = float(row2['low'])
@@ -255,8 +257,8 @@ class MaTrade(BaseTrade):
         before_volume = df_3mins.iloc[-2, :]['volume']
         row2 = df_3mins.iloc[-1, :]
         bar1_close = float(row2['close'])
+        self.last_price = float(row2['close'])
         _volume = float(row2['volume'])
-        self.bar1_close = bar1_close
         _open = float(row2['open'])
         _high = float(row2['high'])
         entity = abs(bar1_close - _open)
@@ -466,7 +468,7 @@ class MaTrade(BaseTrade):
                 self.log.info('%s 开仓成功！！！！！！' % obj.account_text)
                 # self.track_trading_status(5)
 
-                avgpx = '0'
+                avgpx = self.last_price
                 if self.order_lst:
                     avgpx = "%.2f" % float(self.order_lst[0].get('avgPx'))
                     orderinfo_dict['order_ctime'] = self.timestamp_to_date(self.order_lst[0].get('cTime'))
@@ -572,7 +574,7 @@ class MaTrade(BaseTrade):
             return True
         return False
 
-    def set_place_algo_order_price(self, atr, avgPx):
+    def set_place_algo_order_price(self, atr, avgPx, posSide):
         """ 设置止损止盈价格
             -1是市价止盈止损
 
@@ -580,37 +582,29 @@ class MaTrade(BaseTrade):
         """
         # p = (0.05 * self.mybalance) / (3 * self.sz / 10)
         p = self.get_algo_p(atr)
-        if self.order_lst:
-            for data in self.order_lst:
-                posSide = data.get('posSide')
-                if self.set_profit:
-                    if posSide == 'long':
-                        tp = float(avgPx) + int(self.set_profit) * p
-                        sl = float(avgPx) - p
-                    else:
-                        tp = float(avgPx) - int(self.set_profit) * p
-                        sl = float(avgPx) + p
-                else:
-                    if posSide == 'long':
-                        tp = float(avgPx) * 2
-                        sl = float(avgPx) - p
-                    else:
-                        tp = float(avgPx) / 2
-                        sl = float(avgPx) + p
-                # -1 为市价平仓
-                p2 = "-1"
-                price_para = {
-                    "tpTriggerPx": "%0.2f" % tp,
-                    "tpOrdPx": p2,
-                    "slTriggerPx": "%0.2f" % sl,
-                    "slOrdPx": p2
-                }
-                # msg = "止损止盈设置成功， 止盈触发价：%s, 止损触发价： %s， 市价平仓" % (tp, sl)
-                # self.log.info(msg)
-                return price_para
+        if self.set_profit:
+            if posSide == 'long':
+                tp = float(avgPx) + int(self.set_profit) * p
+                sl = float(avgPx) - p
+            else:
+                tp = float(avgPx) - int(self.set_profit) * p
+                sl = float(avgPx) + p
         else:
-            self.log.error("no order details!!!*******************************")
-            return
+            if posSide == 'long':
+                tp = float(avgPx) * 2
+                sl = float(avgPx) - p
+            else:
+                tp = float(avgPx) / 2
+                sl = float(avgPx) + p
+        # -1 为市价平仓
+        p2 = "-1"
+        price_para = {
+            "tpTriggerPx": "%0.2f" % tp,
+            "tpOrdPx": p2,
+            "slTriggerPx": "%0.2f" % sl,
+            "slOrdPx": p2
+        }
+        return price_para
 
     def set_place_algo_order_oco(self, obj_api, atr, sz, avgpx):
         """策略委托下单
@@ -630,7 +624,7 @@ class MaTrade(BaseTrade):
         """
         side = {"long": "sell", "short": "buy"}.get(self.posSide)
 
-        price_para = self.set_place_algo_order_price(atr, avgpx)
+        price_para = self.set_place_algo_order_price(atr, avgpx, self.posSide)
 
         try:
             # result = self.tradeAPI.place_algo_order(self.instId, self.tdMode, self.side, ordType=self.ordType,
@@ -726,7 +720,7 @@ class MaTrade(BaseTrade):
                 self.log.info("信号3已确认！")
                 self.log.info(self.signal_recorder.get('signal3'))
                 return signal_order_para
-            time.sleep(5)
+            time.sleep(2)
 
         # 没出现信号
         self.log.info('未出现开仓信号， 停止交易')
