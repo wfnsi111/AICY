@@ -4,7 +4,7 @@ from qcloudsms_py.httpclient import HTTPError
 
 
 class WeixinSMS:
-    def __init__(self, phone_num='17780691144'):
+    def __init__(self, phone_num=''):
         self.appid = 1400449769
         self.appkey = '32bbdc8cc64c91a3d4ce2ca2fc11e27d'
         self.sign = '刘康解忧'

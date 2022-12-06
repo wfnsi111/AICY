@@ -31,6 +31,7 @@ class MaTrade(BaseTrade):
         self.ma = kwargs.get('ma')
         self.instId = kwargs.get('instId')
         self.bar2 = kwargs.get('bar2')
+        self.trader = kwargs.get('trader')
         self.big_bar_time = 10
         self.accountinfo_obj = kwargs.get('accountinfo')
         self.strategy_obj = kwargs.get('strategy_obj')
@@ -502,7 +503,7 @@ class MaTrade(BaseTrade):
             self.track_trading_status(5)
             # 发消息提示
             if not self.matrade_open_order:
-                self.send_msg_to_me()
+                self.send_msg_to_me(self.trader)
         if place_order_error_code:
             self.track_trading_status(6)
 

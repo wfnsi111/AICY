@@ -254,6 +254,7 @@ def matrade(request):
         "ma": ma,
         "bar2": bar,
         "accountinfo": all_accountinfo,
+        "trader": request.session.get('username'),
     }
 
     try:
@@ -332,6 +333,7 @@ def matrade_open_order(request):
         "bar2": bar,
         "posside": posside,
         "accountinfo": all_accountinfo,
+        "trader": request.session.get('username'),
     }
 
     try:

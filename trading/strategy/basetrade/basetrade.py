@@ -5,7 +5,7 @@ from ..okx import Account_api as Account
 from ..okx import Trade_api as Trade
 from ..okx import Market_api as Market
 from ..okx.AccountAndTradeApi import AccountAndTradeApi
-from ...models import OrderInfo, AccountInfo
+from ...models import OrderInfo, AccountInfo, Trader
 from ..weixin_msg.work import WeixinSMS
 from ..conf.pieces_of_coin import pieces_of_coin
 from ..conf.robot_name import robot_name
@@ -254,9 +254,12 @@ class BaseTrade:
             self.log.error(e)
             self.log.error('订单信息保存失败')
 
-    def send_msg_to_me(self):
+    def send_msg_to_me(self, phonenumber):
         try:
-            sendmsg = WeixinSMS()
+            if len(phonenumber.strip()) != 11 or not phonenumber.isdigit():
+                self.log.info('手机号错误，无法发送短信提示信息[trader:%s]' % phonenumber)
+                return
+            sendmsg = WeixinSMS(phonenumber)
             msg = sendmsg.send_msg_with_param()
             if msg == 'ok':
                 self.log.info('成功发送短信到手机')

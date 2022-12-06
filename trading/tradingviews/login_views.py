@@ -26,6 +26,28 @@ def islogin(func_name):
     return wrapper
 
 
+def user_login(func_name):
+    # 登录装饰器
+    def wrapper(request, *args, **kwargs):
+        if request.session.get('username', ''):
+            # 说明当前处于登录状态，直接调用func_name即可。
+            if request.session.get('lever', '') == 1:
+                return func_name(request, *args, **kwargs)
+            else:
+                # 此时需要获取用户所点击的url，并保存在cookie中，再跳转到登录页面。
+                response = HttpResponseRedirect('/trading/login/')
+                # 用户点击链接，会发送GET请求，对应的request对象中，含有要请求的url地址、请求参数、等等。
+                response.set_cookie('click_url', request.path)
+                return response
+        else:
+            # 此时需要获取用户所点击的url，并保存在cookie中，再跳转到登录页面。
+            response = HttpResponseRedirect('/trading/login/')
+            # 用户点击链接，会发送GET请求，对应的request对象中，含有要请求的url地址、请求参数、等等。
+            response.set_cookie('click_url', request.path)
+            return response
+    return wrapper
+
+
 def tologin(request):
     if request.method == 'GET':
         return render(request, 'trading/login.html')
