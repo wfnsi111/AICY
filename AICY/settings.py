@@ -33,7 +33,7 @@ if platform.system().lower() == 'windows':
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = ['16.163.127.18', 'localhost', '0.0.0.0:8000', '127.0.0.1', '172.31.22.98', '192.168.1.108']
+ALLOWED_HOSTS = ['18.163.122.181', 'localhost', '0.0.0.0:8000', '127.0.0.1', '172.31.22.98', '192.168.1.108']
 
 # Application definition
 
