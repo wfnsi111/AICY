@@ -118,8 +118,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'lgh_test',
         'USER': 'lgh_test',
-        'PASSWORD': 'Lgh_123123',
-        'HOST': 'rm-j6c8n6xgpm006ks2lbo.mysql.rds.aliyuncs.com',
+        'PASSWORD': '123456',
+        'HOST': '18.163.122.181',
         'PORT': 3306,
     }
 }
