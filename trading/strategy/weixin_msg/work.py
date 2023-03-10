@@ -1,7 +1,9 @@
 import random
-from qcloudsms_py import SmsSingleSender
-from qcloudsms_py.httpclient import HTTPError
-
+try:
+    from qcloudsms_py import SmsSingleSender
+    from qcloudsms_py.httpclient import HTTPError
+except:
+    pass
 
 class WeixinSMS:
     def __init__(self, phone_num=''):

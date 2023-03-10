@@ -8,7 +8,7 @@
     <title>{% block mytitle %} 机器人 {% endblock %}</title>
 
     {% block myscirpt %}
-        <script type="text/javascript" src="/static/js/jquery-3.6.1.min.js"></script>
+        <script type="text/javascript" src="/static/jquery/jquery-3.6.1.min.js"></script>
         <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
         <script type="text/javascript" src="{% static 'trading/js/strategy.js' %}"></script>
     {% endblock %}
@@ -21,35 +21,56 @@
 
 {% block mybody %}
 
-    <h1>机器人运行情况</h1>
-    <!-- Table goes in the document BODY -->
-    <table class="altrowstable" id="alternatecolor">
-        <tr>
-            <th>机器人</th>
-            <th>合约</th>
-            <th>bar</th>
-            <th>MA</th>
-            <th>运行中的账户</th>
-            <th>状态</th>
-            <th>启动时间</th>
+        <div class="col-12 mb-30">
+        <div class="box">
+            <div class="box-head">
+                <h1 class="title">机器人运行情况</h1>
+            </div>
+            <div class="box-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-bordered">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th>编号</th>
+                            <th>机器人</th>
+                            <th>合约</th>
+                            <th>bar</th>
+                            <th>MA</th>
+                            <th>运行中的账户</th>
+                            <th>状态</th>
+                            <th>启动时间</th>
 
-        </tr>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for strategyinfo in strategyinfos %}
+                            <tr>
+                            <td>{{ strategyinfo.id }}</td>
+                            <td>{{ strategyinfo.name }}</td>
+                            <td>{{ strategyinfo.instid }}</td>
+                            <td>{{ strategyinfo.bar2 }}</td>
+                            <td>{{ strategyinfo.ma }}</td>
+                            <td>
+                                {% for name in strategyinfo.accountinfo %}
+                                    {{ name }}
+                                    <br>
+                                {% endfor %}
+                            </td>
+                            <td>{{ strategyinfo.status }}</td>
+                            <td>{{ strategyinfo.create_time }}</td>
 
-        {% for strategyinfo in strategyinfos %}
-            <tr>
-            <td>{{ strategyinfo.id }}</td>
-            <td>{{ strategyinfo.instid }}</td>
-            <td>{{ strategyinfo.bar2 }}</td>
-            <td>{{ strategyinfo.ma }}</td>
-            <td>{{ strategyinfo.accountinfo }}</td>
-            <td>{{ strategyinfo.status }}</td>
-            <td>{{ strategyinfo.create_time }}</td>
+                            <!--  <td>
+                                 <button class="btn btn-primary">不可用</button>
+                             </td>-->
 
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        {% endfor %}
-
-    </table>
-    <hr>
 
 
 

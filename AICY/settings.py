@@ -25,41 +25,62 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-nxydsc2q%=jkvyr+cxp*6dfsfamudw9$$$1rh!p@4+=)4aik3e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = False
 
+MY_IP = '18.167.165.131'
+
+ALLOWED_HOSTS = [MY_IP, 'localhost', '0.0.0.0:8000', '127.0.0.1', '172.31.22.98', '192.168.1.108']
+
+# Application definition
+# DEBUG = False
 
 if platform.system().lower() == 'windows':
     DEBUG = True
+    INSTALLED_APPS = [
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        # 'corsheaders',
+        'trading',
+        # 'user_sys',
+    ]
+
+    MIDDLEWARE = [
+        'django.middleware.security.SecurityMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        # 'corsheaders.middleware.CorsMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    ]
 else:
     DEBUG = False
+    INSTALLED_APPS = [
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        'corsheaders',
+        'trading',
+        # 'user_sys',
+    ]
 
-ALLOWED_HOSTS = ['18.163.122.181', 'localhost', '0.0.0.0:8000', '127.0.0.1', '172.31.22.98', '192.168.1.108']
-
-# Application definition
-
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'corsheaders',
-    'trading',
-    'user_sys',
-]
-
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-
+    MIDDLEWARE = [
+        'django.middleware.security.SecurityMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'corsheaders.middleware.CorsMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    ]
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
@@ -119,7 +140,7 @@ DATABASES = {
         'NAME': 'lgh_test',
         'USER': 'lgh_test',
         'PASSWORD': '123456',
-        'HOST': '18.163.122.181',
+        'HOST': MY_IP,
         'PORT': 3306,
     }
 }

@@ -14,40 +14,52 @@
 </head>
 <body>
 {% block mybody %}
-<h1>历史订单记录</h1>
-<!-- Table goes in the document BODY -->
-<table class="table table-hover table-bordered table-striped table-dark">
-    <tr>
-        <th>账户</th>
-        <th>品种</th>
-        <th>方向</th>
-        <th>仓位</th>
-        <th>开仓均价</th>
-        <th>止盈</th>
-        <th>止损</th>
-        <th>平仓价格</th>
-        <th>收益(USDT)</th>
-        <th>开仓时间</th>
-        <th>结束时间</th>
-    </tr>
 
-    {% for orderinfo in orderinfos  %}
-        <tr>
-            <td>{{ orderinfo.accountinfo }}</td>
-            <td>{{ orderinfo.instid }}</td>
-            <td>{{ orderinfo.side }}</td>
-            <td>{{ orderinfo.sz }}</td>
-            <td>{{ orderinfo.avgpx }}</td>
-            <td>{{ orderinfo.tptriggerpx }}</td>
-            <td>{{ orderinfo.sltriggerpx }}</td>
-            <td>{{ orderinfo.closeavgpx }}</td>
-            <td>{{ orderinfo.pnl }}</td>
-            <td>{{ orderinfo.create_time }}</td>
-            <td>{{ orderinfo.update_time }}</td>
-        </tr>
-    {% endfor %}
-
-</table>
+    <div class="col-12 mb-30">
+        <div class="box">
+            <div class="box-head">
+                <h1 class="title">历史记录</h1>
+            </div>
+            <div class="box-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-bordered">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th>账户</th>
+                            <th>品种</th>
+                            <th>方向</th>
+                            <th>仓位</th>
+                            <th>开仓均价</th>
+                            <th>止盈</th>
+                            <th>止损</th>
+                            <th>平仓价格</th>
+                            <th>收益(USDT)</th>
+                            <th>开仓时间</th>
+                            <th>结束时间</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for orderinfo in orderinfos %}
+                            <tr>
+                                <td>{{ orderinfo.accountinfo }}</td>
+                                <td>{{ orderinfo.instid }}</td>
+                                <td>{{ orderinfo.side }}</td>
+                                <td>{{ orderinfo.sz }}</td>
+                                <td>{{ orderinfo.avgpx }}</td>
+                                <td>{{ orderinfo.tptriggerpx }}</td>
+                                <td>{{ orderinfo.sltriggerpx }}</td>
+                                <td>{{ orderinfo.closeavgpx }}</td>
+                                <td>{{ orderinfo.pnl }}</td>
+                                <td>{{ orderinfo.create_time }}</td>
+                                <td>{{ orderinfo.update_time }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 </body>

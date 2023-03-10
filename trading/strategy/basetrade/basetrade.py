@@ -73,6 +73,26 @@ class BaseTrade:
                 return False, False, sMsg
             return flag_id, sCode, sMsg
 
+    def close_positions_one(self, instId, mgnMode, posSide):
+        """ 市价平仓 """
+        self.get_positions()
+
+        for item in self.order_lst:
+            para = {
+                "instId": instId,
+                'mgnMode': mgnMode,
+                "ccy": item.get('ccy'),
+                "posSide": posSide,
+                'autoCxl': True
+            }
+            try:
+                result = self.tradeAPI.close_positions(**para)
+                self.log.error("平仓成功")
+                return True
+            except:
+                self.log.error("平仓错误")
+                return False
+
     def close_positions_all(self):
         """ 市价平仓 """
         if not self.order_lst:
@@ -198,21 +218,23 @@ class BaseTrade:
         sz = currency * coefficient
         return sz
 
-    def set_initialization_account_all(self, all_accountinfo, strategy_name, instid):
+    def set_initialization_account_all(self, all_accountinfo, strategy_name, instid, interval=0.2, lever='50',
+                                       mgnMode='cross'):
         # 初始化状态， 设置倍数， 账户状态。
         all_accountinfo_obj = AccountInfo.objects.filter(pk__in=all_accountinfo)
         all_accountinfo_data_list = []
         for obj in all_accountinfo_obj:
-            time.sleep(0.2)
+            if interval:
+                time.sleep(interval)
             accountinfo_data = {}
             try:
                 obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
-                obj_api.set_initialization_account(instid)
+                obj_api.set_initialization_account(instid, lever=lever, mgnMode=mgnMode)
                 balance = obj_api.get_my_balance('availEq')
                 obj.balance = float(balance)
                 if obj.init_balance == -1:
                     obj.init_balance = float(balance)
-                obj.strategy_name = robot_name.get(strategy_name)
+                obj.strategy_name = strategy_name
                 obj.status = 1
                 accountinfo_data['id'] = obj.id
                 accountinfo_data['name'] = obj.account_text

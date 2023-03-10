@@ -8,7 +8,7 @@
     <title>{% block mytitle %} 机器人 {% endblock %}</title>
 
     {% block myscirpt %}
-        <script type="text/javascript" src="/static/js/jquery-3.6.1.min.js"></script>
+        <script type="text/javascript" src="/static/jquery/jquery-3.6.1.min.js"></script>
         <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
         <script type="text/javascript" src="{% static 'trading/js/strategy.js' %}"></script>
     {% endblock %}
@@ -21,161 +21,185 @@
 
 {% block mybody %}
 
-    <h1>机器人运行情况</h1>
-    <!-- Table goes in the document BODY -->
-    <table class="altrowstable" id="alternatecolor">
-        <tr>
-            <th>机器人</th>
-            <th>合约</th>
-            <th>bar</th>
-            <th>MA</th>
-            <th>运行中的账户</th>
-            <th>状态</th>
-            <th>启动时间</th>
-            <th>操作</th>
-            <!--  <th>委托订单</th> -->
+    <div class="col-12 mb-30">
+        <div class="box">
+            <div class="box-head">
+                <h1 class="title">机器人运行情况</h1>
+            </div>
+            <div class="box-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-bordered">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th>编号</th>
+                            <th>机器人</th>
+                            <th>合约</th>
+                            <th>bar</th>
+                            <th>MA</th>
+                            <th>运行中的账户</th>
+                            <th>状态</th>
+                            <th>启动时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for strategyinfo in strategyinfos %}
+                            <tr>
+                            <td>{{ strategyinfo.id }}</td>
+                            <td>{{ strategyinfo.name }}</td>
+                            <td>{{ strategyinfo.instid }}</td>
+                            <td>{{ strategyinfo.bar2 }}</td>
+                            <td>{{ strategyinfo.ma }}</td>
+                            <td>
+                                {% for name in strategyinfo.accountinfo %}
+                                    {{ name }}
+                                    <br>
+                                {% endfor %}
+                            </td>
+                            <td>{{ strategyinfo.status }}</td>
+                            <td>{{ strategyinfo.create_time }}</td>
+                            <td>
+                                <button type="button" class="button button-outline button-primary"><a
+                                        href="{% url 'trading:stop_processing_strategy' %}?strategyinfo_id={{ strategyinfo.id }}">停止运行</a>
+                                </button>
+                            </td>
+                            <!--  <td>
+                                 <button class="btn btn-primary">不可用</button>
+                             </td>-->
 
-        </tr>
-
-        {% for strategyinfo in strategyinfos %}
-            <tr>
-            <td>{{ strategyinfo.id }}</td>
-            <td>{{ strategyinfo.instid }}</td>
-            <td>{{ strategyinfo.bar2 }}</td>
-            <td>{{ strategyinfo.ma }}</td>
-            <td>
-                {% for name in strategyinfo.accountinfo %}
-                    {{ name }}
-                    <br>
-                {% endfor %}
-            </td>
-            <td>{{ strategyinfo.status }}</td>
-            <td>{{ strategyinfo.create_time }}</td>
-            <td>
-                <a href="{% url 'trading:stop_processing_strategy' %}?strategyinfo_id={{ strategyinfo.id }}">停止运行</a>
-            </td>
-           <!--  <td>
-                <button class="btn btn-primary">不可用</button>
-            </td>-->
-
-        {% endfor %}
-
-    </table>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
     <hr>
     <!-- 模态框 -->
 
     <div class="row">
-        <div class="col-3 mr-2">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticBackdropAlgoOrder">
-                重置委托
-            </button>
-            <!-- Modal -->
-            <div class="modal fade" id="staticBackdropAlgoOrder" data-backdrop="static" data-keyboard="false"
-                 tabindex="-1"
-                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="staticBackdropLabel">设置止损止盈</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <form action="{% url 'trading:reset_place_algo' %}" method="post" id="fm">
-                            {% csrf_token %}
-                            <div class="form-group">
-                                <div class="input-group input-group-lg model-input">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="inputGroup-sizing-sm">编 号</span>
-                                    </div>
-                                    <input name="algo_number" type="number" class="form-control"
-                                           aria-label="Sizing example input"
-                                           aria-describedby="inputGroup-sizing-sm" required="required"
-                                           autocomplete="off">
-                                </div>
-                                <div class="input-group input-group-lg model-input">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="inputGroup-sizing-sm">止 盈</span>
-                                    </div>
-                                    <input name="algo_tp" type="number" class="form-control"
-                                           aria-label="Sizing example input"
-                                           aria-describedby="inputGroup-sizing-sm" required="required"
-                                           autocomplete="off">
-                                </div>
-                                <div class="input-group input-group-lg model-input">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="inputGroup-sizing-sm">止 损</span>
-                                    </div>
-                                    <input name="algo_sl" type="number" class="form-control"
-                                           aria-label="Sizing example input"
-                                           aria-describedby="inputGroup-sizing-sm" required="required"
-                                           autocomplete="off">
-                                </div>
-                                <div class="input-group input-group-lg model-input">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="inputGroup-sizing-sm">密 码</span>
-                                    </div>
-                                    <input name="trade_code" type="text" class="form-control"
-                                           aria-label="Sizing example input"
-                                           aria-describedby="inputGroup-sizing-sm" required="required"
-                                           autocomplete="off">
-                                </div>
 
-                                <div class="modal-footer">
-                                    <button class="btn btn-primary">确定</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+        <div class="col-12 box">
+            <div class="box-head">
+                <h4 class="title">操作</h4>
             </div>
-        </div>
-        <div class="cols-3 mr-2">
-            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#staticBackdropCloseOrder">
-                一键平仓
-            </button>
-            <!-- Modal -->
-            <div class="modal fade" id="staticBackdropCloseOrder" data-backdrop="static" data-keyboard="false"
-                 tabindex="-1"
-                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="staticBackdropLabel">一键平仓</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <form action="{% url 'trading:close_positions_all' %}" method="post" id="fm">
-                            {% csrf_token %}
-                            <div class="form-group">
-                                <div class="input-group input-group-lg model-input">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="inputGroup-sizing-sm">编 号</span>
-                                    </div>
-                                    <input name="algo_number" type="number" class="form-control"
-                                           aria-label="Sizing example input"
-                                           aria-describedby="inputGroup-sizing-sm" required="required"
-                                           autocomplete="off">
+            <div class="box-body row justify-content-around">
+                <div class="col-5 mr-2">
+                    <button class="button button-primary text-nowrap" data-toggle="modal"
+                            data-target="#reset_place_algo">重置委托
+                    </button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="reset_place_algo" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">重置止损止盈</h5>
+                                    <button class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{% url 'trading:reset_place_algo' %}" method="post" id="fm">
+                                        {% csrf_token %}
+                                        <div class="form-group">
+                                            <div class="input-group input-group-lg model-input">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="inputGroup-sizing-sm">编 号</span>
+                                                </div>
+                                                <input name="algo_number" type="number" class="form-control"
+                                                       aria-label="Sizing example input"
+                                                       aria-describedby="inputGroup-sizing-sm" required="required"
+                                                       autocomplete="off">
+                                            </div>
+                                            <div class="input-group input-group-lg model-input">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="inputGroup-sizing-sm">止 盈</span>
+                                                </div>
+                                                <input name="algo_tp" type="number" class="form-control"
+                                                       aria-label="Sizing example input"
+                                                       aria-describedby="inputGroup-sizing-sm" required="required"
+                                                       autocomplete="off">
+                                            </div>
+                                            <div class="input-group input-group-lg model-input">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="inputGroup-sizing-sm">止 损</span>
+                                                </div>
+                                                <input name="algo_sl" type="number" class="form-control"
+                                                       aria-label="Sizing example input"
+                                                       aria-describedby="inputGroup-sizing-sm" required="required"
+                                                       autocomplete="off">
+                                            </div>
+                                            <div class="input-group input-group-lg model-input">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="inputGroup-sizing-sm">密 码</span>
+                                                </div>
+                                                <input name="trade_code" type="text" class="form-control"
+                                                       aria-label="Sizing example input"
+                                                       aria-describedby="inputGroup-sizing-sm" required="required"
+                                                       autocomplete="off">
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button class="button button-danger" data-dismiss="modal">取消</button>
+                                                <button class="button button-primary">确定</button>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
 
-                                <div class="input-group input-group-lg model-input">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="inputGroup-sizing-sm">密 码</span>
-                                    </div>
-                                    <input name="trade_code" type="text" class="form-control"
-                                           aria-label="Sizing example input"
-                                           aria-describedby="inputGroup-sizing-sm" required="required"
-                                           autocomplete="off">
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button class="btn btn-primary">确定</button>
-                                </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
+                <div class="col-5 mr-2">
+                    <button type="button" class="btn btn-danger text-nowrap" data-toggle="modal"
+                            data-target="#close_positions_all">
+                        一键平仓
+                    </button>
+
+                    <div class="modal fade" id="close_positions_all" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">平掉所有仓位</h5>
+                                    <button class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{% url 'trading:close_positions_all' %}" method="post" id="fm">
+                                        {% csrf_token %}
+                                        <div class="form-group">
+                                            <div class="input-group input-group-lg model-input">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="inputGroup-sizing-sm">编 号</span>
+                                                </div>
+                                                <input name="algo_number" type="number" class="form-control"
+                                                       aria-label="Sizing example input"
+                                                       aria-describedby="inputGroup-sizing-sm" required="required"
+                                                       autocomplete="off">
+                                            </div>
+
+                                            <div class="input-group input-group-lg model-input">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="inputGroup-sizing-sm">密 码</span>
+                                                </div>
+                                                <input name="trade_code" type="text" class="form-control"
+                                                       aria-label="Sizing example input"
+                                                       aria-describedby="inputGroup-sizing-sm" required="required"
+                                                       autocomplete="off">
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button class="button button-danger" data-dismiss="modal">取消</button>
+                                                <button class="button button-primary">确定</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

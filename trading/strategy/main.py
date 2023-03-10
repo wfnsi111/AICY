@@ -4,6 +4,7 @@ from .basetrade.basetrade import BaseTrade
 from importlib import import_module
 from requests.exceptions import ConnectionError
 from ..models import Strategy, AccountInfo
+from .conf.robot_name import robot_name
 
 
 class MyTrade(BaseTrade):
@@ -54,11 +55,9 @@ def start_my_strategy(strategy_name, kwargs):
     passphrase = one_accountinfo.passphrase
     flag = one_accountinfo.flag
     use_server_time = False
+    strategy_obj = Strategy(name=robot_name.get(strategy_name), accountinfo=all_accountinfo)
 
-    strategy_obj = Strategy(name=strategy_name, ma=kwargs.get('ma'), instid=kwargs.get('instId'),
-                            bar2=kwargs.get('bar2'), accountinfo=all_accountinfo)
-
-    logfile = kwargs.get('bar2') + '_log'
+    logfile = strategy_name + "_" + kwargs.get('bar2', kwargs.get('logfile')) + '_log'
     kwargs['strategy_obj'] = strategy_obj
     kwargs['accountinfo'] = one_accountinfo
     kwargs['logfile'] = logfile

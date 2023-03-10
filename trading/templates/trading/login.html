@@ -1,103 +1,133 @@
-<!DOCTYPE html>
-<html lang="en">
+{% load static %}
+
+<!doctype html>
+<html class="no-js" lang="zh-CN">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>登录</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
-        html {
-            height: 100%;
-        }
-        body {
-            height: 100%;
-        }
-        .container {
-            height: 100%;
-            background-image: linear-gradient(to right, #fbc2eb, #a6c1ee);
-        }
-        .login-wrapper {
-            background-color: #fff;
-            width: 358px;
-            height: 588px;
-            border-radius: 15px;
-            padding: 0 50px;
-            position: relative;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-        }
-        .header {
-            font-size: 38px;
-            font-weight: bold;
-            text-align: center;
-            line-height: 200px;
-        }
-        .input-item {
-            display: block;
-            width: 100%;
-            margin-bottom: 20px;
-            border: 0;
-            padding: 10px;
-            border-bottom: 1px solid rgb(128, 125, 125);
-            font-size: 15px;
-            outline: none;
-        }
-        .input-item:placeholder {
-            text-transform: uppercase;
-        }
-        .btn {
-            text-align: center;
-            padding: 10px;
-            width: 100%;
-            margin-top: 40px;
-            background-image: linear-gradient(to right, #a6c1ee, #fbc2eb);
-            color: #fff;
-        }
-        .sub {
-            border: none;
-            outline: none;
-            text-align: center;
-            padding: 2px;
-            width: 100%;
-            font-size: 25px;
-            background-image: linear-gradient(to right, #a6c1ee, #fbc2eb);
-            color: #fff;
-        }
+    <meta name="robots" content="noindex, follow"/>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'trading/images/favicon.ico' %}">
 
+    <!-- CSS
+	============================================ -->
 
-        .msg {
-            text-align: center;
-            line-height: 88px;
-        }
-        a {
-            text-decoration-line: none;
-            color: #abc1ee;
-        }
-    </style>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'trading/css/vendor/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'trading/css/vendor/bootstrap.min.css' %}">
+
+    <!-- Icon Font CSS -->
+    <link rel="stylesheet" href="{% static 'trading/css/vendor/material-design-iconic-font.min.css' %}">
+    <link rel="stylesheet" href="{% static 'trading/css/vendor/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'trading/css/vendor/themify-icons.css' %}">
+    <link rel="stylesheet" href="{% static 'trading/css/vendor/cryptocurrency-icons.css' %}">
+
+    <!-- Plugins CSS -->
+    <link rel="stylesheet" href="{% static 'trading/css/plugins/plugins.css' %}">
+
+    <!-- Helper CSS -->
+    <link rel="stylesheet" href="{% static 'trading/css/helper.css' %}">
+
+    <!-- Main Style CSS -->
+    <link rel="stylesheet" href="{% static 'trading/css/style.css' %}">
+
+    <!-- Custom Style CSS Only For Demo Purpose -->
+    <link id="cus-style" rel="stylesheet" href="{% static 'trading/css/style-primary.css' %}">
+
 </head>
+
 <body>
-    <div class="container">
-        <div class="login-wrapper">
-            <div class="header">Login</div>
-            <div class="form-wrapper">
-                <form action="{% url 'trading:tologin'  %}" method="post" id="login-form">
-                    {% csrf_token %}
-                    <input type="text" name="username" placeholder="username" class="input-item" required="required">
-                    <input type="password" name="password" placeholder="password" class="input-item" required="required">
-{#                    <div class="btn">{{ error_msg }}</div>#}
-                    <p>{{ error_msg }}</p>
-                    <div class="btn"><input type="submit" value="login" class="sub"></div>
-                </form>
-            </div>
-            <div class="msg">
-                Don't have account?
-                <a href="#">Sign up</a>
+
+<div class="main-wrapper">
+
+    <!-- Content Body Start -->
+    <div class="content-body m-0 p-0">
+
+        <div class="login-register-wrap">
+            <div class="row">
+
+                <div class="d-flex align-self-center justify-content-center order-2 order-lg-1 col-lg-5 col-12">
+                    <div class="login-register-form-wrap">
+
+                        <div class="content">
+                            <h1>登录</h1>
+                            <p>登录您的Beta Go账户.</p>
+                        </div>
+
+                        <div class="login-register-form">
+                            <form action="{% url 'trading:tologin' %}" method="post">
+                                {% csrf_token %}
+                                <div class="row">
+
+
+                                    <div class="row col-12 mb-20">
+                                        <div class="col-3 pt-15"><label for="phonenumber">手机号</label></div>
+                                        <div class="col-9"><input class="form-control" type="text" id="phonenumber"
+                                                                  name="phonenumber" required="required"
+                                                                  autocomplete="off" placeholder="请输入手机号"></div>
+
+                                    </div>
+                                    <div class="row col-12 mb-20">
+                                        <div class="col-3 pt-15"><label for="password">密码</label></div>
+                                        <div class="col-9"><input class="form-control" type="password" id="password"
+                                                                  name="password" required="required" autocomplete="new-password"
+                                                                  placeholder="请输入密码"></div>
+
+                                    </div>
+                                    <p class="text-danger">{{ error_msg }}</p>
+                                    <div class="col-12 mb-20"><label for="remember" class="adomx-checkbox-2"><input
+                                            id="remember" type="checkbox" name="remember"><i class="icon"></i>记住密码.</label>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="row justify-content-between">
+                                            <div class="col-auto mb-15"><a href="#">忘记密码?</a></div>
+                                            <!-- 注册 -->
+{#                                            <div class="col-auto mb-15">没有账户? <a href="{% url 'trading:toregister' %}">马上注册.</a></div>#}
+                                            <div class="col-auto mb-15">没有账户? <a href="#">马上注册.</a></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-10">
+                                        <button class="button button-primary button-outline">登 录</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="login-register-bg order-1 order-lg-2 col-lg-7 col-12">
+                    <div class="content">
+                        <h1>登录</h1>
+                        <p>登录您的Beta Go账户.</p>
+                    </div>
+                </div>
+
             </div>
         </div>
-    </div>
+
+    </div><!-- Content Body End -->
+
+</div>
+
+<!-- JS
+============================================ -->
+
+<!-- Global Vendor, plugins & Activation JS -->
+<script src="{% static 'trading/js/vendor/modernizr-3.6.0.min.js' %}"></script>
+<script src="{% static 'trading/js/vendor/jquery-3.3.1.min.js' %}"></script>
+<script src="{% static 'trading/js/vendor/popper.min.js' %}"></script>
+<script src="{% static 'trading/js/vendor/bootstrap.min.js' %}"></script>
+<!--Plugins JS-->
+<script src="{% static 'trading/js/plugins/perfect-scrollbar.min.js' %}"></script>
+<script src="{% static 'trading/js/plugins/tippy4.min.js.js' %}"></script>
+<!--Main JS-->
+<script src="{% static 'trading/js/main.js' %}"></script>
+
 </body>
+
 </html>

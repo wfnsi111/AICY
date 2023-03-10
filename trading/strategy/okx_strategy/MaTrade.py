@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
+Beta MA No.1
 
 信号1 趋势中
 信号2 大周期接近均线
@@ -34,7 +35,7 @@ class MaTrade(BaseTrade):
         self.trader = kwargs.get('trader')
         self.big_bar_time = 10
         self.accountinfo_obj = kwargs.get('accountinfo')
-        self.strategy_obj = kwargs.get('strategy_obj')
+        self.strategy_obj = self.init_strategy(kwargs.get('strategy_obj'))
         self.all_accountinfo_data_list = None
         self.orderinfo_obj = None
         self.signal_order_para = None
@@ -48,6 +49,12 @@ class MaTrade(BaseTrade):
         self.signal_recorder = {}
         self.last_price = ''
 
+    def init_strategy(self, strategy_obj):
+        strategy_obj.ma = self.ma
+        strategy_obj.instid = self.instId
+        strategy_obj.bar2 = self.bar2
+        strategy_obj.save()
+        return strategy_obj
 
     def drow_k(self, df, ma_list=None):
         ma_list = [self.ma]

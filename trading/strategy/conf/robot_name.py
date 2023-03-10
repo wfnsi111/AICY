@@ -1,3 +1,4 @@
 robot_name = {
-    'MaTrade': "Beta No.1"
+    'MaTrade': "Beta MA No.1",
+    'BetaGo1': "Beta Angel No.1",
 }

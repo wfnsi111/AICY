@@ -1,7 +1,8 @@
 from django.urls import path
 
 from . import views
-from .tradingviews import login_views, trading_views, account_views, algo_views, log_views, cpi_views
+from .tradingviews import login_views, trading_views, account_views, algo_views, log_views, cpi_views, \
+    betago1_views
 
 app_name = 'trading'
 
@@ -9,6 +10,7 @@ app_name = 'trading'
 urlpatterns = [
     path('index', views.index, name='index'),
     path('login/', login_views.tologin, name='tologin'),
+    path('toregister/', login_views.toregister, name='toregister'),
     path('logout/', login_views.tologout, name='tologout'),
 
     # views
@@ -46,6 +48,11 @@ urlpatterns = [
     path('algo/', algo_views.reset_place_algo, name='reset_place_algo'),
 
     # cpi_views
-    path('cpi/', cpi_views.get_jin10_data, name='get_jin10_data'),
+    # path('cpi/', cpi_views.get_jin10_data, name='get_jin10_data'),
+    path('hedging/', cpi_views.hedging, name='hedging'),
+
+    # betago1_views
+    path('betago1/', betago1_views.betago1, name='betago1'),
+    path('betago1_start_trade/', betago1_views.betago1_start_trade, name='betago1_start_trade'),
 
 ]

@@ -52,13 +52,13 @@ def tologin(request):
     if request.method == 'GET':
         return render(request, 'trading/login.html')
     elif request.method == 'POST':
-        username = request.POST.get("username", '').strip()
+        phonenumber = request.POST.get("phonenumber", '').strip()
         password = request.POST.get("password", '').strip()
-        user = Trader.objects.filter(account=username, password=password)
+        user = Trader.objects.filter(account=phonenumber).filter(password=password).first()
         if user:
             # 允许登录，保存登录的session信息。
-            request.session['username'] = username
-            request.session['lever'] = user[0].lever
+            request.session['username'] = phonenumber
+            request.session['lever'] = user.lever
             # 重定向：需要区分用户直接点击的登录页面进行的登录，还是由其他的页面跳转过来的。
             # 如果用户直接访问的是登录页面，那么直接跳转到首页。
             # 如果是从其它页面跳转过来的，需要获取用户所点击的url地址。比如：用户点击文章标题之后跳转的；用户点击评论之后跳转的；登录之后，直接重定向到用户点击的Url地址。
@@ -74,6 +74,37 @@ def tologin(request):
             return render(request, 'trading/login.html', {'error_msg': error_msg})
 
 
+def toregister(request):
+    if request.method == 'GET':
+        return render(request, 'trading/register.html')
+    username = request.POST.get("username")
+    phonenumber = request.POST.get("phonenumber")
+    password = request.POST.get("password", '')
+    password2 = request.POST.get("password2", '')
+    invitation_code = request.POST.get("invitation_code", '')
+    if len(phonenumber.strip()) != 11 or not phonenumber.isdigit():
+        error_msg = '手机号错误'
+        return render(request, 'trading/register.html', {"error_msg": error_msg})
+    if password2.strip() != password.strip():
+        error_msg = '两次密码不一致'
+        return render(request, 'trading/register.html', {"error_msg": error_msg})
+    # sendmsg = WeixinSMS()
+    # code = sendmsg.send_msg_with_param()
+
+    if Trader.objects.filter(phonenumber=phonenumber).exists():
+        error_msg = '手机号已注册'
+        return render(request, 'trading/register.html', {"error_msg": error_msg})
+
+    user = Trader(username=username, phonenumber=phonenumber, password=password, invitation_code=invitation_code)
+    user.save()
+    return redirect(reverse('trading:login'))
+
+
 def tologout(request):
     request.session.flush()
     return redirect(reverse('trading:trading_no_login'))
+
+
+def logout(request):
+    request.session.flush()
+    return redirect(reverse('user_web:index'))

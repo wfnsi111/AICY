@@ -177,3 +177,8 @@ def account_info_no_login(request):
             show_lst.append(show_data)
 
         return render(request, 'trading/accountinfo_no_login.html', {"accountinfo": show_lst})
+
+
+# 查询订单信息
+def get_all_order(request):
+    pass

@@ -1,0 +1,143 @@
+{% extends 'trading/base.html' %}
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block mytitle %} 参数设置 {% endblock %}</title>
+
+    {% block mystyle %}
+        <link rel="stylesheet" type="text/css" href="{% static 'trading/css/matrade.css' %}"/>
+    {% endblock %}
+
+    {% block myscirpt %}
+        <script type="text/javascript" src="/static/jquery/jquery-3.6.1.min.js"></script>
+        <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
+        <script type="text/javascript" src="{% static 'trading/js/matrade.js' %}"></script>
+    {% endblock %}
+
+</head>
+<body>
+{% block mybody %}
+    <form action="{% url 'trading:hedging' %}" method="post" id="fm">
+        {% csrf_token %}
+        <div class="bd-example" style="width: 1200px">
+            <div class="alert alert-secondary" role="alert"><h3> Hedge 参数设置</h3></div>
+            <div style="padding-left: 30px;">
+
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">合约</label>
+                    <select name="instId" class="form-control" id="exampleFormControlSelect1" required="required">
+                        <option style="display:none"></option>
+                        <option value="ETH-USDT-SWAP">ETHUSDT</option>
+                        <option value="BTC-USDT-SWAP">BTCUSDT</option>
+                        <option value="DOG-USDT-SWAP">DOGUSDT</option>
+                        <option value="NEAR-USDT-SWAP">NEARUSDT</option>
+                        <option value="DYDX-USDT-SWAP">DYDXUSDT</option>
+{#                        <option value="CHZ-USDT-SWAP">CHZUSDT</option>#}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">lever</label>
+                    <select name="lever" class="form-control" id="exampleFormControlSelect1" required="required">
+                        <option style="display:none"></option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="50">50</option>
+                        <option value="75">75</option>
+                        <option value="100">100</option>
+                        <option value="125">125</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">mgnMode</label>
+                    <select name="mgnMode" class="form-control" id="exampleFormControlSelect1" required="required">
+                        <option style="display:none"></option>
+                        <option value="cross">全仓</option>
+                        <option value="isolated">逐仓</option>
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">优先</label>
+                    <select name="first" class="form-control" id="exampleFormControlSelect1" required="required">
+                        <option style="display:none"></option>
+                        <option value="buy">buy</option>
+                        <option value="sell">sell</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleFormControlInput1">仓位（张）</label>
+                    <input type="number" name="sz" class="form-control" id="exampleFormControlInput1" required="required" />
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleFormControlInput2">止盈</label>
+                    <input type="number" name="algo_tp" class="form-control" id="exampleFormControlInput2"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleFormControlInput3">止损</label>
+                    <input type="number" name="algo_sl" class="form-control" id="exampleFormControlInput3" />
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleFormControlInput4">验证码</label>
+                    <input name="trade_code" type="text" class="form-control" id="exampleFormControlInput4"
+                           required="required" autocomplete="off">
+                </div>
+            </div>
+            <hr>
+            <div class="alert alert-secondary" role="alert"><h3>选择账户</h3></div>
+            <div class="form-group" style="padding-left: 30px;">
+                <div id="s1" style="float: left;">
+                    <div style="margin-right: 30px">
+                        <select name="select1" class="form-control" id="select1" multiple="multiple">
+                            {% for accountinfo in accountinfos %}
+                                <option value={{ accountinfo.id }}>{{ accountinfo.account_text }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <div>
+                            <input type="button" value="添加账户" class="btn btn-success" id="btn-add"
+                                   onclick="selectedToRight();"/><br/>
+                            {#                            <input type="button" value="全部添加" onclick="allToRight();"/>#}
+                        </div>
+
+                    </div>
+                </div>
+
+                <div id="s2">
+                    <div>
+                        <select name="select2" class="form-control" id="select2" multiple="multiple"
+                                required="required">
+                        </select>
+
+                        <div>
+                            <input type="button" value="删除账户" class="btn btn-warning" id="btn-del"
+                                   onclick="selectedToLeft();"/><br/>
+                            {#                            <input type="button" value="全部删除" onclick="allToLeft();"/>#}
+                        </div>
+
+                    </div>
+                </div>
+
+                <br>
+                <br>
+                <hr>
+
+            </div>
+        </div>
+        {#        <input type="submit" value="确定">#}
+        <button class="btn btn-primary btn-sm btn-lg" id="fm_submit">确定</button>
+    </form>
+
+{% endblock %}
+</body>
+</html>
+
