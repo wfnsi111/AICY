@@ -48,6 +48,7 @@ class MaTrade(BaseTrade):
         self.matrade_open_order = kwargs.get('posside', None)   # 直接开仓
         self.signal_recorder = {}
         self.last_price = ''
+        self.avgpx = None
 
     def init_strategy(self, strategy_obj):
         strategy_obj.ma = self.ma
@@ -378,7 +379,7 @@ class MaTrade(BaseTrade):
                     self.df[self.ma] = self.df['close'].rolling(ma).mean()
                     check_flag = self.check_price_to_ma(self.df)
                     if check_flag:
-                        self.close_positions_all()
+                        self.close_positions_all(self.order_lst)
                         self.track_trading_status(0)
                         self.has_order = False
                         self.stop_loss = 0
@@ -449,7 +450,7 @@ class MaTrade(BaseTrade):
         place_order_code = False
         place_order_error_code = False
         placc_algo_order_info_list = []
-        for accountinfo in self.all_accountinfo_data_list:
+        for index, accountinfo in enumerate(self.all_accountinfo_data_list):
             orderinfo_dict = {}
             obj = accountinfo['obj']
             obj_api = accountinfo['obj_api']
@@ -461,6 +462,7 @@ class MaTrade(BaseTrade):
                 self.log.error(msg)
                 accountinfo['msg'] = msg
             para['sz'] = sz
+            para['clOrdId'] = self.make_cl_ord_id("0" + str(index))
             orderinfo_dict.update(para)
             result = obj_api.tradeAPI.place_order(**para)
             # result = self.tradeAPI.place_order(**para)
@@ -476,17 +478,17 @@ class MaTrade(BaseTrade):
                 self.log.info('%s 开仓成功！！！！！！' % obj.account_text)
                 # self.track_trading_status(5)
 
-                avgpx = self.last_price
+                self.avgpx = self.last_price
                 if self.order_lst:
-                    avgpx = "%.2f" % float(self.order_lst[0].get('avgPx'))
+                    self.avgpx = "%.2f" % float(self.order_lst[0].get('avgPx'))
                     orderinfo_dict['order_ctime'] = self.timestamp_to_date(self.order_lst[0].get('cTime'))
                     orderinfo_dict['order_utime'] = self.timestamp_to_date(self.order_lst[0].get('uTime'))
 
                 orderinfo_dict['ordId'] = ordId
-                orderinfo_dict['avgPx'] = avgpx
+                orderinfo_dict['avgPx'] = self.avgpx
 
                 # 设置止损止盈
-                algo_para = self.set_place_algo_order_oco(obj_api, atr, sz, avgpx)
+                algo_para = self.set_place_algo_order_oco(obj_api, atr, sz, self.avgpx)
                 algo_para['orderid'] = ordId
                 algo_para['accountinfo_id'] = obj.id
                 algo_para['instid'] = self.instId
@@ -535,6 +537,7 @@ class MaTrade(BaseTrade):
         self.signal_info_dict['side'] = self.side
         self.signal_info_dict['atr'] = atr
         self.signal_info_dict['p'] = p
+        self.signal_info_dict['avgPx'] = self.avgpx
         self.set_strategy_info(self.signal_info_dict)
 
         # 保存委托订单信息
@@ -793,7 +796,7 @@ class MaTrade(BaseTrade):
         index_lst = []  # 记录已平仓ID
         i = 0
         while True:
-            time.sleep(2)
+            time.sleep(1)
             # 循环检测所有账户，手动平仓的可能耗时久
             if i == acc_count:
                 i = 0
@@ -813,11 +816,12 @@ class MaTrade(BaseTrade):
                 # obj.save()
                 orderinfo_obj = accountinfo['orderinfo_obj']
                 pnl = order_data.get('pnl')
-                orderinfo_obj.pnl = pnl
-                orderinfo_obj.closeavgpx = "%.2f" % float(order_data.get('avgPx'))
-                orderinfo_obj.closeordid = order_data.get('ordId')
-                orderinfo_obj.close_position = 1
-                orderinfo_obj.save()
+                if pnl is None:
+                    orderinfo_obj.pnl = pnl
+                    orderinfo_obj.closeavgpx = "%.2f" % float(order_data.get('avgPx'))
+                    orderinfo_obj.closeordid = order_data.get('ordId')
+                    orderinfo_obj.close_position = 1
+                    orderinfo_obj.save()
                 index_lst.append(i)
             i += 1
             if len(index_lst) == acc_count:

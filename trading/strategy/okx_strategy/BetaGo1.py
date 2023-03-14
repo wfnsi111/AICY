@@ -14,13 +14,12 @@ Beta Angel No.1
 
 """
 import json
+import random
 
 from ...models import AccountInfo, Strategy, PlaceAlgo
-import pandas as pd
 
 import time
 from ..basetrade.basetrade import BaseTrade
-import re
 
 
 class BetaGo1(BaseTrade):
@@ -44,6 +43,7 @@ class BetaGo1(BaseTrade):
         self.stop_loss_price = 0
         self.vol_ma = 60
         self.order_posside = None
+        self.avgpx = None
 
     def init_strategy(self, strategy_obj):
         strategy_obj.instid = self.instId
@@ -71,9 +71,11 @@ class BetaGo1(BaseTrade):
             # signal1 = True
             if signal1:
                 signal2 = self.check_signal2()
-                # signal2 = "down_wick_flag"
+                # signal2 = random.choice(['down_wick_flag', 'up_wick_flag'])
                 if signal2:
                     # 判断是开仓还是平仓
+                    self.log.info(self.signal_recorder.get('signal1'), signal1)
+                    self.log.info(self.signal_recorder.get('signal2'), signal2)
                     code = self.check_order_status(signal2)
                     if code == 0:
                         continue
@@ -81,6 +83,7 @@ class BetaGo1(BaseTrade):
                     signal3 = self.check_signal3(signal2)
                     # signal3 = True
                     if signal3:
+                        self.log.info(self.signal_recorder.get('signal3'), signal3)
                         self.track_trading_status(4)
                         self.ready_order()
 
@@ -94,6 +97,7 @@ class BetaGo1(BaseTrade):
                 instId = order.get("instId")
                 mgnMode = order.get('mgnMode')
                 posSide = order.get('posSide')
+                ccy = order.get('ccy')
                 self.order_posside = order.get('posSide')
                 if signal2 == 'down_wick_flag':
                     # 出现做多的信号
@@ -103,22 +107,76 @@ class BetaGo1(BaseTrade):
                     else:
                         # 有空单的持仓，止盈平仓
                         code = 1
-                        self.close_positions_one(instId, mgnMode, posSide)
-
+                        # self.stop_order(instId, mgnMode, posSide, ccy)
+                        status_lst = self.stop_order_all(instId, mgnMode, posSide, ccy)
+                        if -1 in status_lst:
+                            pass
+                        else:
+                            # 平仓完成，重置运行状态
+                            self.track_trading_status(1)
                 else:
                     # 出现做空的信号
                     if self.order_posside == 'long':
                         # 有多单的持仓，止盈平仓
                         code = 1
-                        self.close_positions_one(instId, mgnMode, posSide)
-                        self.has_order = False
-                        self.order_lst.clear()
+                        status_lst = self.stop_order_all(instId, mgnMode, posSide, ccy)
+                        if -1 in status_lst:
+                            pass
+                        else:
+                            # 平仓完成，重置运行状态
+                            self.track_trading_status(1)
                     else:
                         # 有空单的持仓，就不操作
                         code = 0
         return code
 
-    def check_signal1(self):
+    def stop_order(self, instId, mgnMode, posSide, ccy):
+        self.close_positions_one(instId, mgnMode, posSide)
+
+    def stop_order_all(self, instId, mgnMode, posSide, ccy):
+        # 平仓
+        status_lst = []
+        for accountinfo in self.all_accountinfo_data_list:
+            obj = accountinfo['obj']
+            obj_api = accountinfo['obj_api']
+            para = {
+                "instId": instId,
+                'mgnMode': mgnMode,
+                "ccy": ccy,
+                "posSide": posSide,
+                'autoCxl': True
+            }
+            try:
+                result = obj_api.tradeAPI.close_positions(**para)
+                if result.get("code") == '0':
+                    status = 0
+                else:
+                    status = -1
+            except Exception as e:
+                print(self.log.error(e))
+                status = -1
+            status_lst.append(status)
+
+        # 保存信息
+        for accountinfo in self.all_accountinfo_data_list:
+            orderinfo_dict = {}
+            obj = accountinfo['obj']
+            obj_api = accountinfo['obj_api']
+            orderinfo_obj = accountinfo.get('orderinfo_obj', None)
+            if not orderinfo_obj:
+                continue
+            result = obj_api.tradeAPI.get_orders_history('SWAP', limit='1')
+            order_data = result.get('data')[0]
+            pnl = order_data.get('pnl')
+            orderinfo_obj.pnl = pnl
+            orderinfo_obj.closeavgpx = "%.2f" % float(order_data.get('avgPx'))
+            orderinfo_obj.closeordid = order_data.get('ordId')
+            orderinfo_obj.close_position = 1
+            orderinfo_obj.save()
+
+        return status_lst
+
+    def check_signal1(self, pro=3):
         # 1 成交量大于等于该周期成交量60MA的3倍
         self.track_trading_status(update_status=False)
         signal1 = False
@@ -126,16 +184,15 @@ class BetaGo1(BaseTrade):
         volume = float(self.KL['volume'])
         ma_vol = float(self.KL['vol_ma'])
 
-        if volume >= ma_vol:
+        if volume >= ma_vol * pro:
             signal1 = True
             self.signal_recorder["signal1"] = {'bar2': self.bar2, 'last': last_p, 'volume': volume,
                                                'ma_vol': ma_vol}
         return signal1
 
-    def check_signal2(self):
+    def check_signal2(self, pro=1.5):
         self.track_trading_status(update_status=False)
         # 下影线长度大于等于上影线长度的1.5倍
-        pro = 1.5
         _open = float(self.KL['open'])
         _close = float(self.KL['close'])
         _high = float(self.KL['high'])
@@ -154,10 +211,9 @@ class BetaGo1(BaseTrade):
                                            "down_wick": down_wick, "up_wick": up_wick}
         return signal2
 
-    def check_signal3(self, signal2):
+    def check_signal3(self, signal2, pro=0.66):
         # 影线长度大于等于实体长度0.66倍
         self.track_trading_status(update_status=False)
-        pro = 0.66
         _open = float(self.KL['open'])
         _close = float(self.KL['close'])
         _high = float(self.KL['high'])
@@ -221,17 +277,17 @@ class BetaGo1(BaseTrade):
                 self.log.info('%s 开仓成功！！！！！！' % obj.account_text)
                 # self.track_trading_status(5)
 
-                avgpx = self.last_price
+                self.avgpx = self.last_price
                 if self.order_lst:
-                    avgpx = "%.2f" % float(self.order_lst[0].get('avgPx'))
+                    self.avgpx = "%.2f" % float(self.order_lst[0].get('avgPx'))
                     orderinfo_dict['order_ctime'] = self.timestamp_to_date(self.order_lst[0].get('cTime'))
                     orderinfo_dict['order_utime'] = self.timestamp_to_date(self.order_lst[0].get('uTime'))
 
                 orderinfo_dict['ordId'] = ordId
-                orderinfo_dict['avgPx'] = avgpx
+                orderinfo_dict['avgPx'] = self.avgpx
 
                 # 设置止损止盈
-                algo_para = self.set_place_algo_order_oco(obj_api, sz, avgpx)
+                algo_para = self.set_place_algo_order_oco(obj_api, sz, self.avgpx)
                 algo_para['orderid'] = ordId
                 algo_para['accountinfo_id'] = obj.id
                 algo_para['instid'] = self.instId
@@ -276,6 +332,7 @@ class BetaGo1(BaseTrade):
         self.signal_info_dict['posSide'] = self.posSide
         self.signal_info_dict['instId'] = self.instId
         self.signal_info_dict['side'] = self.side
+        self.signal_info_dict['avgPx'] = self.avgpx
         self.signal_info_dict['stop_loss_price'] = self.stop_loss_price
         self.set_strategy_info(self.signal_info_dict)
 
@@ -286,7 +343,10 @@ class BetaGo1(BaseTrade):
                 # 把key转小写
                 new_dict[i.lower()] = j
             algo = PlaceAlgo(**new_dict, strategyid=self.strategy_obj.id)
-            algo.save()
+            try:
+                algo.save()
+            except Exception as e:
+                print(e)
 
     def track_trading_status(self, status=0, update_status=True):
         strategy_obj = Strategy.objects.get(pk=self.strategy_obj.id)
@@ -368,7 +428,8 @@ class BetaGo1(BaseTrade):
             try:
                 signalinfo = json.loads(signalinfo)
             except Exception as e:
-                self.log.info(e)
+                pass
+                # self.log.info(e)
                 # self.log.info(signalinfo)
             if isinstance(signalinfo, list):
                 signalinfo.append(data)

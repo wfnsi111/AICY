@@ -1,5 +1,5 @@
 {% extends 'trading/base.html' %}
-
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -14,10 +14,58 @@
         <h1><a href="#"> 没有日志文件 </a> </h1>
     {% endif %}
 
-    {% for log in logs %}
-        <h1><a href="{%  url 'trading:show_log' log %} "> {{ log }} </a> </h1>
-    {% endfor %}
+    <div class="col-xlg-12 col-lg-6 col-12 mb-30">
+                            <div class="box">
 
+                                <div class="box-head">
+                                    <h3 class="title">日志浏览</h3>
+                                </div>
+
+                                <div class="box-body p-0">
+
+                                    <!--Todo List Start-->
+                                    <ul class="todo-list">
+
+                                        <!--Todo Item Start-->
+                                        {% for log in logs %}
+                                        <li class="">
+                                            <div class="list-action">
+                                                <label class="adomx-checkbox"><input type="checkbox"> <i class="icon"></i></label>
+                                                <button class="remove"><i class="zmdi zmdi-delete"></i></button>
+                                            </div>
+                                            <div class="list-content">
+                                                <h3><a href="{%  url 'trading:show_log' log %} "> {{ log }} </a> </h3>
+                                            </div>
+                                            <div class="list-action right">
+                                                <button class="remove btn-remove" onclick="remove_log('{{ log }}')">
+                                                    <i class="zmdi zmdi-delete"></i>
+                                                </button>
+                                            </div>
+                                        </li>
+                                        {% endfor %}
+                                        <!--Todo Item End-->
+
+
+                                    </ul>
+                                    <!--Todo List End-->
+
+
+                                </div>
+                            </div>
+                        </div>
 {% endblock %}
+
+{% block myscirpt %}
+<script>
+    function remove_log(log_name) {
+    var url = "/trading/removelog";
+    var data = {"log_name": log_name};
+    $.get(url, data, function (param){
+    alert('OK' + param)
+    })
+}
+</script>
+{% endblock %}
+
 </body>
 </html>

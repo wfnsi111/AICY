@@ -1,6 +1,7 @@
 import json
 import platform
 import os
+import time
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -113,8 +114,27 @@ def close_positions_one(request):
     accountinfo.save()
     result = obj_api.accountAPI.get_positions('SWAP')
     order_lst = result.get('data', [])
+    clOrdId = "123"
+    # result = obj_api.tradeAPI.get_orders(instId, clOrdId)
+
     if order_lst:
-        obj_api.close_positions_all(order_lst)
+        obj_api.close_positions_all_(order_lst, clOrdId)
+
+    # 更新收益
+    time.sleep(0.3)
+    result = obj_api.tradeAPI.get_orders_history('SWAP', limit='2')
+    result = result.get("data")
+    # 第一个是平仓，第二个是开仓的订单
+    open_order_id = result[1].get('ordId')
+    orderinfos = OrderInfo.objects.filter(ordid=open_order_id)
+    for orderinfo in orderinfos:
+        if orderinfo.pnl is None:
+            orderinfo.pnl = result[0].get("pnl")
+            orderinfo.closeavgpx = "%.2f" % float(result[0].get('avgPx'))
+            orderinfo.closeordid = result[0].get('ordId')
+            orderinfo.close_position = 1
+            orderinfo.save()
+
     return redirect(reverse('trading:account_info'))
 
 
@@ -123,7 +143,7 @@ def close_positions_all(request):
     if request.method == 'POST':
         trade_code = request.POST.get('trade_code', '').strip()
         strategy_id = request.POST.get('algo_number', '').strip()
-        if trade_code != 'lgh':
+        if trade_code != '123456':
             return HttpResponse('Who are you!!!')
         try:
             account_id_list = []
@@ -169,6 +189,11 @@ def close_positions_all(request):
                         status = -1
             status_list.append({'obj': accountinfo, "status": status})
 
+        # 手动平仓之后，更新收益情况
+        orderinfos = OrderInfo.objects.filter(strategyid=int(strategy_id))
+        for orderinfo in orderinfos:
+            close_positions_update_pnl(orderinfo)
+
         # 更新数据库状态
         for item in status_list:
             obj = item['obj']
@@ -180,6 +205,27 @@ def close_positions_all(request):
         strategyinfo.save()
 
         return redirect(reverse('trading:account_info'))
+
+
+def close_positions_update_pnl(orderinfo):
+    if orderinfo.pnl is None:
+        accountinfo = orderinfo.accountinfo
+        obj_api = AccountAndTradeApi(accountinfo.api_key, accountinfo.secret_key, accountinfo.passphrase, False,
+                                     accountinfo.flag)
+        # 更新收益
+        time.sleep(0.5)
+        result = obj_api.tradeAPI.get_orders_history('SWAP', limit='2')
+        result = result.get("data")
+        # 第一个是平仓，第二个是开仓的订单
+        open_order_id = result[1].get('ordId')
+        orderinfos = OrderInfo.objects.filter(ordid=open_order_id)
+        for orderinfo in orderinfos:
+            if orderinfo.pnl is None:
+                orderinfo.pnl = result[0].get("pnl")
+                orderinfo.closeavgpx = "%.2f" % float(result[0].get('avgPx'))
+                orderinfo.closeordid = result[0].get('ordId')
+                orderinfo.close_position = 1
+                orderinfo.save()
 
 
 @islogin

@@ -9,7 +9,7 @@ class AccountAndTradeApi:
         self.tradeAPI = Trade.TradeAPI(api_key, api_secret_key, passphrase, use_server_time, flag)
         self.fundingAPI = Funding.FundingAPI(api_key, api_secret_key, passphrase, use_server_time, flag)
 
-    def close_positions_all(self, order_lst=None):
+    def close_positions_all_(self, order_lst=None, clOrdId=None):
         """ 市价平仓 """
         if order_lst:
             for item in order_lst:
@@ -18,12 +18,14 @@ class AccountAndTradeApi:
                     'mgnMode': item.get('mgnMode'),
                     "ccy": item.get('ccy'),
                     "posSide": item.get('posSide'),
-                    'autoCxl': True
+                    'autoCxl': True,
                 }
                 # self.posSide = {"buy": "long", "sell": "short"}.get(self.side, '')
                 # 检测是否有委托 ，如果有委托， 先撤销委托，在平仓
                 # self.algo = self.cancel_algo_order_(algoid)
                 try:
+                    if clOrdId:
+                        para["clOrdId"] = clOrdId
                     result = self.tradeAPI.close_positions(**para)
                 except Exception as e:
                     print(e)

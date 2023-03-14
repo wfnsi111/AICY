@@ -36,6 +36,7 @@ urlpatterns = [
     # log_views
     path('log/', log_views.check_log, name='check_log'),
     path('showlog/<log_id>', log_views.show_log, name='show_log'),
+    path('removelog/', log_views.remove_log, name='remove_log'),
 
     # account_views
     path('accountinfo/', account_views.account_info, name='account_info'),

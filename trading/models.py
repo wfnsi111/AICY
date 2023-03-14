@@ -62,6 +62,12 @@ class AccountInfo(models.Model):
         ('1', '模拟'),
     )
 
+    active_choices = (
+        (0, '关闭'),
+        (1, '激活'),
+        (2, '取消'),
+    )
+
     trader = models.ForeignKey(Trader, on_delete=models.CASCADE)
     account_text = models.CharField(verbose_name='用户名称', max_length=50)
     api_key = models.CharField(max_length=50, unique=True)
@@ -78,7 +84,7 @@ class AccountInfo(models.Model):
     msg = models.TextField(null=True, blank=True, editable=False)
     strategy_name = models.CharField(max_length=20, null=True, editable=False)
     bar2 = models.CharField(max_length=10, null=True, editable=False)
-    is_active = models.IntegerField(default=1, editable=False)
+    is_active = models.IntegerField(verbose_name='激活账户', default=1, choices=active_choices)
 
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
@@ -127,6 +133,7 @@ class OrderInfo(models.Model):
     slordpx = models.CharField(max_length=20, null=True)
     algoid = models.CharField(max_length=50, null=True)
     closeordid = models.CharField(max_length=50, null=True)
+    clordid = models.CharField(verbose_name='自定义 ID', max_length=50, null=True)
 
     tdmode = models.CharField(default='cross', max_length=20, null=True)
     ccy = models.CharField(default='USDT', max_length=20, null=True)

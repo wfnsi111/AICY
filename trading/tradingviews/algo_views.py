@@ -24,7 +24,7 @@ def reset_place_algo(request):
         if not all([tptriggerpx, sltriggerpx, strategy_id]):
             return HttpResponse('委托单设置错误')
 
-        if trade_code.strip().lower() != 'lgh':
+        if trade_code.strip().lower() != '123456':
             return HttpResponse('密码错误')
 
         try:

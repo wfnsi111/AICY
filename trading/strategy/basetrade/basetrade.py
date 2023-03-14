@@ -41,6 +41,13 @@ class BaseTrade:
         date = time.strftime("%Y-%m-%d %H:%M:%S", timearray)
         return date
 
+    def make_cl_ord_id(self, code=None):
+        # 自定义订单的 ID
+        millis = str(int(round(time.time() * 1000)))
+        if code is not None:
+            millis += str(code)
+        return str(millis)
+
     def get_positions(self):
         try:
             result = self.accountAPI.get_positions('SWAP')
@@ -93,9 +100,11 @@ class BaseTrade:
                 self.log.error("平仓错误")
                 return False
 
-    def close_positions_all(self):
+    def close_positions_all(self, order_lst):
         """ 市价平仓 """
-        if not self.order_lst:
+
+        # 如果没有订单列表，重新获取，在平仓
+        if not order_lst:
             self.get_positions()
 
         for item in self.order_lst:
@@ -265,7 +274,7 @@ class BaseTrade:
                                   tptriggerpx=kwargs.get('tpTriggerPx'), tpordpx=kwargs.get('tpOrdPx'),
                                   sltriggerpx=kwargs.get('slTriggerPx'), slordpx=kwargs.get('slOrdPx'),
                                   sz=kwargs.get('sz'), px=kwargs.get('px'), lever=kwargs.get('lever'),
-                                  algoid=kwargs.get('algoid'), strategyid=kwargs.get('strategyid'),
+                                  algoid=kwargs.get('algoid'), clordid=kwargs.get('clOrdId'), strategyid=kwargs.get('strategyid'),
                                   order_ctime=kwargs.get('order_ctime'), order_utime=kwargs.get('order_utime'),
                                   algo_ctime=kwargs.get('algo_ctime'))
             orderinfo.accountinfo_id = accountinfo.id
