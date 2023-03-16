@@ -28,7 +28,8 @@ def show_log(request, log_id):
             f.close()
         except FileNotFoundError:
             return render(request, 'trading/checklog.html', {'logs': ''})
-        return render(request, 'trading/showlog.html', {'file_content': file_content})
+        return render(request, 'trading/showlog.html', {'filename': log_id,
+                                                        'file_content': file_content})
 
 
 def remove_log(request):

@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-nxydsc2q%=jkvyr+cxp*6dfsfamudw9$$$1rh!p@4+=)4aik3e
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-MY_IP = '18.167.165.131'
+MY_IP = '43.198.96.55'
 
 ALLOWED_HOSTS = [MY_IP, 'localhost', '0.0.0.0:8000', '127.0.0.1', '172.31.22.98', '192.168.1.108']
 
@@ -174,7 +174,7 @@ TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
