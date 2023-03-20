@@ -44,6 +44,7 @@ class BetaGo1(BaseTrade):
         self.vol_ma = 60
         self.order_posside = None
         self.avgpx = None
+        self.risk_control = 0.01
 
     def init_strategy(self, strategy_obj):
         strategy_obj.instid = self.instId
@@ -144,7 +145,8 @@ class BetaGo1(BaseTrade):
                 'mgnMode': mgnMode,
                 "ccy": ccy,
                 "posSide": posSide,
-                'autoCxl': True
+                'autoCxl': True,
+                "clOrdId": "1111",
             }
             try:
                 result = obj_api.tradeAPI.close_positions(**para)
@@ -165,14 +167,25 @@ class BetaGo1(BaseTrade):
             orderinfo_obj = accountinfo.get('orderinfo_obj', None)
             if not orderinfo_obj:
                 continue
-            result = obj_api.tradeAPI.get_orders_history('SWAP', limit='1')
-            order_data = result.get('data')[0]
-            pnl = order_data.get('pnl')
-            orderinfo_obj.pnl = pnl
-            orderinfo_obj.closeavgpx = "%.2f" % float(order_data.get('avgPx'))
-            orderinfo_obj.closeordid = order_data.get('ordId')
-            orderinfo_obj.close_position = 1
-            orderinfo_obj.save()
+            count_time = 0
+            while True:
+                # 循环获取 ，避免交易所的延迟造成的未获取订单信息
+                count_time += 1
+                time.sleep(0.1)
+                result = obj_api.tradeAPI.get_orders_history('SWAP', limit='1')
+                order_data = result.get('data')[0]
+                if count_time == 10:
+                    break
+                if order_data.get('ordId') == orderinfo_obj.ordid:
+                    continue
+                pnl = order_data.get('pnl')
+                orderinfo_obj.pnl = pnl
+                orderinfo_obj.closeavgpx = "%.2f" % float(order_data.get('avgPx'))
+                orderinfo_obj.closeordid = order_data.get('ordId')
+                orderinfo_obj.close_position = 1
+                orderinfo_obj.save()
+                count_time = 0
+                break
 
         return status_lst
 
@@ -255,7 +268,7 @@ class BetaGo1(BaseTrade):
             obj = accountinfo['obj']
             obj_api = accountinfo['obj_api']
             orderinfo_dict['lever'] = self.lever
-            sz = self.set_my_position(accountinfo['balance'])
+            sz, org_sz = self.set_my_position(accountinfo['balance'])
             if not sz:
                 msg = '仓位太小， 无法开仓 ---> *** 余额%sU ***' % accountinfo['balance']
                 self.log.error(accountinfo['name'])
@@ -287,7 +300,7 @@ class BetaGo1(BaseTrade):
                 orderinfo_dict['avgPx'] = self.avgpx
 
                 # 设置止损止盈
-                algo_para = self.set_place_algo_order_oco(obj_api, sz, self.avgpx)
+                algo_para = self.set_place_algo_order_oco(obj_api, sz, self.avgpx, org_sz, accountinfo['balance'])
                 algo_para['orderid'] = ordId
                 algo_para['accountinfo_id'] = obj.id
                 algo_para['instid'] = self.instId
@@ -348,6 +361,13 @@ class BetaGo1(BaseTrade):
             except Exception as e:
                 print(e)
 
+        # 等1根 K线
+        # t = int(self.bar2[:-1]) * 60 if "m" in self.bar2 else int(self.bar2[:-1]) * 60 * 60
+        # for i in range(t // 5 + 1):
+        #     time.sleep(5)
+        #     self.track_trading_status(update_status=False)
+        # time.sleep(5)
+
     def track_trading_status(self, status=0, update_status=True):
         strategy_obj = Strategy.objects.get(pk=self.strategy_obj.id)
         if strategy_obj.status in (0, -2):
@@ -360,18 +380,19 @@ class BetaGo1(BaseTrade):
 
     def set_my_position(self, mybalance):
         # 总资金*1%风险值/(收盘价减去最低价的绝对值)
-        risk_control = 0.01
         _close = float(self.KL['close'])
         _high = float(self.KL['high'])
         _low = float(self.KL['low'])
-        sz = float(mybalance) * risk_control / abs(_close - _low)
+        org_sz = float(mybalance) * self.risk_control / abs(_close - _low)
+        sz = self.currency_to_sz(self.instId, org_sz)
         if sz < 1:
             sz = 0
-        return int(sz)
+        return int(sz), int(org_sz)
 
-    def set_place_algo_order_oco(self, obj_api, sz, avgpx):
+    def set_place_algo_order_oco(self, obj_api, sz, avgpx, org_sz, balance):
         side = {"long": "sell", "short": "buy"}.get(self.posSide)
-        price_para = self.set_place_algo_order_price(avgpx, self.posSide)
+        p_pre1 = self.reset_algo_order_price(balance, org_sz)
+        price_para, sl2 = self.set_place_algo_order_price(avgpx, self.posSide, p_pre1)
         try:
             result = obj_api.tradeAPI.place_algo_order(self.instId, self.tdMode, side, ordType=self.ordType,
                                                        sz=sz, posSide=self.posSide, **price_para,
@@ -391,10 +412,26 @@ class BetaGo1(BaseTrade):
             except Exception as e:
                 self.log.error(e)
         else:
-            # 事件执行失败时的msg
-            status = -1
-            msg = "止损止盈设置错误，，，%s" % msg
-            self.log.error(msg)
+            # 可能是止损设置错误
+            price_para['slTriggerPx'] = sl2
+            result = obj_api.tradeAPI.place_algo_order(self.instId, self.tdMode, side, ordType=self.ordType,
+                                                       sz=sz, posSide=self.posSide, **price_para,
+                                                       tpTriggerPxType='last', slTriggerPxType='last')
+            algoId, sCode, msg = self.check_order_result_data(result, "algoId")
+            if sCode == "0":
+                # 事件执行结果的code，0代表成功
+                status = 1
+                self.log.info("止损止盈设置成功 市价委托")
+                try:
+                    result = obj_api.tradeAPI.order_algos_list(ordType=self.ordType, algoId=algoId, instType='SWAP')
+                    price_para['algo_ctime'] = self.timestamp_to_date(result.get('data')[0].get('cTime'))
+                except Exception as e:
+                    self.log.error(e)
+            else:
+                status = -1
+                msg = "止损止盈设置错误，，，%s" % msg
+                self.log.error(msg)
+
         price_para['algoid'] = algoId
         price_para['posside'] = self.posSide
         price_para['side'] = side
@@ -404,14 +441,20 @@ class BetaGo1(BaseTrade):
         price_para['status'] = status
         return price_para
 
-    def set_place_algo_order_price(self, avgPx, posSide):
+    def reset_algo_order_price(self, balance, org_sz):
+        p_pre1 = float(balance) * self.risk_control / float(org_sz)    # p为止损1%的点数
+        return p_pre1
+
+    def set_place_algo_order_price(self, avgPx, posSide, p_pre1):
         # K线收盘的最低价
         if posSide == 'long':
             tp = float(avgPx) * 1.2
             sl = self.stop_loss_price
+            sl2 = self.stop_loss_price - p_pre1
         else:
             tp = float(avgPx) * 0.8
             sl = self.stop_loss_price
+            sl2 = self.stop_loss_price + p_pre1
         # -1 为市价平仓
         p2 = "-1"
         price_para = {
@@ -420,7 +463,7 @@ class BetaGo1(BaseTrade):
             "slTriggerPx": "%0.2f" % sl,
             "slOrdPx": p2
         }
-        return price_para
+        return price_para, sl2
 
     def set_strategy_info(self, data):
         signalinfo = self.strategy_obj.signalinfo

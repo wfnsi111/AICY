@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-nxydsc2q%=jkvyr+cxp*6dfsfamudw9$$$1rh!p@4+=)4aik3e
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-MY_IP = '43.198.96.55'
+MY_IP = '18.163.198.108'
 
 ALLOWED_HOSTS = [MY_IP, 'localhost', '0.0.0.0:8000', '127.0.0.1', '172.31.22.98', '192.168.1.108']
 
@@ -52,7 +52,7 @@ if platform.system().lower() == 'windows':
         'django.contrib.sessions.middleware.SessionMiddleware',
         # 'corsheaders.middleware.CorsMiddleware',
         'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
+        # 'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',

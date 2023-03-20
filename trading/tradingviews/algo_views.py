@@ -17,6 +17,9 @@ status = 3  # 手动设置止损止盈
 @islogin
 def reset_place_algo(request):
     if request.method == 'POST':
+        # -1 为市价平仓
+        tpordpx = "-1"
+        slordpx = "-1"
         tptriggerpx = request.POST.get('algo_tp')
         sltriggerpx = request.POST.get('algo_sl')
         strategy_id = request.POST.get('algo_number')
@@ -36,13 +39,53 @@ def reset_place_algo(request):
 
         if not all_algo_orders:
             return HttpResponse('未查询到之前的委托信息')
+            accountinfo_id_lst = strategyinfo.accountinfo
+            for id in eval(accountinfo_id_lst):
+                accountinfo = AccountInfo.objects.get(pk=id)
+                obj_api = AccountAndTradeApi(accountinfo.api_key, accountinfo.secret_key, accountinfo.passphrase, False,
+                                             accountinfo.flag)
+                result = obj_api.accountAPI.get_positions(instType='SWAP', instId=strategyinfo.instid)
+                for order_info in result.get('data'):
+                    pos = order_info.get('pos')
+                    if not pos:
+                        continue
+                    posSide = order_info.get('posSide')
+                    side = 'sell' if posSide == 'long' else 'buy'
+                    try:
+                        result = obj_api.tradeAPI.place_algo_order(strategyinfo.instid, 'cross', side, ordType='oco',
+                                                                   sz=pos, posSide=posSide, tpTriggerPx=tptriggerpx,
+                                                                   tpOrdPx=tpordpx, slTriggerPx=sltriggerpx,
+                                                                   slOrdPx=slordpx,
+                                                                   tpTriggerPxType='last', slTriggerPxType='last')
+                        for data in result.get('data'):
+                            scode = data.get('sCode')
+                            if scode == "0":
+                                print('止损止盈重设成功')
+                                order = PlaceAlgo()
+                                order.status = 0
+                                order.algoid = data.get("algoId")
+                                order.orderid = ''
+                                order.strategyid = strategy_id
+                                order.accountinfo_id = id
+                                order.tptriggerpx = tptriggerpx
+                                order.tpordpx = tpordpx
+                                order.sltriggerpx = sltriggerpx
+                                order.slordpx = slordpx
+                                order.status = 3
+                                order.save()
+
+                            else:
+                                # 止损止盈的价格设置不合理，需要重新设置
+                                print('止损止盈重设出现错误！！！！！！！！！！！！！！')
+                                if scode in ('51277', '51278', '51279', '51280'):
+                                    return HttpResponse(data.get("sMsg"))
+
+                    except Exception as e:
+                        error_code = True
+                        print(e)
 
         # 错误标识 有一个账户发生错误则为Ture
         error_code = False
-
-        # -1 为市价平仓
-        tpordpx = "-1"
-        slordpx = "-1"
 
         for order in all_algo_orders:
             accountinfo = AccountInfo.objects.get(pk=order.accountinfo_id)
