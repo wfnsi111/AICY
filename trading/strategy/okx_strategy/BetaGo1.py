@@ -14,7 +14,6 @@ Beta Angel No.1
 
 """
 import json
-import random
 
 from ...models import AccountInfo, Strategy, PlaceAlgo
 
@@ -362,11 +361,11 @@ class BetaGo1(BaseTrade):
                 print(e)
 
         # 等1根 K线
-        # t = int(self.bar2[:-1]) * 60 if "m" in self.bar2 else int(self.bar2[:-1]) * 60 * 60
-        # for i in range(t // 5 + 1):
-        #     time.sleep(5)
-        #     self.track_trading_status(update_status=False)
-        # time.sleep(5)
+        t = int(self.bar2[:-1]) * 60 if "m" in self.bar2 else int(self.bar2[:-1]) * 60 * 60
+        for i in range(t // 5 + 1):
+            time.sleep(5)
+            self.track_trading_status(update_status=False)
+        time.sleep(5)
 
     def track_trading_status(self, status=0, update_status=True):
         strategy_obj = Strategy.objects.get(pk=self.strategy_obj.id)
@@ -379,11 +378,16 @@ class BetaGo1(BaseTrade):
             self.log.info('更新运行状态--%s--' % status)
 
     def set_my_position(self, mybalance):
-        # 总资金*1%风险值/(收盘价减去最低价的绝对值)
+        """
+        做空： 总资金*1%风险值/ (收盘价减去最高价的绝对值)
+        做多： 总资金*1%风险值/ (收盘价减去最低价的绝对值)
+
+        """
+
         _close = float(self.KL['close'])
         _high = float(self.KL['high'])
         _low = float(self.KL['low'])
-        org_sz = float(mybalance) * self.risk_control / abs(_close - _low)
+        org_sz = float(mybalance) * self.risk_control / abs(_close - _low if self.order_posside == 'long' else _high)
         sz = self.currency_to_sz(self.instId, org_sz)
         if sz < 1:
             sz = 0
