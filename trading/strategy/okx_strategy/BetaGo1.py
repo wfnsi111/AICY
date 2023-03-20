@@ -14,6 +14,7 @@ Beta Angel No.1
 
 """
 import json
+import random
 
 from ...models import AccountInfo, Strategy, PlaceAlgo
 
@@ -74,8 +75,8 @@ class BetaGo1(BaseTrade):
                 # signal2 = random.choice(['down_wick_flag', 'up_wick_flag'])
                 if signal2:
                     # 判断是开仓还是平仓
-                    self.log.info(self.signal_recorder.get('signal1'), signal1)
-                    self.log.info(self.signal_recorder.get('signal2'), signal2)
+                    self.log.info(self.signal_recorder.get('signal1', signal1))
+                    self.log.info(self.signal_recorder.get('signal2', signal2))
                     code = self.check_order_status(signal2)
                     if code == 0:
                         continue
@@ -83,7 +84,7 @@ class BetaGo1(BaseTrade):
                     signal3 = self.check_signal3(signal2)
                     # signal3 = True
                     if signal3:
-                        self.log.info(self.signal_recorder.get('signal3'), signal3)
+                        self.log.info(self.signal_recorder.get('signal3', signal3))
                         self.track_trading_status(4)
                         self.ready_order()
 
