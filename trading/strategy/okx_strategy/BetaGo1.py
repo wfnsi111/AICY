@@ -69,22 +69,21 @@ class BetaGo1(BaseTrade):
             self.KL = self.df.iloc[-1, :]
 
             signal1 = self.check_signal1()
-            # signal1 = True
+            signal1 = True
             if signal1:
                 signal2 = self.check_signal2()
-                # signal2 = random.choice(['down_wick_flag', 'up_wick_flag'])
+                signal2 = random.choice(['down_wick_flag', 'up_wick_flag'])
                 if signal2:
                     # 判断是开仓还是平仓
-                    self.log.info(self.signal_recorder.get('signal1', signal1))
-                    self.log.info(self.signal_recorder.get('signal2', signal2))
                     code = self.check_order_status(signal2)
                     if code == 0:
                         continue
 
                     signal3 = self.check_signal3(signal2)
-                    # signal3 = True
+                    signal3 = True
                     if signal3:
-                        self.log.info(self.signal_recorder.get('signal3', signal3))
+                        self.log.info(self.signal_recorder)
+                        self.log.info('满足信号 ，准备开仓')
                         self.track_trading_status(4)
                         self.ready_order()
 
@@ -136,6 +135,7 @@ class BetaGo1(BaseTrade):
 
     def stop_order_all(self, instId, mgnMode, posSide, ccy):
         # 平仓
+        self.log.info('准备平仓')
         status_lst = []
         for accountinfo in self.all_accountinfo_data_list:
             obj = accountinfo['obj']
@@ -151,6 +151,7 @@ class BetaGo1(BaseTrade):
             try:
                 result = obj_api.tradeAPI.close_positions(**para)
                 if result.get("code") == '0':
+                    self.log.info('平仓成功')
                     status = 0
                 else:
                     status = -1
@@ -269,13 +270,14 @@ class BetaGo1(BaseTrade):
             obj_api = accountinfo['obj_api']
             orderinfo_dict['lever'] = self.lever
             sz, org_sz = self.set_my_position(accountinfo['balance'])
+            para['sz'] = sz
+            orderinfo_dict.update(para)
             if not sz:
                 msg = '仓位太小， 无法开仓 ---> *** 余额%sU ***' % accountinfo['balance']
                 self.log.error(accountinfo['name'])
                 self.log.error(msg)
                 accountinfo['msg'] = msg
-            para['sz'] = sz
-            orderinfo_dict.update(para)
+                continue
             result = obj_api.tradeAPI.place_order(**para)
             # result = self.tradeAPI.place_order(**para)
             ordId, sCode, sMsg = self.check_order_result_data(result, 'ordId')
@@ -363,10 +365,10 @@ class BetaGo1(BaseTrade):
 
         # 等1根 K线
         t = int(self.bar2[:-1]) * 60 if "m" in self.bar2 else int(self.bar2[:-1]) * 60 * 60
-        for i in range(t // 5 + 1):
+        self.log.info('开仓完成，等待1根K线收线--%s' % self.bar2)
+        for i in range(t // 5):
             time.sleep(5)
             self.track_trading_status(update_status=False)
-        time.sleep(5)
 
     def track_trading_status(self, status=0, update_status=True):
         strategy_obj = Strategy.objects.get(pk=self.strategy_obj.id)
@@ -388,7 +390,7 @@ class BetaGo1(BaseTrade):
         _close = float(self.KL['close'])
         _high = float(self.KL['high'])
         _low = float(self.KL['low'])
-        org_sz = float(mybalance) * self.risk_control / abs(_close - _low if self.order_posside == 'long' else _high)
+        org_sz = float(mybalance) * self.risk_control / abs(_close - (_low if self.posSide == 'long' else _high))
         sz = self.currency_to_sz(self.instId, org_sz)
         if sz < 1:
             sz = 0
