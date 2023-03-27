@@ -108,18 +108,24 @@ def account_info(request):
         show_lst = []
         account_all = AccountInfo.objects.filter(is_active=1)
         for obj in account_all:
+            order_lst = []
             show_data = {}
             try:
-                obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
-                balance = obj_api.get_my_balance('availEq')
-                show_data['balance'] = balance
-                result = obj_api.accountAPI.get_positions('SWAP')
-                order_lst = result.get('data', [])
-                if order_lst:
-                    order_algos_info = obj_api.get_order_tp_and_sl_info()
-                    if order_algos_info:
-                        show_data['tpTriggerPx'] = order_algos_info.get('tpTriggerPx')
-                        show_data['slTriggerPx'] = order_algos_info.get('slTriggerPx')
+                if obj.test_balance and obj.test_balance != -1:
+                    # 测试显示数据
+                    show_data['balance'] = obj.test_balance
+                else:
+                    obj_api = AccountAndTradeApi(obj.api_key, obj.secret_key, obj.passphrase, False, obj.flag)
+                    balance = obj_api.get_my_balance('availEq')
+                    # s = obj_api.tradeAPI.get_orders_history('SWAP')
+                    show_data['balance'] = balance
+                    result = obj_api.accountAPI.get_positions('SWAP')
+                    order_lst = result.get('data', [])
+                    if order_lst:
+                        order_algos_info = obj_api.get_order_tp_and_sl_info()
+                        if order_algos_info:
+                            show_data['tpTriggerPx'] = order_algos_info.get('tpTriggerPx')
+                            show_data['slTriggerPx'] = order_algos_info.get('slTriggerPx')
             except Exception as e:
                 print(e)
                 order_lst = []
@@ -182,3 +188,7 @@ def account_info_no_login(request):
 # 查询订单信息
 def get_all_order(request):
     pass
+
+
+def update_pnl_by_ajax(request):
+    print(request.POST)

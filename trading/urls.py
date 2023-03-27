@@ -14,8 +14,8 @@ urlpatterns = [
     path('logout/', login_views.tologout, name='tologout'),
 
     # views
-    path('boot2/', views.boot2, name='boot2'),
-    path('boot3/', views.boot3, name='boot3'),
+    # path('boot2/', views.index, name='boot2'),
+    # path('copydata/', views.copy_data, name='copydata'),
 
     # trading_views
     path('', trading_views.trading_index, name='trading'),

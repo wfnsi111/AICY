@@ -74,7 +74,8 @@ class AccountInfo(models.Model):
     secret_key = models.CharField(max_length=50)
     passphrase = models.CharField(max_length=50)
     balance = models.FloatField(verbose_name='保证金（USD）', default=-1)
-    init_balance = models.FloatField(verbose_name='保证金（USD）', default=-1)
+    init_balance = models.FloatField(verbose_name='保证金（USDT）', default=-1)
+    test_balance = models.FloatField(verbose_name='保证金（USDT）-测试用', default=-1, null=True, blank=True)
     flag = models.CharField(default='0', max_length=10, choices=data, editable=False)
     email = models.CharField(max_length=50, null=True, blank=True)
     phone = models.CharField(max_length=50, null=True, blank=True)
@@ -148,8 +149,8 @@ class OrderInfo(models.Model):
     close_position = models.IntegerField(default=0)
     status = models.IntegerField(default=0)
     msg = models.TextField(null=True)
-    create_time = models.DateTimeField(verbose_name='开始时间', auto_now_add=True)
-    update_time = models.DateTimeField(verbose_name='结束时间', auto_now=True)
+    create_time = models.DateTimeField(verbose_name='开始时间', default=datetime.datetime.now, blank=True)
+    update_time = models.DateTimeField(verbose_name='结束时间', default=datetime.datetime.now, blank=True)
     # date = models.DateTimeField('date published')
 
     order_ctime = models.CharField(max_length=40, null=True)    # 订单创建时间

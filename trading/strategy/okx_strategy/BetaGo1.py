@@ -69,10 +69,10 @@ class BetaGo1(BaseTrade):
             self.KL = self.df.iloc[-1, :]
 
             signal1 = self.check_signal1()
-            signal1 = True
+            # signal1 = True
             if signal1:
                 signal2 = self.check_signal2()
-                signal2 = random.choice(['down_wick_flag', 'up_wick_flag'])
+                # signal2 = random.choice(['down_wick_flag', 'up_wick_flag'])
                 if signal2:
                     # 判断是开仓还是平仓
                     code = self.check_order_status(signal2)
@@ -80,7 +80,7 @@ class BetaGo1(BaseTrade):
                         continue
 
                     signal3 = self.check_signal3(signal2)
-                    signal3 = True
+                    # signal3 = True
                     if signal3:
                         self.log.info(self.signal_recorder)
                         self.log.info('满足信号 ，准备开仓')

@@ -27,7 +27,7 @@ class TraderAdmin(admin.ModelAdmin):
 
 @admin.register(AccountInfo)
 class AccountInfoAdmin(admin.ModelAdmin):
-    list_display = ("account_text", "trader", "api_key", "balance", "promoter", "is_active")  # 需要显示的字段
+    list_display = ("account_text", "trader", "api_key", "balance", "test_balance", "promoter", "is_active")  # 需要显示的字段
     search_fields = list_display
     list_filter = list_display
 
