@@ -26,9 +26,9 @@ SECRET_KEY = 'django-insecure-nxydsc2q%=jkvyr+cxp*6dfsfamudw9$$$1rh!p@4+=)4aik3e
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-MY_IP = '18.163.198.108'
+MY_IP = '18.167.167.234'
 
-ALLOWED_HOSTS = [MY_IP, 'localhost', '0.0.0.0:8000', '127.0.0.1', '172.31.22.98', '192.168.1.108']
+ALLOWED_HOSTS = [MY_IP, 'localhost', '0.0.0.0:8000', '127.0.0.1', '192.168.2.109']
 
 # Application definition
 # DEBUG = False
@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [MY_IP, 'localhost', '0.0.0.0:8000', '127.0.0.1', '172.31.22.98'
 if platform.system().lower() == 'windows':
     DEBUG = True
     INSTALLED_APPS = [
+        # 'simpleui',
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
@@ -46,7 +47,11 @@ if platform.system().lower() == 'windows':
         'trading',
         # 'user_sys',
     ]
+    SIMPLEUI_HOME_INFO = False  # 隐藏SIMPLEUI服务器信息
 
+    # SIMPLEUI_HOME_QUICK = False   # 隐藏快速操作
+
+    # SIMPLEUI_HOME_ACTION = False    # 隐藏最近动作
     MIDDLEWARE = [
         'django.middleware.security.SecurityMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
@@ -138,10 +143,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'lgh_test',
-        'USER': 'lgh_test',
-        'PASSWORD': '123456',
-        'HOST': MY_IP,
-        'PORT': 3306,
+        'USER': 'beta_pro',
+        'PASSWORD': 'beta_pro',
+        'HOST': "hk-cdb-ozh67w6d.sql.tencentcdb.com",
+        'PORT': 63973,
     }
 }
 
@@ -238,7 +243,7 @@ CELERY_TASK_RESULT_EXPIRES = 10
 CELERY_WORKER_CONCURRENCY = 4
 
 # 每个worker执行了多少任务就会死掉，默认是无限的
-CELERY_WORKER_MAX_TASKS_PER_CHILD = 200
+# CELERY_WORKER_MAX_TASKS_PER_CHILD = 200
 
 # celery 配置 ******************************************************************************
 
