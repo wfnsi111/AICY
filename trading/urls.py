@@ -16,6 +16,8 @@ urlpatterns = [
     # views
     # path('boot2/', views.index, name='boot2'),
     # path('copydata/', views.copy_data, name='copydata'),
+    path('get_order_history/', views.get_order_history, name='get_order_history'),
+
 
     # trading_views
     path('', trading_views.trading_index, name='trading'),

@@ -41,10 +41,11 @@ class StrategyAdmin(admin.ModelAdmin):
 
 @admin.register(OrderInfo)
 class OrderInfoAdmin(admin.ModelAdmin):
-    list_display = ("accountinfo", "strategyid", "posside", "side", "sz", "avgpx", "closeavgpx", "pnl", "msg",
+    list_display = ("accountinfo", "side", "sz", "avgpx", "closeavgpx", "pnl",
                     "create_time", "update_time")
     search_fields = list_display
     list_filter = ("accountinfo",)
+    list_editable = ("side", "sz", "avgpx", "closeavgpx", "pnl", "create_time")
 
 
 @admin.register(PlaceAlgo)

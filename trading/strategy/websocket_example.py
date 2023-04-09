@@ -415,7 +415,7 @@ url = "wss://ws.okx.com:8443/ws/v5/public"
 # channels = [{"channel": "instruments", "instType": "SWAP"}]
 # 行情频道 tickers channel
 # channels = [{"channel": "tickers", "instId": "BTC-USDT"}, {"channel": "tickers", "instId": "ETH-USDT"}]
-channels = [{"channel": "tickers", "instId": "BTC-USDT-SWAP"}]
+# channels = [{"channel": "tickers", "instId": "BTC-USDT-SWAP"}]
 # 持仓总量频道 Open interest Channel
 # channels = [{"channel": "open-interest", "instId": "LTC-USD-SWAP"}]
 # channels = [{"channel": "open-interest", "instId": "BTC-USD-210326"}]
@@ -518,6 +518,10 @@ trade_param = {"id": "1512", "op": "order", "args": [{"side": "buy", "instId": "
 loop = asyncio.get_event_loop()
 
 # 公共频道 不需要登录（行情，持仓总量，K线，标记价格，深度，资金费率等）subscribe public channel
+# channels = [{"channel": "tickers", "instId": "BTC-USDT"}, {"channel": "tickers", "instId": "ETH-USDT"}]
+channels = [{"channel": "tickers", "instId": "BTC-USDT-SWAP"},
+            {"channel": "tickers", "instId": "ETH-USDT-SWAP"},
+            ]
 loop.run_until_complete(subscribe_without_login(url, channels))
 
 # 私有频道 需要登录（账户，持仓，订单等）subscribe private channel

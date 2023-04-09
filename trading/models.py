@@ -150,7 +150,8 @@ class OrderInfo(models.Model):
     status = models.IntegerField(default=0)
     msg = models.TextField(null=True)
     create_time = models.DateTimeField(verbose_name='开始时间', default=datetime.datetime.now, blank=True)
-    update_time = models.DateTimeField(verbose_name='结束时间', default=datetime.datetime.now, blank=True)
+    # update_time = models.DateTimeField(verbose_name='结束时间', default=datetime.datetime.now, blank=True)
+    update_time = models.DateTimeField(verbose_name='结束时间', auto_now=True)
     # date = models.DateTimeField('date published')
 
     order_ctime = models.CharField(max_length=40, null=True)    # 订单创建时间
@@ -158,7 +159,7 @@ class OrderInfo(models.Model):
     algo_ctime = models.CharField(max_length=40, null=True)
 
     def __str__(self):
-        return self.accountinfo
+        return self.ordid
 
 
 class NewUser(models.Model):
@@ -191,7 +192,7 @@ class AccountAssetBills(models.Model):
     update_time = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.accountinfo
+        return self.billid
 
 
 class PlaceAlgo(models.Model):
@@ -222,6 +223,3 @@ class PlaceAlgo(models.Model):
     update_time = models.DateTimeField(auto_now=True)
 
     algo_ctime = models.CharField(max_length=40, null=True)    # 订单创建时间
-
-    def __str__(self):
-        return self.accountinfo
