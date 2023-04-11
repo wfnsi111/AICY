@@ -2,7 +2,7 @@ from django.urls import path
 
 from . import views
 from .tradingviews import login_views, trading_views, account_views, algo_views, log_views, cpi_views, \
-    betago1_views
+    betago1_views, zhang_views
 
 app_name = 'trading'
 
@@ -57,5 +57,10 @@ urlpatterns = [
     # betago1_views
     path('betago1/', betago1_views.betago1, name='betago1'),
     path('betago1_start_trade/', betago1_views.betago1_start_trade, name='betago1_start_trade'),
+
+    # zhang_views
+    path('laozhang/', zhang_views.laozhang, name='laozhang'),
+    path('laozhang_start_trade/', zhang_views.laozhang_start_trade, name='laozhang_start_trade'),
+
 
 ]

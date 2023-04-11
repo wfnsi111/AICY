@@ -6,7 +6,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>{% block mytitle %} 参数设置 {% endblock %}</title>
+    <title>{% block mytitle %} Mr.zhang {% endblock %}</title>
 
     {% block mystyle %}
         <link rel="stylesheet" type="text/css" href="{% static 'trading/css/matrade.css' %}"/>
@@ -21,7 +21,7 @@
 </head>
 <body>
 {% block mybody %}
-    <form action="{% url 'trading:betago1_start_trade' %}" method="post" id="fm">
+    <form action="{% url 'trading:laozhang_start_trade' %}" method="post" id="fm">
         {% csrf_token %}
         <div class="bd-example" style="width: 1200px">
             <div class="alert alert-secondary" role="alert"><h3> 周期策略参数设置</h3></div>
@@ -33,27 +33,37 @@
                         <option style="display:none"></option>
                         <option value="ETH-USDT-SWAP">ETHUSDT</option>
                         <option value="BTC-USDT-SWAP">BTCUSDT</option>
-                        <option value="DOG-USDT-SWAP">DOGUSDT</option>
-                        <option value="NEAR-USDT-SWAP">NEARUSDT</option>
-                        <option value="DYDX-USDT-SWAP">DYDXUSDT</option>
-{#                        <option value="CHZ-USDT-SWAP">CHZUSDT</option>#}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="exampleFormControlSelect1">K线周期</label>
-                    <select name="bar" class="form-control" id="exampleFormControlSelect1" required="required">
+                    <label for="exampleFormControlInput1">止损</label>
+                    <input type="number" name="slTriggerPx" class="form-control" id="exampleFormControlInput1" required="required">
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleFormControlInput4">止盈</label>
+                    <input type="number" name="tpTriggerPx" class="form-control" id="exampleFormControlInput4">
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">方向</label>
+                    <select name="side" class="form-control" id="exampleFormControlSelect1" required="required">
                         <option style="display:none"></option>
-                        <option value="5m">5min</option>
-                        <option value="15m">15m</option>
-                        <option value="30m">30m</option>
-                        <option value="1H">1H</option>
-                        <option value="2H">2H</option>
-                        <option value="4H">4H</option>
-                        <option value="6H">6H</option>
-                        <option value="12H">12H</option>
-                        <option value="1D">1D</option>
+                        <option value="sell">sell</option>
+                        <option value="buy">buy</option>
                     </select>
                 </div>
+
+                <div class="form-group">
+                    <label for="exampleFormControlInput2">风控</label>
+                    <input  type="text" name="risk" class="form-control" id="exampleFormControlInput2" disabled="disabled" value="2%">
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleFormControlInput3">密码</label>
+                    <input  type="password" name="password" class="form-control" id="exampleFormControlInput3" required="required">
+                </div>
+
             </div>
             <hr>
             <div class="alert alert-secondary" role="alert"><h3>选择账户</h3></div>

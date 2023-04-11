@@ -221,6 +221,9 @@ class BaseTrade:
         self.log.info(msg)
         return self.order_details
 
+    def get_instid_coefficient(self, instId):
+        return pieces_of_coin.get(instId)
+
     def currency_to_sz(self, instId, currency):
         """ 币转张 """
         coefficient = pieces_of_coin.get(instId)

@@ -75,7 +75,10 @@ def start_my_strategy(strategy_name, kwargs):
         print(e)
         # if strategy_obj.status == -2:
         #     strategy_obj.msg = e
-
+    if strategy_name == 'LaoZhang':
+        strategy_obj.status = 9
+        strategy_obj.save()
+        return
     strategy_obj.status = 0
     strategy_obj.is_active = 0
     strategy_obj.save()
