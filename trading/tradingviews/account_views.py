@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from trading.models import AccountInfo, AccountAssetBills
@@ -6,7 +7,6 @@ from trading.tradingviews.login_views import islogin
 from trading.strategy.conf.account_bills_type import account_bills_type
 
 import time
-
 
 account_status = {
     -2: "强制退出",
@@ -82,7 +82,7 @@ def get_account_asset_bills(request):
 
 def timestamp_to_date(t):
     # 13位时间戳转日期
-    timestamp = float(t)/1000
+    timestamp = float(t) / 1000
     timearray = time.localtime(timestamp)
     date = time.strftime("%Y-%m-%d %H:%M:%S", timearray)
     return date
@@ -136,6 +136,8 @@ def account_info(request):
             show_data['bar2'] = obj.bar2
             if order_lst:
                 for item in order_lst:
+                    if 'instId' in item:
+                        item = {"instId": item['instId'].strip("-")[0]}
                     show_data.update(item)
                     show_data['upl'] = "%.2f" % float(item['upl'])
 
@@ -192,3 +194,26 @@ def get_all_order(request):
 
 def update_pnl_by_ajax(request):
     print(request.POST)
+
+
+def update_order_info(request):
+    return HttpResponse('OK')
+    if request.method == 'GET':
+        all_accountinfo = AccountInfo.objects.filter(is_active=1).filter(flag=0)
+        return render(request, 'trading/update_order.html', {'all_accountinfo': all_accountinfo})
+
+    if request.method == 'POST':
+        if request.method == 'POST':
+            accountinfo_id = request.POST.get('accountinfo_id', '')
+            instId = request.POST.get('instId', '')
+            acc = AccountInfo.objects.get(id=accountinfo_id)
+            obj_api = AccountAndTradeApi(acc.api_key, acc.secret_key, acc.passphrase, False, acc.flag)
+            # instType='', instId = '', mgnMode = '', type = '', after = '', before = '', limit = ''
+            result = obj_api.tradeAPI.get_positions_history(instType='SWAP', instId=instId, limit=25)
+            data = result.get("data")
+            for item in data:
+                # direction 持仓方向
+                print("openAvgPx:", item['openAvgPx'], "closeAvgPx:", item['closeAvgPx'], "openMaxPos:",
+                      item['openMaxPos'], "closeTotalPos:", item['closeTotalPos'],
+                      "pnl:", item['pnl'], "direction:", item['direction'], )
+            return HttpResponse('OK')

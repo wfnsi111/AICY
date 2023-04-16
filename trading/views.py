@@ -1,5 +1,7 @@
 
 from django.http import HttpResponse
+from django.shortcuts import render
+
 from .models import Question, OrderInfo, AccountInfo
 from trading.strategy.okx.AccountAndTradeApi import AccountAndTradeApi
 
@@ -63,12 +65,19 @@ def index(request):
 
 
 def copy_data(request):
-    start_id = 10000
-    account1_id = 10
-    account2_id = 2
-    pret = 0.8  # 系数
+    if request.method == 'GET':
+        all_accountinfo = AccountInfo.objects.all()
+        return render(request, 'trading/update_data.html', {'all_accountinfo': all_accountinfo})
+
+    account1_id = int(request.POST.get("account1_id")) # 模板id
+    account2_id = int(request.POST.get("account2_id"))    # 需要修改的ID
+    pret = float(request.POST.get("pret"))    # 需要修改的ID
+    # account1_id = 42
+    # account2_id = 31
+    # pret = 0.8  # 系数
     OrderInfo.objects.filter(accountinfo=account2_id).delete()
     result = OrderInfo.objects.filter(accountinfo=account1_id).all()
+    # result = OrderInfo.objects.filter(accountinfo=account1_id).filter(id__gte=1000)
     for orderinfo in result:
         new_orderinfo = copy.deepcopy(orderinfo)
         new_orderinfo.sz = int(int(orderinfo.sz) * pret)

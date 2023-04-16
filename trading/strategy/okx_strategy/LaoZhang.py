@@ -98,6 +98,8 @@ class LaoZhang(BaseTrade):
                 msg = '仓位太小， 无法开仓 ---> *** 余额%sU ***' % accountinfo['balance']
                 self.log.error(accountinfo['name'])
                 self.log.error(msg)
+                self.log.error("价格：%s, 止损：%s，" % (self.last_price, self.slTriggerPx))
+                self.log.error(orderinfo_dict)
                 accountinfo['msg'] = msg
                 continue
 

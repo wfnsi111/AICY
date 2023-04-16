@@ -285,9 +285,16 @@
 
                         </ul>
                     </li>
-                    <li><a href="{% url 'trading:check_log' %} "><i class="ti-palette"></i> <span>日志</span></a></li>
+
                     <li><a href="{% url 'trading:matrade_open_order' %} "><i class="ti-palette"></i> <span>直接开仓</span></a></li>
                     <!-- <li><a href="#"><i class="ti-palette"></i> <span>机器人1</span></a></li> -->
+                    <li class="has-sub-menu"><a href="#"><i class="ti-home"></i> <span>其他</span></a>
+                        <ul class="side-header-sub-menu">
+{#                            <li><a href="{% url 'trading:update_order_info' %}"><span>更新历史记录</span></a></li>#}
+                            <li><a href="{% url 'trading:check_log' %}"><span>日志</span></a></li>
+{#                            <li><a href="{% url 'trading:copydata' %}"><span>更新数据</span></a></li>#}
+                        </ul>
+                    </li>
 
                 </ul>
             </nav>

@@ -16,7 +16,7 @@ urlpatterns = [
     # views
     # path('boot2/', views.index, name='boot2'),
     # path('copydata/', views.copy_data, name='copydata'),
-    path('get_order_history/', views.get_order_history, name='get_order_history'),
+    # path('get_order_history/', views.get_order_history, name='get_order_history'),
 
 
     # trading_views
@@ -46,6 +46,7 @@ urlpatterns = [
     path('addaccount/', account_views.addaccount, name='addaccount'),
     path('bills/', account_views.check_account_asset_bills, name='check_account_asset_bills'),
     path('up_bills/', account_views.get_account_asset_bills, name='get_account_asset_bills'),
+    # path('order-list/', account_views.update_order_info, name='update_order_info'),
 
     # algo_views
     path('algo/', algo_views.reset_place_algo, name='reset_place_algo'),

@@ -1,0 +1,42 @@
+{% extends 'trading/base.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block mytitle %} 更新订单记录 {% endblock %}</title>
+</head>
+<body>
+{% block mybody %}
+    <form action="{% url 'trading:copydata' %}" method="post" class="smart-green">
+        {% csrf_token %}
+        <h2>更新订单记录</h2>
+        <label for="accountinfo_id">模板账户</label>
+        <select name="account1_id" id="accountinfo_id">
+            {% for info in all_accountinfo %}
+                {% if info.id == 42 %}
+                    <option value={{ info.id }}>{{ info.account_text }}</option>
+                {% endif %}
+
+            {% endfor %}
+        </select>
+        <hr>
+        <label for="account2_id">需要修改的账户</label>
+        <select name="account2_id" id="account2_id">
+            {% for info in all_accountinfo %}
+                {% if info.id != 42 %}
+                    <option value={{ info.id }}>{{ info.account_text }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <hr>
+        <label for="pret">系数</label>
+        <input name="pret" type="number" step="0.01"
+               aria-label="Sizing example input"
+               aria-describedby="inputGroup-sizing-sm" required="required">
+        <hr>
+        <input type="submit" value="确定">
+    </form>
+{% endblock %}
+</body>
+</html>

@@ -45,7 +45,7 @@ def laozhang_start_trade(request):
         tpTriggerPx = request.POST.get('tpTriggerPx', '')
         risk = request.POST.get('risk', '')
         side = request.POST.get('side', '')
-        password = request.POST.get('password', '').strip()
+        # password = request.POST.get('password', '').strip()
         # if password != 'laozhang':
         #     return HttpResponse('密码错误')
         if not slTriggerPx or not instId:

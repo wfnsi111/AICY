@@ -1,0 +1,31 @@
+{% extends 'trading/base.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block mytitle %} 更新订单记录 {% endblock %}</title>
+</head>
+<body>
+{% block mybody %}
+    <form action="{% url 'trading:update_order_info' %}" method="post" class="smart-green">
+        {% csrf_token %}
+        <h2>更新订单记录</h2>
+        <label for="accountinfo_id">选择账户</label>
+        <select name="accountinfo_id" id="accountinfo_id">
+            {% for info in all_accountinfo %}
+                <option value={{ info.id }}>{{ info.account_text }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="exampleFormControlSelect1">合约</label>
+        <select name="instId" class="form-control" id="exampleFormControlSelect1" required="required">
+            <option style="display:none"></option>
+            <option value="ETH-USDT-SWAP">ETHUSDT</option>
+            <option value="BTC-USDT-SWAP">BTCUSDT</option>
+        </select>
+        <input type="submit" value="确定">
+    </form>
+{% endblock %}
+</body>
+</html>
