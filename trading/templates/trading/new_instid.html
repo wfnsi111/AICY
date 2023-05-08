@@ -1,0 +1,107 @@
+{% extends 'trading/base.html' %}
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block mytitle %} 打新币 {% endblock %}</title>
+
+    {% block mystyle %}
+        <link rel="stylesheet" type="text/css" href="{% static 'trading/css/matrade.css' %}"/>
+    {% endblock %}
+
+    {% block myscirpt %}
+        <script type="text/javascript" src="/static/jquery/jquery-3.6.1.min.js"></script>
+        <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
+        <script type="text/javascript" src="{% static 'trading/js/matrade.js' %}"></script>
+    {% endblock %}
+
+</head>
+<body>
+{% block mybody %}
+    <form action="{% url 'trading:new_instid_start_trade' %}" method="post" id="fm">
+        {% csrf_token %}
+        <div class="bd-example" style="width: 1200px">
+            <div class="alert alert-secondary" role="alert"><h3> 打新币参数设置</h3></div>
+            <div style="padding-left: 30px;">
+
+
+                <div class="form-group">
+                    <label for="exampleFormControlInput1">新币ID</label>
+                    <input  type="text" name="new_instId" class="form-control" id="exampleFormControlInput1" required="required">
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleFormControlInput2">仓位(USDT)</label>
+                    <input  type="text" name="sz" class="form-control" id="exampleFormControlInput2" required="required">
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleFormControlInput3">止损倍数</label>
+                    <input type="text" name="slTriggerPx" class="form-control" id="exampleFormControlInput3" >
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleFormControlInput4">止盈倍数</label>
+                    <input type="text" name="tpTriggerPx" class="form-control" id="exampleFormControlInput4">
+                </div>
+
+{#                <div class="form-group">#}
+{#                    <label for="exampleFormControlInput3">密码</label>#}
+{#                    <input  type="password" name="password" class="form-control" id="exampleFormControlInput3" required="required">#}
+{#                </div>#}
+
+            </div>
+            <hr>
+            <div class="alert alert-secondary" role="alert">
+                <h3>选择账户</h3>
+            </div>
+            <div class="form-group" style="padding-left: 30px;">
+                <div id="s1" style="float: left;">
+                    <div style="margin-right: 30px">
+                        <select name="select1" class="form-control" id="select1" multiple="multiple">
+                            {% for accountinfo in accountinfos %}
+                                <option value={{ accountinfo.id }}>{{ accountinfo.account_text }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <div>
+                            <input type="button" value="添加账户" class="btn btn-success" id="btn-add"
+                                   onclick="selectedToRight();"/><br/>
+                            {#                            <input type="button" value="全部添加" onclick="allToRight();"/>#}
+                        </div>
+
+                    </div>
+                </div>
+
+                <div id="s2">
+                    <div>
+                        <select name="select2" class="form-control" id="select2" multiple="multiple"
+                                required="required">
+                        </select>
+
+                        <div>
+                            <input type="button" value="删除账户" class="btn btn-warning" id="btn-del"
+                                   onclick="selectedToLeft();"/><br/>
+                            {#                            <input type="button" value="全部删除" onclick="allToLeft();"/>#}
+                        </div>
+
+                    </div>
+                </div>
+
+                <br>
+                <br>
+                <hr>
+
+            </div>
+        </div>
+        {#        <input type="submit" value="确定">#}
+        <button class="btn btn-primary btn-sm btn-lg" id="fm_submit">确定</button>
+    </form>
+
+{% endblock %}
+</body>
+</html>
+

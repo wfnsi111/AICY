@@ -48,9 +48,9 @@ class BaseTrade:
             millis += str(code)
         return str(millis)
 
-    def get_positions(self):
+    def get_positions(self, instType='SWAP'):
         try:
-            result = self.accountAPI.get_positions('SWAP')
+            result = self.accountAPI.get_positions(instType)
             self.order_lst = result.get('data', [])
             if len(self.order_lst) > 1:
                 self.log.info('存在两笔订单')
