@@ -136,8 +136,8 @@ def account_info(request):
             show_data['bar2'] = obj.bar2
             if order_lst:
                 for item in order_lst:
-                    if 'instId' in item:
-                        item = {"instId": item['instId'].strip("-")[0]}
+                    #if 'instId' in item:
+                    #    item = {"instId": item['instId'].split("-")[0]}
                     show_data.update(item)
                     show_data['upl'] = "%.2f" % float(item['upl'])
 

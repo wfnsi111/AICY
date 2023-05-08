@@ -256,7 +256,8 @@ class LaoZhang(BaseTrade):
         else:
             # 可能是止损设置错误
             status = -1
-            msg = "止损止盈设置错误，，，%s" % msg
+            msg = "止损止盈设置错误，，，%s, 止损：%s, 止盈：%s, 现价：%s" % (
+                msg, self.slTriggerPx, self.tpTriggerPx, self.last_price)
             self.log.error(msg)
 
         price_para['algoid'] = algoId
@@ -267,4 +268,3 @@ class LaoZhang(BaseTrade):
         price_para['smsg'] = msg
         price_para['status'] = status
         return price_para
-
