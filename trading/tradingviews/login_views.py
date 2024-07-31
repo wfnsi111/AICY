@@ -91,13 +91,13 @@ def toregister(request):
     # sendmsg = WeixinSMS()
     # code = sendmsg.send_msg_with_param()
 
-    if Trader.objects.filter(phonenumber=phonenumber).exists():
+    if Trader.objects.filter(account=phonenumber).exists():
         error_msg = '手机号已注册'
         return render(request, 'trading/register.html', {"error_msg": error_msg})
 
-    user = Trader(username=username, phonenumber=phonenumber, password=password, invitation_code=invitation_code)
+    user = Trader(name=username, account=phonenumber, password=password)
     user.save()
-    return redirect(reverse('trading:login'))
+    return redirect(reverse('trading:tologin'))
 
 
 def tologout(request):

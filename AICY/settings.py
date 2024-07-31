@@ -26,15 +26,14 @@ SECRET_KEY = 'django-insecure-nxydsc2q%=jkvyr+cxp*6dfsfamudw9$$$1rh!p@4+=)4aik3e
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-MY_IP = '18.167.167.234'
+MY_IP = '16.162.220.229'
 
-ALLOWED_HOSTS = [MY_IP, 'localhost', '0.0.0.0:8000', '127.0.0.1', '192.168.2.109']
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
-# DEBUG = False
+DEBUG = True
 
 if platform.system().lower() == 'windows':
-    DEBUG = True
     INSTALLED_APPS = [
         # 'simpleui',
         'django.contrib.admin',
@@ -43,9 +42,8 @@ if platform.system().lower() == 'windows':
         'django.contrib.sessions',
         'django.contrib.messages',
         'django.contrib.staticfiles',
-        # 'corsheaders',
         'trading',
-        # 'user_sys',
+
     ]
     SIMPLEUI_HOME_INFO = False  # 隐藏SIMPLEUI服务器信息
 
@@ -63,7 +61,6 @@ if platform.system().lower() == 'windows':
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
     ]
 else:
-    DEBUG = False
     INSTALLED_APPS = [
         'django.contrib.admin',
         'django.contrib.auth',
@@ -71,9 +68,8 @@ else:
         'django.contrib.sessions',
         'django.contrib.messages',
         'django.contrib.staticfiles',
-        'corsheaders',
+        # 'corsheaders',
         'trading',
-        # 'user_sys',
     ]
 
     MIDDLEWARE = [
@@ -81,7 +77,7 @@ else:
         'django.contrib.sessions.middleware.SessionMiddleware',
         'corsheaders.middleware.CorsMiddleware',
         'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
+        # 'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -142,13 +138,14 @@ WSGI_APPLICATION = 'AICY.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'lgh_test',
-        'USER': 'beta_pro',
-        'PASSWORD': 'beta_pro',
-        'HOST': "hk-cdb-ozh67w6d.sql.tencentcdb.com",
-        'PORT': 63973,
+        'NAME': 'aicy',
+        'USER': 'root',
+        'PASSWORD': 'Aicy123@',
+        'HOST': "127.0.0.1",
+        'PORT': 3306,
     }
 }
+
 
 
 # Password validation
@@ -255,3 +252,9 @@ CELERY_WORKER_CONCURRENCY = 4
 #     from .env_settings.dev_settings import *
 #
 #
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
